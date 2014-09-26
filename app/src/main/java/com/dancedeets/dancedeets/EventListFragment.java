@@ -60,7 +60,7 @@ public class EventListFragment extends ListFragment {
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onItemSelected(HashMap<String, String> item);
     }
 
     /**
@@ -69,7 +69,7 @@ public class EventListFragment extends ListFragment {
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onItemSelected(HashMap<String, String> item) {
         }
     };
 
@@ -89,6 +89,7 @@ public class EventListFragment extends ListFragment {
             try {
                 JSONObject event = response.getJSONObject(i);
                 map.put("image_url", event.getString("image_url"));
+                map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
                 ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
                 imageLoader.get(event.getString("image_url"), new ImageLoader.ImageListener() {
                     @Override
@@ -182,7 +183,7 @@ public class EventListFragment extends ListFragment {
     }
 
 
-        @Override
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -225,7 +226,7 @@ public class EventListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(eventMapList.get(position).get("id"));
+        mCallbacks.onItemSelected(eventMapList.get(position));
     }
 
     @Override

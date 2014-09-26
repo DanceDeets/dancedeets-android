@@ -17,7 +17,7 @@
         android:id="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/cover"
+        android:layout_below="@id/cover"
         android:layout_alignWithParentIfMissing="true"
         android:gravity="center_vertical"
         android:text="Event Title"

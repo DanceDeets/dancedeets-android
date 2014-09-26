@@ -1,10 +1,12 @@
 package com.dancedeets.dancedeets;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
@@ -15,8 +17,9 @@ public class EventInfoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.getInstance(getApplicationContext());
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_info);
+        //setContentView(R.layout.activity_event_info);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         // savedInstanceState is non-null when there is fragment state
@@ -31,14 +34,14 @@ public class EventInfoActivity extends Activity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(EventInfoFragment.ARG_ITEM_ID, getIntent()
-                    .getStringExtra(EventInfoFragment.ARG_ITEM_ID));
-            EventInfoFragment fragment = new EventInfoFragment();
-            fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
-                    .add(R.id.event_info_fragment, fragment).commit();
+            Fragment f = new EventInfoFragment();
+            f.setArguments(getIntent().getExtras());
+            Log.i("asdf", "Temp Bundle: " + getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+
         }
+
+
     }
 
 

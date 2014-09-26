@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
+import java.util.HashMap;
+
 
 public class EventListActivity extends Activity implements EventListFragment.Callbacks {
 
@@ -47,13 +49,15 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
      * the item with the given ID was selected.
      */
     @Override
-    public void onItemSelected(String id) {
+    public void onItemSelected(HashMap<String, String> item) {
+        Bundle arguments = new Bundle();
+        arguments.putString("cover", item.get("cover_url"));
+        arguments.putString("title", item.get("title"));
+        Log.i(LOG_TAG, "Sending Bundle: " + arguments);
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(EventInfoFragment.ARG_ITEM_ID, id);
             EventInfoFragment fragment = new EventInfoFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
@@ -63,7 +67,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, EventInfoActivity.class);
-            detailIntent.putExtra(EventInfoFragment.ARG_ITEM_ID, id);
+            detailIntent.putExtras(arguments);
             startActivity(detailIntent);
         }
     }
