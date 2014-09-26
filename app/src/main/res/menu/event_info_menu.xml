@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".EventsList" >
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share"
+        android:showAsAction="always"
+        android:actionProviderClass="android.widget.ShareActionProvider">
+    </item>
+
+    <item
+        android:id="@+id/action_view_facebook"
+        android:icon="@drawable/ic_menu_facebook"
+        android:title="@string/menu_view_facebook"
+        android:showAsAction="always">
+    </item>
+<!--
+    <item
+        android:id="@+id/action_view_map"
+        android:icon="@icon/view_map"
+        android:title="@string/menu_view_map"
+        android:showAsAction="always">
+    </item>
+-->
+</menu>
