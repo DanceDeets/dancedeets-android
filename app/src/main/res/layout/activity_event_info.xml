@@ -1,15 +1,8 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_info_fragment"
+    android:name="com.dancedeets.dancedeets.EventInfoFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EventInfo">
-
-    <fragment
-        android:name="com.dancedeets.dancedeets.EventInfoFragment"
-        android:id="@+id/event_info_fragment"
-        android:layout_weight="1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_event_info" />
-</FrameLayout>
+    tools:context=".EventInfo"
+    tools:layout="@layout/fragment_event_info" />
