@@ -103,6 +103,7 @@ public class EventListFragment extends ListFragment {
                 map.put("id", event.getString("id"));
                 map.put("title", event.getString("title"));
                 map.put("location", event.getString("location"));
+                map.put("description", event.getString("description"));
                 DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 try {
                     Date date = isoDateFormat.parse(event.getString("start_time"));
