@@ -8,5 +8,7 @@
     <string name="menu_view_facebook">View on Facebook</string>
     <string name="action_search">Search</string>
     <string name="menu_add_to_calendar">Add to Calendar</string>
+    <string name="retry_button">Retry</string>
+    <string name="no_events">No events found.</string>
 
 </resources>

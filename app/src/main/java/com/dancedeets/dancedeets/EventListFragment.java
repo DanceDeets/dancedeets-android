@@ -7,8 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -79,6 +82,10 @@ public class EventListFragment extends ListFragment {
     SimpleAdapter simpleAdapter;
     JSONArray mJsonResponse;
 
+    View mEmptyListView;
+    TextView mEmptyText;
+    Button mRetryButton;
+
     public EventListFragment() {
     }
 
@@ -116,6 +123,8 @@ public class EventListFragment extends ListFragment {
             }
             eventMapList.add(map);
         }
+        mEmptyText.setVisibility(View.GONE);
+        mRetryButton.setVisibility(View.VISIBLE);
         setListAdapter(simpleAdapter);
     }
 
@@ -128,6 +137,18 @@ public class EventListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
+                container, false);
+        mEmptyText = (TextView)mEmptyListView.findViewById(R.id.empty_events_list_text);
+        mRetryButton = (Button)mEmptyListView.findViewById(R.id.retry_button);
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fetchJsonData();
+            }
+        });
+
         Volley.newRequestQueue(inflater.getContext());
         Log.d(LOG_TAG, "onCreateView");
         String[] from = new String[]{"image_url", "title", "location", "start_time"};
@@ -165,10 +186,11 @@ public class EventListFragment extends ListFragment {
         } else {
             fetchJsonData();
         }
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return rootView;
     }
 
     public void fetchJsonData() {
+        setListAdapter(null);
         final String url = "http://www.dancedeets.com/events/feed?location=nyc&keywords=&distance=10&distance_units=miles";
 
         JsonArrayRequest request = new JsonArrayRequest
@@ -184,7 +206,9 @@ public class EventListFragment extends ListFragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
-                        //TODO: show "Try Again" button?
+                        mEmptyText.setVisibility(View.GONE);
+                        mRetryButton.setVisibility(View.VISIBLE);
+                        setListAdapter(simpleAdapter);
                     }
                 });
 
@@ -204,6 +228,18 @@ public class EventListFragment extends ListFragment {
             setActivatedPosition(savedInstanceState
                     .getInt(STATE_ACTIVATED_POSITION));
         }
+
+        /* We need to add the emptyListView as a sibling to the List,
+         * as suggested by ListFragment.onCreateView documentation.
+         * Then setting/unsetting the ListFragment's Adapter triggers
+         * the ProgressBar and ListContainer(List+EmptyView) to alternate.
+         * And within the List, it will then alternate with the EmptyView.
+         */
+        ViewParent listContainerView = view.findViewById(android.R.id.list).getParent();
+        ((ViewGroup)listContainerView).addView(mEmptyListView);
+        getListView().setEmptyView(mEmptyListView);
+
+
     }
 
     @Override
