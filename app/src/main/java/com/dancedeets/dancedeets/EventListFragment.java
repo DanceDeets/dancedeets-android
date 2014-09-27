@@ -129,7 +129,7 @@ public class EventListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Volley.newRequestQueue(inflater.getContext());
-        Log.i(LOG_TAG, "onCreateView");
+        Log.d(LOG_TAG, "onCreateView");
         String[] from = new String[]{"image_url", "title", "location", "start_time"};
         int[] to = new int[]{R.id.icon, R.id.title, R.id.location, R.id.datetime};
 
@@ -149,40 +149,50 @@ public class EventListFragment extends ListFragment {
 
         // If we saved the json, use it, otherwise fetch it from the server
         if (savedInstanceState != null) {
-            try {
-                String jsonData = savedInstanceState.getString(STATE_JSON_RESPONSE);
-                mJsonResponse = new JSONArray(savedInstanceState.getString(STATE_JSON_RESPONSE));
-                parseJsonResponse(mJsonResponse);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Error processing saved json...strange!");
+            String jsonData = savedInstanceState.getString(STATE_JSON_RESPONSE);
+            if (jsonData != null) {
+                try {
+                    mJsonResponse = new JSONArray(jsonData);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error processing saved json...strange!");
+                }
             }
+        }
+        Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
+
+        if (mJsonResponse != null) {
+            parseJsonResponse(mJsonResponse);
         } else {
-            final String url = "http://www.dancedeets.com/events/feed?location=nyc&keywords=&distance=10&distance_units=miles";
-
-            JsonArrayRequest request = new JsonArrayRequest
-                    (url, new Response.Listener<JSONArray>() {
-
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            mJsonResponse = response;
-                            parseJsonResponse(response);
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
-                        }
-                    });
-
-            Log.d(LOG_TAG, "Querying server feed: " + url);
-            request.setShouldCache(false);
-            RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
-            queue.add(request);
+            fetchJsonData();
         }
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    public void fetchJsonData() {
+        final String url = "http://www.dancedeets.com/events/feed?location=nyc&keywords=&distance=10&distance_units=miles";
+
+        JsonArrayRequest request = new JsonArrayRequest
+                (url, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        mJsonResponse = response;
+                        parseJsonResponse(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
+                        //TODO: show "Try Again" button?
+                    }
+                });
+
+        Log.d(LOG_TAG, "Querying server feed: " + url);
+        request.setShouldCache(false);
+        RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
+        queue.add(request);
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -233,11 +243,14 @@ public class EventListFragment extends ListFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d(LOG_TAG, "onSaveInstanceState");
         if (mActivatedPosition != ListView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
-        outState.putString(STATE_JSON_RESPONSE, mJsonResponse.toString());
+        if (mJsonResponse != null) {
+            outState.putString(STATE_JSON_RESPONSE, mJsonResponse.toString());
+        }
     }
 
     /**
