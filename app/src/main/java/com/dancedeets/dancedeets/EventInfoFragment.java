@@ -66,8 +66,7 @@ public class EventInfoFragment extends Fragment {
                 return true;
             case R.id.action_add_to_calendar:
                 Bundle b = getArguments();
-                Intent intent = new Intent(Intent.ACTION_INSERT);
-                intent.setData(CalendarContract.Events.CONTENT_URI);
+                Intent intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, b.getString("location"));
                 intent.putExtra(CalendarContract.Events.TITLE, b.getString("title"));
                 intent.putExtra(

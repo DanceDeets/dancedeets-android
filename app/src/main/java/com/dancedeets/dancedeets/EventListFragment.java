@@ -3,13 +3,18 @@ package com.dancedeets.dancedeets;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -47,7 +52,7 @@ public class EventListFragment extends ListFragment {
      * The fragment's current callback object, which is notified of list item
      * clicks.
      */
-    private Callbacks mCallbacks = sDummyCallbacks;
+    private Callbacks mCallbacks = null;
 
     /**
      * The current activated item position. Only used on tablets.
@@ -63,18 +68,8 @@ public class EventListFragment extends ListFragment {
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(HashMap<String, String> item);
+        public void onEventSelected(Bundle bundle);
     }
-
-    /**
-     * A dummy implementation of the {@link Callbacks} interface that does
-     * nothing. Used only when this fragment is not attached to an activity.
-     */
-    private static Callbacks sDummyCallbacks = new Callbacks() {
-        @Override
-        public void onItemSelected(HashMap<String, String> item) {
-        }
-    };
 
     static final String LOG_TAG = "EventListFragment";
 
@@ -132,6 +127,39 @@ public class EventListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         eventMapList = new ArrayList<HashMap<String, String>>();
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.events_list, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Log.i(LOG_TAG, "Search for " + s);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -260,7 +288,7 @@ public class EventListFragment extends ListFragment {
         super.onDetach();
 
         // Reset the active callbacks interface to the dummy implementation.
-        mCallbacks = sDummyCallbacks;
+        mCallbacks = null;
     }
 
     @Override
@@ -271,9 +299,21 @@ public class EventListFragment extends ListFragment {
         String facebookId = eventMapList.get(position).get("id");
         Log.i(LOG_TAG, "fb id " + facebookId);
 
+        HashMap<String, String> item = eventMapList.get(position);
+        Bundle arguments = new Bundle();
+        arguments.putString("id", item.get("id"));
+        arguments.putString("cover", item.get("cover_url"));
+        arguments.putString("title", item.get("title"));
+        arguments.putString("location", item.get("location"));
+        arguments.putString("description", item.get("description"));
+        arguments.putLong("start_time", 0);
+        arguments.putLong("end_time", 0);
+
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(eventMapList.get(position));
+        if (mCallbacks != null) {
+            mCallbacks.onEventSelected(arguments);
+        }
     }
 
     @Override
