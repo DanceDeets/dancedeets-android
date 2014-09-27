@@ -73,6 +73,8 @@ public class EventListFragment extends ListFragment {
 
     static final String LOG_TAG = "EventListFragment";
 
+    String mLocation;
+
     List<HashMap<String, String>> eventMapList;
     SimpleAdapter simpleAdapter;
     JSONArray mJsonResponse;
@@ -128,6 +130,7 @@ public class EventListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         eventMapList = new ArrayList<HashMap<String, String>>();
         setHasOptionsMenu(true);
+        mLocation = "nyc";
     }
 
     @Override
@@ -145,6 +148,8 @@ public class EventListFragment extends ListFragment {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 Log.i(LOG_TAG, "Search for " + s);
+                mLocation = s;
+                fetchJsonData();
                 return false;
             }
         });
@@ -195,31 +200,22 @@ public class EventListFragment extends ListFragment {
                 return false;
             }
         });
-
-        // If we saved the json, use it, otherwise fetch it from the server
-        if (savedInstanceState != null) {
-            String jsonData = savedInstanceState.getString(STATE_JSON_RESPONSE);
-            if (jsonData != null) {
-                try {
-                    mJsonResponse = new JSONArray(jsonData);
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, "Error processing saved json...strange!");
-                }
-            }
-        }
-        Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
-
-        if (mJsonResponse != null) {
-            parseJsonResponse(mJsonResponse);
-        } else {
-            fetchJsonData();
-        }
         return rootView;
     }
 
     public void fetchJsonData() {
+        // Show the progress bar
+        Log.e(LOG_TAG, "getListAdapter" + getListAdapter());
         setListAdapter(null);
-        final String url = "http://www.dancedeets.com/events/feed?location=nyc&keywords=&distance=10&distance_units=miles";
+        /* We need to call setListShown after setListAdapter,
+         * because otherwise setListAdapter thinks it has an adapter
+         * and tries to show the un-initialized list view. Reported in:
+         * https://code.google.com/p/android/issues/detail?id=76779
+         */
+        setListShown(false);
+        eventMapList.clear();
+
+        final String url = "http://www.dancedeets.com/events/feed?location="+mLocation+"&keywords=&distance=10&distance_units=miles";
 
         JsonArrayRequest request = new JsonArrayRequest
                 (url, new Response.Listener<JSONArray>() {
@@ -251,10 +247,27 @@ public class EventListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Restore the previously serialized activated item position.
-        if (savedInstanceState != null
-                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-            setActivatedPosition(savedInstanceState
-                    .getInt(STATE_ACTIVATED_POSITION));
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+                setActivatedPosition(savedInstanceState
+                        .getInt(STATE_ACTIVATED_POSITION));
+            }
+            // If we saved the json, use it, otherwise fetch it from the server
+            String jsonData = savedInstanceState.getString(STATE_JSON_RESPONSE);
+            if (jsonData != null) {
+                try {
+                    mJsonResponse = new JSONArray(jsonData);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error processing saved json...strange!");
+                }
+            }
+        }
+        Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
+
+        if (mJsonResponse != null) {
+            parseJsonResponse(mJsonResponse);
+        } else {
+            fetchJsonData();
         }
 
         /* We need to add the emptyListView as a sibling to the List,
@@ -266,8 +279,6 @@ public class EventListFragment extends ListFragment {
         ViewParent listContainerView = view.findViewById(android.R.id.list).getParent();
         ((ViewGroup)listContainerView).addView(mEmptyListView);
         getListView().setEmptyView(mEmptyListView);
-
-
     }
 
     @Override
