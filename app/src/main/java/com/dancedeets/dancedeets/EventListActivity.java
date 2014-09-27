@@ -51,8 +51,14 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
     @Override
     public void onItemSelected(HashMap<String, String> item) {
         Bundle arguments = new Bundle();
+        arguments.putString("id", item.get("id"));
         arguments.putString("cover", item.get("cover_url"));
         arguments.putString("title", item.get("title"));
+        arguments.putString("location", item.get("location"));
+        arguments.putString("description", item.get("description"));
+        arguments.putLong("start_time", 0);
+        arguments.putLong("end_time", 0);
+
         Log.i(LOG_TAG, "Sending Bundle: " + arguments);
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by

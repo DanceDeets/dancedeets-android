@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ShareActionProvider;
 
 
 public class EventInfoActivity extends Activity {
@@ -36,42 +33,17 @@ public class EventInfoActivity extends Activity {
             // using a fragment transaction.
             Fragment f = new EventInfoFragment();
             f.setArguments(getIntent().getExtras());
-            Log.i("asdf", "Temp Bundle: " + getIntent().getExtras());
             getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
 
         }
-
-
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.event_info_menu, menu);
-
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider)shareItem.getActionProvider();
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        String url = "Test URL"; //TODO
-        intent.putExtra(Intent.EXTRA_TEXT, url);
-        shareActionProvider.setShareIntent(intent);
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case R.id.action_view_facebook:
-                return true;
-            //case R.id.action_view_map:
-            //    return true;
+
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 Intent upIntent = NavUtils.getParentActivityIntent(this);
