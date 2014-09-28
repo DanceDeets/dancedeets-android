@@ -1,56 +1,61 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/event_info_fragment"
-    >
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
 
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/cover"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="6dip"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_launcher" />
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        >
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/cover"
-        android:layout_alignWithParentIfMissing="true"
-        android:gravity="center_vertical"
-        android:text="Event Title"
-        android:textSize="20sp" />
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/cover"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@null"
+            android:src="@null" />
 
-    <TextView
-        android:id="@+id/location"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:ellipsize="marquee"
-        android:singleLine="true"
-        android:text="Event Location"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_below="@id/cover"
+            android:gravity="center_vertical"
+            android:text="Event Title"
+            android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/starttime"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/location"
-        android:ellipsize="marquee"
-        android:singleLine="true"
-        android:text="Event Start Date/Time"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="Event Location"
+            android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/starttime"
-        android:text="Event Description"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/starttime"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/location"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="Event Start Date/Time"
+            android:textSize="14sp" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/starttime"
+            android:text="Event Description"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+</ScrollView>
