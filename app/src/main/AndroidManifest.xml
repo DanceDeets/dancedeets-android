@@ -30,6 +30,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.dancedeets.dancedeets.EventListActivity" />
         </activity>
+        <activity
+            android:name=".ViewFlyerActivity"
+            android:label="@string/app_name"
+            android:parentActivityName="com.dancedeets.dancedeets.EventInfoActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.dancedeets.dancedeets.EventInfoActivity" />
+        </activity>
     </application>
 
 </manifest>

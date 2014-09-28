@@ -88,21 +88,30 @@ public class EventInfoFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
-
         View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
 
         Bundle b = getArguments();
 
-        NetworkImageView cover = (NetworkImageView)rootView.findViewById(R.id.cover);
+        NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
         Log.i(LOG_TAG, "Received Bundle: " + b);
         cover.setImageUrl(b.getString("cover"), imageLoader);
+        cover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "Creating intent for flyer view.");
+                Intent detailIntent = new Intent(getActivity(), ViewFlyerActivity.class);
+                detailIntent.putExtras(getArguments());
+                startActivity(detailIntent);
+            }
+        });
 
-        TextView title = (TextView)rootView.findViewById(R.id.title);
+        TextView title = (TextView) rootView.findViewById(R.id.title);
         title.setText(b.getString("title"));
-        TextView location = (TextView)rootView.findViewById(R.id.location);
+        TextView location = (TextView) rootView.findViewById(R.id.location);
         location.setText(b.getString("location"));
-        TextView description = (TextView)rootView.findViewById(R.id.description);
+        TextView description = (TextView) rootView.findViewById(R.id.description);
+        // TODO: Somehow linkify the links in description? Maybe I need to use a web view?
         description.setText(b.getString("description"));
 
         return rootView;
