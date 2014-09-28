@@ -19,6 +19,11 @@ public class EventInfoActivity extends Activity {
         //setContentView(R.layout.activity_event_info);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Bundle b = getIntent().getExtras();
+        if (b != null) {
+            setTitle(b.getString("title"));
+        }
+
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
         // (e.g. when rotating the screen from portrait to landscape).
