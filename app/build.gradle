@@ -21,7 +21,7 @@ android {
 
 repositories {
     maven {
-        url 'https://github.com/Goddchen/mvn-repo/master/'
+        url 'http://repo1.maven.org/maven2/'
     }
     mavenCentral()
 }
@@ -31,8 +31,10 @@ dependencies {
     // You must install or update the Support Repository through the SDK manager to use this dependency.
     compile 'com.android.support:support-v4:20.0.0'
 
-    //compile 'com.android:volley:1.0'
+    // Don't want version 5.2.08, as it's not yet available on devices
+    compile 'com.google.android.gms:play-services:5.0.89'
+
     compile 'com.mcxiaoke.volley:library:1.0.6'
 
-    compile 'com.google.android.gms:play-services:5.2.08'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
 }
