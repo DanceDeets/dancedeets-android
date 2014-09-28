@@ -54,7 +54,10 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             EventInfoFragment fragment = new EventInfoFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
-                    .replace(R.id.event_info_fragment, fragment).commit();
+                    .replace(R.id.event_info_fragment, fragment)
+                    // Add this transaction to the back stack
+                    .addToBackStack(null)
+                    .commit();
 
         } else {
             // In single-pane mode, simply start the detail activity
