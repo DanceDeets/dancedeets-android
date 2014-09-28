@@ -133,7 +133,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                     map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
                 }
                 // Prefetch images so scrolling "just works"
-                volley.prefetchImage(event.getString("image_url"));
+                volley.prefetchThumbnail(event.getString("image_url"));
 
                 map.put("id", event.getString("id"));
                 map.put("title", event.getString("title"));
@@ -262,14 +262,16 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         int[] to = new int[]{R.id.icon, R.id.title, R.id.location, R.id.datetime};
 
         //TODO: get rid of this intermediary string-labels that requires a map<string, string>, and have it all operate on bundles
+        // TODO: Probably will make sense to operate with a ViewHolder object at that point?
+        // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
         simpleAdapter = new SimpleAdapter(inflater.getContext(),
                 eventMapList, R.layout.event_row, from, to);
         simpleAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
             public boolean setViewValue(View view, Object data, String textRepresentation) {
                 if (view.getId() == R.id.icon) {
                     NetworkImageView iv = (NetworkImageView) view;
-                    ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
-                    iv.setImageUrl((String) data, imageLoader);
+                    ImageLoader thumbnailLoader = VolleySingleton.getInstance(null).getThumbnailLoader();
+                    iv.setImageUrl((String) data, thumbnailLoader);
                     return true;
                 }
                 return false;
@@ -397,7 +399,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         arguments.putString("cover", item.get("cover_url"));
         if (item.containsKey("cover_url")) {
             VolleySingleton volley = VolleySingleton.getInstance(null);
-            volley.prefetchImage(item.get("cover_url"));
+            volley.prefetchPhoto(item.get("cover_url"));
         }
         arguments.putString("title", item.get("title"));
         arguments.putString("location", item.get("location"));

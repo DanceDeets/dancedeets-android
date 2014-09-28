@@ -13,26 +13,36 @@ public class VolleySingleton {
 
     private static VolleySingleton instance;
     private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
+    private ImageLoader thumbnailLoader;
+    private ImageLoader photoLoader;
 
+    class ImageCache implements ImageLoader.ImageCache {
+        // LRU of 100 images
+        private final LruCache<String, Bitmap> cache;
+
+        public ImageCache(int size) {
+            cache = new LruCache<String, Bitmap>(size);
+        }
+
+
+        @Override
+        public Bitmap getBitmap(String url) {
+            return cache.get(url);
+        }
+
+        @Override
+        public void putBitmap(String url, Bitmap bitmap) {
+            cache.put(url, bitmap);
+        }
+    }
     private VolleySingleton(Context context) {
         requestQueue = Volley.newRequestQueue(context);
 
-        imageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
-            // LRU of 100 images
-            private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(100);
+        // Can cache many small thumbnails
+        thumbnailLoader = new ImageLoader(requestQueue, new ImageCache(100));
 
-
-            @Override
-            public Bitmap getBitmap(String url) {
-                return cache.get(url);
-            }
-
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                cache.put(url, bitmap);
-            }
-        });
+        // But can only cache a few big photos
+        photoLoader = new ImageLoader(requestQueue, new ImageCache(3));
     }
 
 
@@ -47,8 +57,12 @@ public class VolleySingleton {
         return requestQueue;
     }
 
-    public ImageLoader getImageLoader() {
-        return imageLoader;
+    public ImageLoader getThumbnailLoader() {
+        return thumbnailLoader;
+    }
+
+    public ImageLoader getPhotoLoader() {
+        return photoLoader;
     }
 
     ImageLoader.ImageListener mDummyListener = new ImageLoader.ImageListener() {
@@ -61,7 +75,11 @@ public class VolleySingleton {
         }
     };
 
-    public void prefetchImage(String url) {
-        imageLoader.get(url, mDummyListener);
+    public void prefetchThumbnail(String url) {
+        thumbnailLoader.get(url, mDummyListener);
+    }
+
+    public void prefetchPhoto(String url) {
+        photoLoader.get(url, mDummyListener);
     }
 }

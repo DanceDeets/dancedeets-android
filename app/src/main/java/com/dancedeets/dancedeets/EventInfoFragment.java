@@ -87,7 +87,7 @@ public class EventInfoFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
+        ImageLoader photoLoader = VolleySingleton.getInstance(null).getPhotoLoader();
         View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
 
@@ -95,7 +95,7 @@ public class EventInfoFragment extends Fragment {
 
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
         Log.i(LOG_TAG, "Received Bundle: " + b);
-        cover.setImageUrl(b.getString("cover"), imageLoader);
+        cover.setImageUrl(b.getString("cover"), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -22,25 +22,21 @@ public class ViewFlyerFragment extends Fragment {
     static final String LOG_TAG = "ViewFlyerFragment";
 
     //TODO: add a shareable action for sharing raw flyers
+    // http://stackoverflow.com/questions/22795525/how-to-share-image-that-is-downloaded-and-cached-with-volley
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        /*
-            new ImageViewTouch(getActivity(), null);
-            new TouchImageView(getActivity());
-         */
         Bundle b = getArguments();
         Log.i(LOG_TAG, "Received Bundle: " + b);
         final ImageViewTouch imageViewTouch = new ImageViewTouch(getActivity(), null);
         imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
-        //ViewGroup.LayoutParams params = new FrameLayout.LayoutParams()
-        //getActivity().getBaseContext());
         container.addView(imageViewTouch);
 
-        ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
-        imageLoader.get(b.getString("cover"), new ImageLoader.ImageListener() {
+        ImageLoader photoLoader = VolleySingleton.getInstance(null).getPhotoLoader();
+        photoLoader.get(b.getString("cover"), new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                 imageViewTouch.setImageBitmap(response.getBitmap());
