@@ -51,6 +51,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
     private static final String STATE_JSON_RESPONSE = "json_response";
+    private static final String STATE_LOCATION = "location";
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -119,6 +120,18 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     protected void parseJsonResponse(JSONArray response) {
         Log.i(LOG_TAG, "Parsing JSON Response");
         DateFormat format = DateFormat.getDateTimeInstance();
+
+        ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
+        ImageLoader.ImageListener dummyListener = new ImageLoader.ImageListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+            }
+        };
+
         for (int i = 0; i < response.length(); i++) {
             HashMap<String, String> map = new HashMap<String, String>();
             try {
@@ -127,16 +140,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 if (!event.isNull("cover_url")) {
                     map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
                 }
-                ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
-                imageLoader.get(event.getString("image_url"), new ImageLoader.ImageListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                    }
+                // Prefetch images so scrolling "just works"
+                imageLoader.get(event.getString("image_url"), dummyListener);
 
-                    @Override
-                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                    }
-                });
                 map.put("id", event.getString("id"));
                 map.put("title", event.getString("title"));
                 map.put("location", event.getString("location"));
@@ -193,12 +199,15 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        Log.i(LOG_TAG, "Loc is " + location);
-        Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
-        mLocation = location.getLatitude() + "," + location.getLongitude();
-        fetchJsonData();
+        // We reconnect every time the app wakes up, but we only need
+        // to fetch on start if we have no location data (ie, app startup).
+        if (mLocation == null) {
+            Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
+            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
+            mLocation = location.getLatitude() + "," + location.getLongitude();
+            fetchJsonData();
+        }
     }
     public void onConnectionSuspended(int cause) {
         Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
@@ -258,6 +267,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         String[] from = new String[]{"image_url", "title", "location", "start_time"};
         int[] to = new int[]{R.id.icon, R.id.title, R.id.location, R.id.datetime};
 
+        //TODO: get rid of this intermediary string-labels that requires a map<string, string>, and have it all operate on bundles
         simpleAdapter = new SimpleAdapter(inflater.getContext(),
                 eventMapList, R.layout.event_row, from, to);
         simpleAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
@@ -330,6 +340,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Error processing saved json...strange!");
                 }
+            }
+            // If we saved the json, use it, otherwise fetch it from the server
+            if (savedInstanceState.containsKey(STATE_LOCATION)) {
+                mLocation = savedInstanceState.getString(STATE_LOCATION);
             }
         }
         Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
@@ -409,6 +423,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         }
         if (mJsonResponse != null) {
             outState.putString(STATE_JSON_RESPONSE, mJsonResponse.toString());
+        }
+        if (mLocation != null) {
+            outState.putString(STATE_LOCATION, mLocation);
         }
     }
 
