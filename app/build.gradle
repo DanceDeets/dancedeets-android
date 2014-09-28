@@ -29,7 +29,10 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // You must install or update the Support Repository through the SDK manager to use this dependency.
-    compile 'com.android.support:support-v4:20.+'
+    compile 'com.android.support:support-v4:20.0.0'
+
     //compile 'com.android:volley:1.0'
     compile 'com.mcxiaoke.volley:library:1.0.6'
+
+    compile 'com.google.android.gms:play-services:5.2.08'
 }

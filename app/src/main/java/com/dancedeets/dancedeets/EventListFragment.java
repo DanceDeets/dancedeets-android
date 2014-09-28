@@ -2,6 +2,8 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
@@ -25,6 +27,8 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +42,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class EventListFragment extends ListFragment {
+public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -82,18 +86,47 @@ public class EventListFragment extends ListFragment {
     View mEmptyListView;
     TextView mEmptyText;
     Button mRetryButton;
+    GoogleApiClient mGoogleApiClient;
 
     public EventListFragment() {
     }
 
+    /*
+ * Handle results returned to the FragmentActivity
+ * by Google Play services
+ */
+    @Override
+    public void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        // Decide what to do based on the original request code
+        switch (requestCode) {
+            case GooglePlayUtil.CONNECTION_FAILURE_RESOLUTION_REQUEST :
+            /*
+             * If the result code is Activity.RESULT_OK, try
+             * to connect again
+             */
+                switch (resultCode) {
+                    case Activity.RESULT_OK :
+                    /*
+                     * Try the request again
+                     */
+                        initializeFromLocation();
+                        break;
+                }
+        }
+    }
+
     protected void parseJsonResponse(JSONArray response) {
+        Log.i(LOG_TAG, "Parsing JSON Response");
         DateFormat format = DateFormat.getDateTimeInstance();
         for (int i = 0; i < response.length(); i++) {
             HashMap<String, String> map = new HashMap<String, String>();
             try {
                 JSONObject event = response.getJSONObject(i);
                 map.put("image_url", event.getString("image_url"));
-                map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
+                if (!event.isNull("cover_url")) {
+                    map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
+                }
                 ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
                 imageLoader.get(event.getString("image_url"), new ImageLoader.ImageListener() {
                     @Override
@@ -128,9 +161,47 @@ public class EventListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(LOG_TAG, "onCreate");
         eventMapList = new ArrayList<HashMap<String, String>>();
         setHasOptionsMenu(true);
-        mLocation = "nyc";
+        initializeFromLocation();
+    }
+
+    protected void initializeFromLocation() {
+        if (GooglePlayUtil.servicesConnected(getActivity())) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getBaseContext())
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .build();
+        }
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(LOG_TAG, "onStart");
+        // Connect the client.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        Log.i(LOG_TAG, "onStop");
+        // Disconnecting the client invalidates it.
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Log.i(LOG_TAG, "Loc is " + location);
+        Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
+        mLocation = location.getLatitude() + "," + location.getLongitude();
+        fetchJsonData();
+    }
+    public void onConnectionSuspended(int cause) {
+        Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
     }
 
     @Override
@@ -205,7 +276,6 @@ public class EventListFragment extends ListFragment {
 
     public void fetchJsonData() {
         // Show the progress bar
-        Log.e(LOG_TAG, "getListAdapter" + getListAdapter());
         setListAdapter(null);
         /* We need to call setListShown after setListAdapter,
          * because otherwise setListAdapter thinks it has an adapter
@@ -267,7 +337,9 @@ public class EventListFragment extends ListFragment {
         if (mJsonResponse != null) {
             parseJsonResponse(mJsonResponse);
         } else {
-            fetchJsonData();
+            // Don't fetch data, let the Google Play Services connect,
+            // and then grab the most recent location information,
+            // and use that to fetch the results.
         }
 
         /* We need to add the emptyListView as a sibling to the List,
