@@ -25,12 +25,6 @@ import java.util.List;
 
 public class EventInfoFragment extends Fragment {
 
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
-    public static final String ARG_ITEM_ID = "item_id";
-
     static final String LOG_TAG = "EventInfoFragment";
 
     public EventInfoFragment() {
@@ -81,7 +75,7 @@ public class EventInfoFragment extends Fragment {
                 if (isAvailable(getActivity(), intent)) {
                     startActivity(intent);
                 } else {
-                    Toast.makeText(getActivity(), "Could not find your Calendar!", Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity(), "Could not find your Calendar!", Toast.LENGTH_SHORT).show();
                 }
                 return true;
                 //case R.id.action_view_map:
