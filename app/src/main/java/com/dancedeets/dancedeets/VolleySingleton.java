@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.util.LruCache;
 
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
@@ -48,5 +49,19 @@ public class VolleySingleton {
 
     public ImageLoader getImageLoader() {
         return imageLoader;
+    }
+
+    ImageLoader.ImageListener mDummyListener = new ImageLoader.ImageListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+        }
+
+        @Override
+        public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+        }
+    };
+
+    public void prefetchImage(String url) {
+        imageLoader.get(url, mDummyListener);
     }
 }

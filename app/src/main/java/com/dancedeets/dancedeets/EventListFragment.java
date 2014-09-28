@@ -121,16 +121,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Log.i(LOG_TAG, "Parsing JSON Response");
         DateFormat format = DateFormat.getDateTimeInstance();
 
-        ImageLoader imageLoader = VolleySingleton.getInstance(null).getImageLoader();
-        ImageLoader.ImageListener dummyListener = new ImageLoader.ImageListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
+        VolleySingleton volley = VolleySingleton.getInstance(null);
 
-            @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-            }
-        };
 
         for (int i = 0; i < response.length(); i++) {
             HashMap<String, String> map = new HashMap<String, String>();
@@ -141,7 +133,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                     map.put("cover_url", event.getJSONObject("cover_url").getString("source"));
                 }
                 // Prefetch images so scrolling "just works"
-                imageLoader.get(event.getString("image_url"), dummyListener);
+                volley.prefetchImage(event.getString("image_url"));
 
                 map.put("id", event.getString("id"));
                 map.put("title", event.getString("title"));
@@ -400,6 +392,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Bundle arguments = new Bundle();
         arguments.putString("id", item.get("id"));
         arguments.putString("cover", item.get("cover_url"));
+        if (item.containsKey("cover_url")) {
+            VolleySingleton volley = VolleySingleton.getInstance(null);
+            volley.prefetchImage(item.get("cover_url"));
+        }
         arguments.putString("title", item.get("title"));
         arguments.putString("location", item.get("location"));
         arguments.putString("description", item.get("description"));
