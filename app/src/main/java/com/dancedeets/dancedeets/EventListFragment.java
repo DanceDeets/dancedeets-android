@@ -171,6 +171,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
                     .build();
+        } else {
+            Log.i(LOG_TAG, "Unable to connect to Google Play Services");
         }
     }
     @Override
@@ -317,6 +319,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.i(LOG_TAG, "onViewCreated");
 
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null) {

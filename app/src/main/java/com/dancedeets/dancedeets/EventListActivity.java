@@ -50,6 +50,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
+            Log.i(LOG_TAG, "Replacing fragment for info page.");
             EventInfoFragment fragment = new EventInfoFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
@@ -58,6 +59,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
+            Log.i(LOG_TAG, "Creating intent for info page.");
             Intent detailIntent = new Intent(this, EventInfoActivity.class);
             detailIntent.putExtras(arguments);
             startActivity(detailIntent);
