@@ -1,6 +1,7 @@
 package com.dancedeets.dancedeets;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +21,10 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.getInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_event_list);
+
+        Log.i(LOG_TAG, "onCreate");
 
         if (findViewById(R.id.event_info_fragment) != null) {
             // The detail container view will be present only in the
@@ -35,7 +39,33 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
                     R.id.event_list_fragment)).setActivateOnItemClick(true);
         }
 
-        // TODO: If exposing deep links into your app, handle intents here.
+        if (savedInstanceState == null) {
+            // TODO: If exposing deep links into your app, handle intents here.
+            handleIntent(getIntent());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        Log.i(LOG_TAG, "handleIntent: " + intent);
+        if (Intent.ACTION_MAIN.equals(intent.getAction())) {
+            EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
+                    R.id.event_list_fragment);
+            fragment.mLocation = null;
+            fragment.initializeFromLocation();
+        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
+                    R.id.event_list_fragment);
+            //TODO: make a better API for this
+            fragment.mLocation = intent.getStringExtra(SearchManager.QUERY);
+            fragment.fetchJsonData();
+
+        }
     }
 
     /**
