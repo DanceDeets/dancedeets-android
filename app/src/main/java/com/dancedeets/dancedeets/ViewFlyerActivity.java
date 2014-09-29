@@ -2,12 +2,20 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
+import android.view.MenuItem;
 
 /**
  * Created by lambert on 2014/09/28.
  */
 public class ViewFlyerActivity extends Activity {
+
+    private static String LOG_TAG = "ViewFlyerActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.getInstance(getApplicationContext());
@@ -36,4 +44,34 @@ public class ViewFlyerActivity extends Activity {
             f.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
         }
-    }}
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                // Only safe as long as we don't allow deep-linking into the app
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                Log.i(LOG_TAG, "Navigating Home with Intent: " + upIntent);
+                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                    // This activity is NOT part of this app's task, so create a new task
+                    // when navigating up, with a synthesized back stack.
+                    TaskStackBuilder.create(this)
+                            // Add all of this activity's parents to the back stack
+                            .addNextIntentWithParentStack(upIntent)
+                                    // Navigate up to the closest parent
+                            .startActivities();
+                } else {
+                    // This activity is part of this app's task, so simply
+                    // navigate up to the logical parent activity.
+                    NavUtils.navigateUpTo(this, upIntent);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}
