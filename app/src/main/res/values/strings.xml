@@ -10,5 +10,7 @@
     <string name="menu_add_to_calendar">Add to Calendar</string>
     <string name="retry_button">Retry</string>
     <string name="no_events">No events found.</string>
+    <string name="action_refresh">Refresh Events</string>
+    <string name="search_hint">Enter Location</string>
 
 </resources>

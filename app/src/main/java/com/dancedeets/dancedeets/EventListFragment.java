@@ -2,6 +2,8 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -212,21 +214,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.events_list, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager =
+                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                Log.i(LOG_TAG, "Search for " + s);
-                mLocation = s;
-                fetchJsonData();
-                return false;
-            }
-        });
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
     }
 
     @Override
@@ -426,8 +418,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             outState.putString(STATE_JSON_RESPONSE, mJsonResponse.toString());
         }
         if (mLocation != null) {
+            Log.d(LOG_TAG, "Location is " + mLocation);
             outState.putString(STATE_LOCATION, mLocation);
         }
+        Log.d(LOG_TAG, "Bundle saved is " + outState);
     }
 
     /**

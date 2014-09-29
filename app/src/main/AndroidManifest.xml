@@ -3,7 +3,7 @@
     package="com.dancedeets.dancedeets">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -11,20 +11,34 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".EventListActivity" />
 
         <activity
             android:name=".EventListActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
         <activity
             android:name=".EventInfoActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:parentActivityName="com.dancedeets.dancedeets.EventListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -33,6 +47,7 @@
         <activity
             android:name=".ViewFlyerActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:parentActivityName="com.dancedeets.dancedeets.EventInfoActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
