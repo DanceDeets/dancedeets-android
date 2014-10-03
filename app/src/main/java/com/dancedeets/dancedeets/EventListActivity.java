@@ -17,6 +17,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
     static final String LOG_TAG = "EventListActivity";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.getInstance(getApplicationContext());
@@ -45,9 +46,38 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         }
     }
 
+/* DEBUGGING: The "Up" button doesn't seem to do anything in some cases, trying to investigate why...
+    public boolean onNavigateUp() {
+        Log.i(LOG_TAG, "onNavigateUp");
+        return super.onNavigateUp();
+    }
+
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        CharSequence titleCondensed = item.getTitleCondensed();
+        Log.i(LOG_TAG, "onMenuItemSelected, featureId is " + featureId + ", item is " + item);
+
+        switch (featureId) {
+            case Window.FEATURE_OPTIONS_PANEL:
+                Log.i(LOG_TAG, "FEATURE_OPTIONS_PANEL, mParent is " + getParent());
+                break;
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        Log.i(LOG_TAG, "onCreateView name " + name + ", isChild? " + isChild());
+
+        return super.onCreateView(name, context, attrs);
+    }
+*/
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        // getIntent return the intent that started this activity,
+        // so call setIntent in case we ever want to call getIntent.
+        setIntent(intent);
         handleIntent(intent);
     }
 
@@ -98,6 +128,5 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             startActivity(detailIntent);
         }
     }
-
 
 }
