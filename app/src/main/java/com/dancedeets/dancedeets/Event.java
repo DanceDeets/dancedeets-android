@@ -20,7 +20,7 @@ public class Event {
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public Event(Bundle b) {
-        mBundle = (Bundle) b.clone();
+        mBundle = (Bundle)b.clone();
     }
 
     public Event(JSONObject jsonEvent) throws JSONException {

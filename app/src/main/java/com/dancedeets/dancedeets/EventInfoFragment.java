@@ -116,7 +116,7 @@ public class EventInfoFragment extends Fragment {
         title.setText(mEvent.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
         location.setText(mEvent.getLocation());
-        TextView startTime  = (TextView) rootView.findViewById(R.id.starttime);
+        TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
         startTime.setText(mEvent.getStartTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
         // TODO: Somehow linkify the links in description? Maybe I need to use a web view?

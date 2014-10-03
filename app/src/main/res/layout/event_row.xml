@@ -39,7 +39,7 @@
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/datetime"
+        android:id="@+id/start_time"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/location"

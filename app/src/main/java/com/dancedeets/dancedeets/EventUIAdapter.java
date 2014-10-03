@@ -16,6 +16,12 @@ import java.util.List;
  * Created by lambert on 2014/10/02.
  */
 public class EventUIAdapter extends BaseAdapter {
+    static class ViewBinder {
+        NetworkImageView icon;
+        TextView title;
+        TextView location;
+        TextView startTime;
+    }
     private LayoutInflater mInflater;
     private List<Event> mEventBundleList;
     private int mResource;
@@ -44,20 +50,11 @@ public class EventUIAdapter extends BaseAdapter {
         Event event = (Event)getItem(position);
         ImageLoader thumbnailLoader = VolleySingleton.getInstance(null).getThumbnailLoader();
 
-        // TODO: Maybe use a ViewHolder?
-        // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
-
-        NetworkImageView iconView = (NetworkImageView )view.findViewById(R.id.icon);
-        iconView.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
-
-        TextView titleView = (TextView)view.findViewById(R.id.title);
-        titleView.setText(event.getTitle());
-
-        TextView locationView = (TextView)view.findViewById(R.id.location);
-        locationView.setText(event.getLocation());
-
-        TextView dateView = (TextView)view.findViewById(R.id.datetime);
-        dateView.setText(event.getStartTimeString());
+        ViewBinder viewBinder = (ViewBinder)view.getTag();
+        viewBinder.icon.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
+        viewBinder.title.setText(event.getTitle());
+        viewBinder.location.setText(event.getLocation());
+        viewBinder.startTime.setText(event.getStartTimeString());
     }
 
     @Override
@@ -67,16 +64,22 @@ public class EventUIAdapter extends BaseAdapter {
 
     private View createViewFromResource(int position, View convertView,
                                         ViewGroup parent, int resource) {
-        View v;
+        View view;
         if (convertView == null) {
-            v = mInflater.inflate(resource, parent, false);
+            view = mInflater.inflate(resource, parent, false);
+            ViewBinder viewBinder = new ViewBinder();
+            viewBinder.icon = (NetworkImageView )view.findViewById(R.id.icon);
+            viewBinder.title = (TextView)view.findViewById(R.id.title);
+            viewBinder.location = (TextView)view.findViewById(R.id.location);
+            viewBinder.startTime = (TextView)view.findViewById(R.id.start_time);
+            view.setTag(viewBinder);
         } else {
-            v = convertView;
+            view = convertView;
         }
 
-        bindView(position, v);
+        bindView(position, view);
 
-        return v;
+        return view;
     }
 
 }
