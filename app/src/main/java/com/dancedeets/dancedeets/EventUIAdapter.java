@@ -1,7 +1,6 @@
 package com.dancedeets.dancedeets;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +17,10 @@ import java.util.List;
  */
 public class EventUIAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
-    private List<Bundle> mEventBundleList;
+    private List<Event> mEventBundleList;
     private int mResource;
 
-    public EventUIAdapter(Context context, List<Bundle> eventBundleList, int resource) {
+    public EventUIAdapter(Context context, List<Event> eventBundleList, int resource) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mEventBundleList = eventBundleList;
         mResource = resource;
@@ -42,23 +41,23 @@ public class EventUIAdapter extends BaseAdapter {
     }
 
     protected void bindView(int position, View view) {
-        Bundle eventBundle = (Bundle)getItem(position);
+        Event event = (Event)getItem(position);
         ImageLoader thumbnailLoader = VolleySingleton.getInstance(null).getThumbnailLoader();
 
         // TODO: Maybe use a ViewHolder?
         // http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
 
         NetworkImageView iconView = (NetworkImageView )view.findViewById(R.id.icon);
-        iconView.setImageUrl(eventBundle.getString("image_url"), thumbnailLoader);
+        iconView.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
 
         TextView titleView = (TextView)view.findViewById(R.id.title);
-        titleView.setText(eventBundle.getString("title"));
+        titleView.setText(event.getTitle());
 
         TextView locationView = (TextView)view.findViewById(R.id.location);
-        locationView.setText(eventBundle.getString("location"));
+        locationView.setText(event.getLocation());
 
         TextView dateView = (TextView)view.findViewById(R.id.datetime);
-        dateView.setText(eventBundle.getString("start_time"));
+        dateView.setText(event.getStartTimeString());
     }
 
     @Override

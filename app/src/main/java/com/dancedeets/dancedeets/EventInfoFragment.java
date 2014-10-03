@@ -27,6 +27,8 @@ public class EventInfoFragment extends Fragment {
 
     static final String LOG_TAG = "EventInfoFragment";
 
+    protected Event mEvent;
+
     public EventInfoFragment() {
     }
 
@@ -43,12 +45,17 @@ public class EventInfoFragment extends Fragment {
         inflater.inflate(R.menu.event_info_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider)shareItem.getActionProvider();
+        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        String url = "Test URL"; //TODO
+        String url = formatShareText();
         intent.putExtra(Intent.EXTRA_TEXT, url);
         shareActionProvider.setShareIntent(intent);
+    }
+
+    public String formatShareText() {
+        String url = mEvent.getUrl();
+        return url;
     }
 
     @Override
@@ -59,19 +66,18 @@ public class EventInfoFragment extends Fragment {
             case R.id.action_view_facebook:
                 return true;
             case R.id.action_add_to_calendar:
-                Bundle b = getArguments();
                 Intent intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, b.getString("location"));
-                intent.putExtra(CalendarContract.Events.TITLE, b.getString("title"));
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mEvent.getLocation());
+                intent.putExtra(CalendarContract.Events.TITLE, mEvent.getTitle());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                        b.getLong("begin_time"));
+                        mEvent.getStartTimeLong());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_END_TIME,
-                        b.getLong("end_time"));
+                        mEvent.getEndTimeLong());
                 intent.putExtra(
                         CalendarContract.Events.DESCRIPTION,
-                        b.getString("description"));
+                        mEvent.getDescription());
                 if (isAvailable(getActivity(), intent)) {
                     startActivity(intent);
                 } else {
@@ -91,28 +97,30 @@ public class EventInfoFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
 
-        Bundle b = getArguments();
+        mEvent = new Event(getArguments());
 
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
-        Log.i(LOG_TAG, "Received Bundle: " + b);
-        cover.setImageUrl(b.getString("cover"), photoLoader);
+        Log.i(LOG_TAG, "Received Bundle: " + mEvent);
+        cover.setImageUrl(mEvent.getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG, "Creating intent for flyer view.");
                 Intent detailIntent = new Intent(getActivity(), ViewFlyerActivity.class);
-                detailIntent.putExtras(getArguments());
+                detailIntent.putExtras(mEvent.getBundle());
                 startActivity(detailIntent);
             }
         });
 
         TextView title = (TextView) rootView.findViewById(R.id.title);
-        title.setText(b.getString("title"));
+        title.setText(mEvent.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
-        location.setText(b.getString("location"));
+        location.setText(mEvent.getLocation());
+        TextView startTime  = (TextView) rootView.findViewById(R.id.starttime);
+        startTime.setText(mEvent.getStartTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
         // TODO: Somehow linkify the links in description? Maybe I need to use a web view?
-        description.setText(b.getString("description"));
+        description.setText(mEvent.getDescription());
 
         return rootView;
     }

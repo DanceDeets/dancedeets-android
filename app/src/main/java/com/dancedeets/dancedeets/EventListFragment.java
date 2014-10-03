@@ -33,11 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
@@ -71,14 +67,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         /**
          * Callback for when an item has been selected.
          */
-        public void onEventSelected(Bundle bundle);
+        public void onEventSelected(Event event);
     }
 
     static final String LOG_TAG = "EventListFragment";
 
     String mLocation;
 
-    List<Bundle> eventBundleList;
+    List<Event> eventList;
     EventUIAdapter eventAdapter;
     JSONArray mJsonResponse;
 
@@ -117,38 +113,22 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     protected void parseJsonResponse(JSONArray response) {
         Log.i(LOG_TAG, "Parsing JSON Response");
-        DateFormat format = DateFormat.getDateTimeInstance();
 
         VolleySingleton volley = VolleySingleton.getInstance(null);
 
 
         for (int i = 0; i < response.length(); i++) {
             Bundle eventBundle = new Bundle();
+            Event event = null;
             try {
-                JSONObject event = response.getJSONObject(i);
-                eventBundle.putString("image_url", event.getString("image_url"));
-                if (!event.isNull("cover_url")) {
-                    eventBundle.putString("cover_url", event.getJSONObject("cover_url").getString("source"));
-                }
+                JSONObject jsonEvent = response.getJSONObject(i);
+                event = new Event(jsonEvent);
                 // Prefetch images so scrolling "just works"
-                volley.prefetchThumbnail(event.getString("image_url"));
-
-                eventBundle.putString("id", event.getString("id"));
-                eventBundle.putString("title", event.getString("title"));
-                eventBundle.putString("location", event.getString("location"));
-                eventBundle.putString("description", event.getString("description"));
-                DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                try {
-                    Date date = isoDateFormat.parse(event.getString("start_time"));
-                    //TODO: use a raw long representation for this?
-                    eventBundle.putString("start_time", format.format(date));
-                } catch (ParseException e) {
-                    Log.e(LOG_TAG, "Date ParseException: " + e);
-                }
+                volley.prefetchThumbnail(event.getThumbnailUrl());
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSONException: " + e);
             }
-            eventBundleList.add(eventBundle);
+            eventList.add(event);
         }
         mEmptyText.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.VISIBLE);
@@ -159,7 +139,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
-        eventBundleList = new ArrayList<Bundle>();
+        eventList = new ArrayList<Event>();
         setHasOptionsMenu(true);
         initializeFromLocation();
     }
@@ -253,7 +233,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Volley.newRequestQueue(inflater.getContext());
         Log.d(LOG_TAG, "onCreateView");
 
-        eventAdapter = new EventUIAdapter(inflater.getContext(), eventBundleList, R.layout.event_row);
+        eventAdapter = new EventUIAdapter(inflater.getContext(), eventList, R.layout.event_row);
         return rootView;
     }
 
@@ -266,7 +246,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
          * https://code.google.com/p/android/issues/detail?id=76779
          */
         setListShown(false);
-        eventBundleList.clear();
+        eventList.clear();
 
         boolean SANS_INTERNET = true;
         if (SANS_INTERNET) {
@@ -382,21 +362,19 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Bundle item = eventBundleList.get(position);
-        String facebookId = item.getString("id");
+        Event event = eventList.get(position);
+        String facebookId = event.getId();
         Log.i(LOG_TAG, "fb id " + facebookId);
 
-        //TODO: define how we want to deal with mutable elements inside our eventBundleList.
-        Bundle arguments = (Bundle)item.clone();
-        if (item.containsKey("cover_url")) {
+        if (event.getCoverUrl() != null) {
             VolleySingleton volley = VolleySingleton.getInstance(null);
-            volley.prefetchPhoto(item.getString("cover_url"));
+            volley.prefetchPhoto(event.getCoverUrl());
         }
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
-            mCallbacks.onEventSelected(arguments);
+            mCallbacks.onEventSelected(event);
         }
     }
 

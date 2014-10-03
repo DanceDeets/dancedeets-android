@@ -103,16 +103,16 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
      * the item with the given ID was selected.
      */
     @Override
-    public void onEventSelected(Bundle arguments) {
-
-        Log.i(LOG_TAG, "Sending Bundle: " + arguments);
+    public void onEventSelected(Event event) {
+        Bundle bundle = event.getBundle();
+        Log.i(LOG_TAG, "Sending Bundle: " + bundle);
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Log.i(LOG_TAG, "Replacing fragment for info page.");
             EventInfoFragment fragment = new EventInfoFragment();
-            fragment.setArguments(arguments);
+            fragment.setArguments(bundle);
             getFragmentManager().beginTransaction()
                     .replace(R.id.event_info_fragment, fragment)
                     // Add this transaction to the back stack
@@ -124,7 +124,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             // for the selected item ID.
             Log.i(LOG_TAG, "Creating intent for info page.");
             Intent detailIntent = new Intent(this, EventInfoActivity.class);
-            detailIntent.putExtras(arguments);
+            detailIntent.putExtras(bundle);
             startActivity(detailIntent);
         }
     }
