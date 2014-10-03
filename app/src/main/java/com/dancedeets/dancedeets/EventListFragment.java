@@ -95,9 +95,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     }
 
     /*
- * Handle results returned to the FragmentActivity
- * by Google Play services
- */
+     * Handle results returned to the FragmentActivity
+     * by Google Play services
+     */
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
@@ -219,6 +219,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setIconifiedByDefault(false);
+        Log.i(LOG_TAG, "onCreateOptionsMenu, with Location: " + mLocation);
+        if (mLocation != null) {
+            searchItem.expandActionView();
+            searchView.setQuery(mLocation, false);
+        }
     }
 
     @Override
@@ -283,31 +288,44 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         setListShown(false);
         eventMapList.clear();
 
-        final String url = "http://www.dancedeets.com/events/feed?location="+mLocation+"&keywords=&distance=10&distance_units=miles";
+        boolean SANS_INTERNET = true;
+        if (SANS_INTERNET) {
+            Log.i(LOG_TAG, "fetchJsonData");
 
-        JsonArrayRequest request = new JsonArrayRequest
-                (url, new Response.Listener<JSONArray>() {
+            final String jsonString = "[{\"city\": \"EXPG New York, New York, NY, US\", \"end_time\": \"2014-09-29T20:30:00Z\", \"image_url\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/c0.0.200.200/p200x200/10635707_10152646002551066_7530276650584086219_n.jpg?oh=33a51a2e0ad11b5ea42ee1f083d39233&oe=548B9F4D\", \"description\": \"Weekly House Dance class in New York City at EXPG-NYC studio, every Monday night (7-8:30PM).\\n\\nIt's a beginner, open class. We talk about the club culture, the history of House dance and music, learn foundation steps, how to get creative with them & be able to freestyle. Emphasis is made on how to connect the movement with the music. \\n\\n\\nEvery Monday\\nFrom 7:00PM to 8:30PM\\n@EXPG New York 27 2nd avenue, NY, NY 10003.\\n\\nFor more info, please visit www.expg-ny.com.\", \"title\": \"House Dance class with Mai L\\u00ea\", \"keywords\": \"class, club, house dance\", \"start_time\": \"2014-09-29T19:00:00Z\", \"id\": \"781192871949041\", \"cover_url\": {\"source\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10635707_10152646002551066_7530276650584086219_n.jpg?oh=26b884cb2af327e81336b27e9981f08c&oe=5485D972\", \"height\": 756, \"width\": 945}, \"location\": \"New York, NY, US\"}";
+            try {
+                mJsonResponse = new JSONArray(jsonString);
+            } catch (JSONException exception) {
+                Log.e(LOG_TAG, "Error faking json response: " + exception);
+            }
+            parseJsonResponse(mJsonResponse);
+        } else {
+            final String url = "http://www.dancedeets.com/events/feed?location=" + mLocation + "&keywords=&distance=10&distance_units=miles";
 
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        mJsonResponse = response;
-                        parseJsonResponse(response);
-                    }
-                }, new Response.ErrorListener() {
+            JsonArrayRequest request = new JsonArrayRequest
+                    (url, new Response.Listener<JSONArray>() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
-                        mEmptyText.setVisibility(View.GONE);
-                        mRetryButton.setVisibility(View.VISIBLE);
-                        setListAdapter(simpleAdapter);
-                    }
-                });
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            mJsonResponse = response;
+                            parseJsonResponse(response);
+                        }
+                    }, new Response.ErrorListener() {
 
-        Log.d(LOG_TAG, "Querying server feed: " + url);
-        request.setShouldCache(false);
-        RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
-        queue.add(request);
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
+                            mEmptyText.setVisibility(View.GONE);
+                            mRetryButton.setVisibility(View.VISIBLE);
+                            setListAdapter(simpleAdapter);
+                        }
+                    });
+
+            Log.d(LOG_TAG, "Querying server feed: " + url);
+            request.setShouldCache(false);
+            RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
+            queue.add(request);
+        }
     }
 
     @Override
@@ -333,6 +351,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             // If we saved the json, use it, otherwise fetch it from the server
             if (savedInstanceState.containsKey(STATE_LOCATION)) {
                 mLocation = savedInstanceState.getString(STATE_LOCATION);
+                Log.i(LOG_TAG, "Loading bundle-saved location: " + mLocation);
+                //TODO: save this somewhere, and figure out if we want to do this in the activity or the fragment
             }
         }
         Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
