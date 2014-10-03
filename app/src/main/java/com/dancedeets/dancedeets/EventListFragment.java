@@ -203,7 +203,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         }
     }
     public void onConnectionSuspended(int cause) {
-        Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
+        Log.i(LOG_TAG, "GoogleApiClient connection has been suspended");
     }
 
     @Override
