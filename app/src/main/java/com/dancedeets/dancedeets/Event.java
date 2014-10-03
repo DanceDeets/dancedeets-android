@@ -24,32 +24,31 @@ public class Event {
     }
 
     public Event(JSONObject jsonEvent) throws JSONException {
-        Bundle b = new Bundle();
-        b.putString("image_url", jsonEvent.getString("image_url"));
+        mBundle = new Bundle();
+        mBundle.putString("image_url", jsonEvent.getString("image_url"));
         if (!jsonEvent.isNull("cover_url")) {
-            b.putString("cover_url", jsonEvent.getJSONObject("cover_url").getString("source"));
+            mBundle.putString("cover_url", jsonEvent.getJSONObject("cover_url").getString("source"));
         }
 
-        b.putString("id", jsonEvent.getString("id"));
-        b.putString("title", jsonEvent.getString("title"));
-        b.putString("location", jsonEvent.getString("location"));
-        b.putString("description", jsonEvent.getString("description"));
+        mBundle.putString("id", jsonEvent.getString("id"));
+        mBundle.putString("title", jsonEvent.getString("title"));
+        mBundle.putString("location", jsonEvent.getString("location"));
+        mBundle.putString("description", jsonEvent.getString("description"));
 
         String startTimeString = jsonEvent.getString("end_time");
         try {
             Date date = isoDateFormat.parse(startTimeString);
-            b.putLong("start_time", date.getTime());
+            mBundle.putLong("start_time", date.getTime());
         } catch (ParseException e) {
             new JSONException("ParseException on date string: " + startTimeString + ": " + e);
         }
         String endTimeString = jsonEvent.getString("end_time");
         try {
             Date date = isoDateFormat.parse(endTimeString);
-            b.putLong("end_time", date.getTime());
+            mBundle.putLong("end_time", date.getTime());
         } catch (ParseException e) {
             new JSONException("ParseException on date string: " + endTimeString + ": " + e);
         }
-
     }
 
     public String getId() {

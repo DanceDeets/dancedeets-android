@@ -28,15 +28,15 @@ public class ViewFlyerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Bundle b = getArguments();
-        Log.i(LOG_TAG, "Received Bundle: " + b);
+        Event event = new Event(getArguments());
+        Log.i(LOG_TAG, "Received Bundle: " + getArguments());
         final ImageViewTouch imageViewTouch = new ImageViewTouch(getActivity(), null);
         imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
         container.addView(imageViewTouch);
 
         ImageLoader photoLoader = VolleySingleton.getInstance(null).getPhotoLoader();
-        photoLoader.get(b.getString("cover"), new ImageLoader.ImageListener() {
+        photoLoader.get(event.getCoverUrl(), new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                 imageViewTouch.setImageBitmap(response.getBitmap());
