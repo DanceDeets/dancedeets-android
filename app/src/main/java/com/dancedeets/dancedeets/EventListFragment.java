@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
@@ -260,10 +261,15 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
             parseJsonResponse(mJsonResponse);
         } else {
-            final String url = "http://www.dancedeets.com/events/feed?location=" + mLocation + "&keywords=&distance=10&distance_units=miles";
+            Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
+            builder.appendQueryParameter("location", mLocation);
+            builder.appendQueryParameter("keywords", "");
+            builder.appendQueryParameter("distance", "10");
+            builder.appendQueryParameter("distance_units", "miles");
+            final Uri uri = builder.build();
 
             JsonArrayRequest request = new JsonArrayRequest
-                    (url, new Response.Listener<JSONArray>() {
+                    (uri.toString(), new Response.Listener<JSONArray>() {
 
                         @Override
                         public void onResponse(JSONArray response) {
@@ -274,14 +280,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "Error retrieving URL " + url + ", with error: " + error.toString());
+                            Log.e(LOG_TAG, "Error retrieving URL " + uri + ", with error: " + error.toString());
                             mEmptyText.setVisibility(View.GONE);
                             mRetryButton.setVisibility(View.VISIBLE);
                             setListAdapter(eventAdapter);
                         }
                     });
 
-            Log.d(LOG_TAG, "Querying server feed: " + url);
+            Log.d(LOG_TAG, "Querying server feed: " + uri);
             request.setShouldCache(false);
             RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
             queue.add(request);
