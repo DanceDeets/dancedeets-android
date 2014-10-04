@@ -207,6 +207,13 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         }
     }
 
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setQuery(mLocation, false);
+        searchView.clearFocus();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
