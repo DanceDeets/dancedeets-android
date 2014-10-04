@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 /**
- * Created by lambert on 2014/09/28.
+ * Shows zoomable/pannable event flyers, when clicked on from the event info page.
  */
 public class ViewFlyerActivity extends Activity {
 
@@ -18,10 +18,12 @@ public class ViewFlyerActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        VolleySingleton.getInstance(getApplicationContext());
+        VolleySingleton.createInstance(getApplicationContext());
 
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Bundle b = getIntent().getExtras();
         if (b != null) {

@@ -10,7 +10,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 /**
- * Created by lambert on 2014/09/27.
+ * For managing the Google Play error dialogs and resolution requests.
  */
 public class GooglePlayUtil {
     // Global constants

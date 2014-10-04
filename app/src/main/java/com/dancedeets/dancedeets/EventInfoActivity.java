@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
+import android.support.v4.content.IntentCompat;
 import android.view.MenuItem;
 
 
@@ -17,11 +17,12 @@ public class EventInfoActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        VolleySingleton.getInstance(getApplicationContext());
+        VolleySingleton.createInstance(getApplicationContext());
 
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_event_info);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
@@ -49,19 +50,18 @@ public class EventInfoActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
+                // Basic intent for Parent Activity
                 String parentName = NavUtils.getParentActivityName(this);
                 final ComponentName target = new ComponentName(this, parentName);
                 Intent upIntent = new Intent().setComponent(target);
-                Log.i(LOG_TAG, "Home Selected: Navigating Home with Intent: " + upIntent);
+
+                // If this activity was started by an Intent, recreate parent Intents
                 if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
-                    Log.d(LOG_TAG, "Home Selected: Should recreate task");
+                    // But instead of normal basic intent, let's make a Main Intent
+                    upIntent = IntentCompat.makeMainActivity(target);
                     // This activity is NOT part of this app's task, so create a new task
                     // when navigating up, with a synthesized back stack.
                     TaskStackBuilder.create(this)
@@ -70,7 +70,6 @@ public class EventInfoActivity extends Activity {
                                     // Navigate up to the closest parent
                             .startActivities();
                 } else {
-                    Log.i(LOG_TAG, "Home Selected: Navigating up to previous task");
                     // This activity is part of this app's task, so simply
                     // navigate up to the logical parent activity.
                     NavUtils.navigateUpTo(this, upIntent);

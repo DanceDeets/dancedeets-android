@@ -46,7 +46,11 @@ public class VolleySingleton {
     }
 
 
-    public static VolleySingleton getInstance(Context context) {
+    public static VolleySingleton getInstance() {
+        return instance;
+    }
+
+    public static VolleySingleton createInstance(Context context) {
         if (instance == null) {
             instance = new VolleySingleton(context);
         }

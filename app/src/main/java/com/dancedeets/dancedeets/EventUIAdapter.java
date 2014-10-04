@@ -13,7 +13,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import java.util.List;
 
 /**
- * Created by lambert on 2014/10/02.
+ * An Adapter for mapping Event objects to the Event ListView UI.
  */
 public class EventUIAdapter extends BaseAdapter {
     static class ViewBinder {
@@ -48,7 +48,7 @@ public class EventUIAdapter extends BaseAdapter {
 
     protected void bindView(int position, View view) {
         Event event = (Event)getItem(position);
-        ImageLoader thumbnailLoader = VolleySingleton.getInstance(null).getThumbnailLoader();
+        ImageLoader thumbnailLoader = VolleySingleton.getInstance().getThumbnailLoader();
 
         ViewBinder viewBinder = (ViewBinder)view.getTag();
         viewBinder.icon.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);

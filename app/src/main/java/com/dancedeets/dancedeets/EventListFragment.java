@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
 
@@ -45,7 +45,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
      */
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-    private static final String STATE_JSON_RESPONSE = "json_response";
+    private static final String STATE_EVENT_LIST = "event_list";
     private static final String STATE_LOCATION = "location";
 
     /**
@@ -75,9 +75,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     String mLocation;
 
-    List<Event> eventList;
+    ArrayList<Event> eventList;
     EventUIAdapter eventAdapter;
-    JSONArray mJsonResponse;
 
     View mEmptyListView;
     TextView mEmptyText;
@@ -106,7 +105,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                     /*
                      * Try the request again
                      */
-                        initializeFromLocation();
+                        initializeGoogleApiClient();
                         break;
                 }
         }
@@ -115,11 +114,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     protected void parseJsonResponse(JSONArray response) {
         Log.i(LOG_TAG, "Parsing JSON Response");
 
-        VolleySingleton volley = VolleySingleton.getInstance(null);
-
+        VolleySingleton volley = VolleySingleton.getInstance();
 
         for (int i = 0; i < response.length(); i++) {
-            Bundle eventBundle = new Bundle();
             Event event = null;
             try {
                 JSONObject jsonEvent = response.getJSONObject(i);
@@ -131,6 +128,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
             eventList.add(event);
         }
+        onEventListFilled();
+    }
+
+    protected void onEventListFilled() {
         mEmptyText.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.VISIBLE);
         setListAdapter(eventAdapter);
@@ -142,10 +143,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Log.i(LOG_TAG, "onCreate");
         eventList = new ArrayList<Event>();
         setHasOptionsMenu(true);
-        initializeFromLocation();
+        initializeGoogleApiClient();
     }
 
-    protected void initializeFromLocation() {
+    protected void initializeGoogleApiClient() {
         if (GooglePlayUtil.servicesConnected(getActivity())) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getBaseContext())
                     .addApi(LocationServices.API)
@@ -155,6 +156,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             Log.i(LOG_TAG, "Unable to connect to Google Play Services");
         }
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -180,11 +182,12 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
             mLocation = location.getLatitude() + "," + location.getLongitude();
+            // I think this gets done by onCreateOptionsMenu?
             fetchJsonData();
         }
     }
     public void onConnectionSuspended(int cause) {
-        Log.i(LOG_TAG, "GoogleApiClient connection has been suspended");
+        Log.i(LOG_TAG, "GoogleApiClient.onConnectionSuspended: " + cause);
     }
 
     @Override
@@ -199,7 +202,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         searchView.setIconifiedByDefault(false);
         Log.i(LOG_TAG, "onCreateOptionsMenu, with Location: " + mLocation);
         if (mLocation != null) {
-            searchView.setQuery(mLocation, true);
+            // triggers a search intent, which then triggers a query
+            searchView.setQuery(mLocation, false);
         }
     }
 
@@ -218,6 +222,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreateView");
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
                 container, false);
@@ -230,10 +235,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
         });
 
-        Volley.newRequestQueue(inflater.getContext());
-        Log.d(LOG_TAG, "onCreateView");
-
         eventAdapter = new EventUIAdapter(inflater.getContext(), eventList, R.layout.event_row);
+        Volley.newRequestQueue(inflater.getContext());
+
         return rootView;
     }
 
@@ -254,11 +258,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
             final String jsonString = "[{\"city\": \"EXPG New York, New York, NY, US\", \"end_time\": \"2014-09-29T20:30:00Z\", \"image_url\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/c0.0.200.200/p200x200/10635707_10152646002551066_7530276650584086219_n.jpg?oh=33a51a2e0ad11b5ea42ee1f083d39233&oe=548B9F4D\", \"description\": \"Weekly House Dance class in New York City at EXPG-NYC studio, every Monday night (7-8:30PM).\\n\\nIt's a beginner, open class. We talk about the club culture, the history of House dance and music, learn foundation steps, how to get creative with them & be able to freestyle. Emphasis is made on how to connect the movement with the music. \\n\\n\\nEvery Monday\\nFrom 7:00PM to 8:30PM\\n@EXPG New York 27 2nd avenue, NY, NY 10003.\\n\\nFor more info, please visit www.expg-ny.com.\", \"title\": \"House Dance class with Mai L\\u00ea\", \"keywords\": \"class, club, house dance\", \"start_time\": \"2014-09-29T19:00:00Z\", \"id\": \"781192871949041\", \"cover_url\": {\"source\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10635707_10152646002551066_7530276650584086219_n.jpg?oh=26b884cb2af327e81336b27e9981f08c&oe=5485D972\", \"height\": 756, \"width\": 945}, \"location\": \"New York, NY, US\"}]";
             try {
-                mJsonResponse = new JSONArray(jsonString);
+                JSONArray response = new JSONArray(jsonString);
+                parseJsonResponse(response);
             } catch (JSONException exception) {
                 Log.e(LOG_TAG, "Error faking json response: " + exception);
             }
-            parseJsonResponse(mJsonResponse);
         } else {
             Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
             builder.appendQueryParameter("location", mLocation);
@@ -272,7 +276,6 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
                         @Override
                         public void onResponse(JSONArray response) {
-                            mJsonResponse = response;
                             parseJsonResponse(response);
                         }
                     }, new Response.ErrorListener() {
@@ -288,7 +291,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
             Log.d(LOG_TAG, "Querying server feed: " + uri);
             request.setShouldCache(false);
-            RequestQueue queue = VolleySingleton.getInstance(null).getRequestQueue();
+            RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
             queue.add(request);
         }
     }
@@ -304,14 +307,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 setActivatedPosition(savedInstanceState
                         .getInt(STATE_ACTIVATED_POSITION));
             }
-            // If we saved the json, use it, otherwise fetch it from the server
-            String jsonData = savedInstanceState.getString(STATE_JSON_RESPONSE);
-            if (jsonData != null) {
-                try {
-                    mJsonResponse = new JSONArray(jsonData);
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, "Error processing saved json...strange!");
+            if (savedInstanceState.containsKey(STATE_EVENT_LIST)) {
+                Parcelable[] bundleList = savedInstanceState.getParcelableArray(STATE_EVENT_LIST);
+                eventList.clear();
+                eventList.ensureCapacity(bundleList.length);
+                for (int i = 0; i < bundleList.length; ++i) {
+                    eventList.add(new Event((Bundle) bundleList[i]));
                 }
+                onEventListFilled();
             }
             // If we saved the json, use it, otherwise fetch it from the server
             if (savedInstanceState.containsKey(STATE_LOCATION)) {
@@ -319,15 +322,6 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 Log.i(LOG_TAG, "Loading bundle-saved location: " + mLocation);
                 //TODO: save this somewhere, and figure out if we want to do this in the activity or the fragment
             }
-        }
-        Log.d(LOG_TAG, "mJsonResponse is " + mJsonResponse);
-
-        if (mJsonResponse != null) {
-            parseJsonResponse(mJsonResponse);
-        } else {
-            // Don't fetch data, let the Google Play Services connect,
-            // and then grab the most recent location information,
-            // and use that to fetch the results.
         }
 
         /* We need to add the emptyListView as a sibling to the List,
@@ -368,11 +362,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         super.onListItemClick(listView, view, position, id);
 
         Event event = eventList.get(position);
-        String facebookId = event.getId();
-        Log.i(LOG_TAG, "fb id " + facebookId);
+        Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         if (event.getCoverUrl() != null) {
-            VolleySingleton volley = VolleySingleton.getInstance(null);
+            VolleySingleton volley = VolleySingleton.getInstance();
             volley.prefetchPhoto(event.getCoverUrl());
         }
 
@@ -391,8 +384,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
-        if (mJsonResponse != null) {
-            outState.putString(STATE_JSON_RESPONSE, mJsonResponse.toString());
+        if (eventList != null) {
+            Bundle[] bundleList = new Bundle[eventList.size()];
+            int i = 0;
+            for (Event event : eventList) {
+                bundleList[i] = event.getBundle();
+                i++;
+            }
+            outState.putParcelableArray(STATE_EVENT_LIST, bundleList);
         }
         if (mLocation != null) {
             Log.d(LOG_TAG, "Location is " + mLocation);

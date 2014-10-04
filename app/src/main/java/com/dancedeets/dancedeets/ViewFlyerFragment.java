@@ -15,7 +15,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
 /**
- * Created by lambert on 2014/09/28.
+ * Shows zoomable/pannable event flyers, when clicked on from the event info page.
  */
 public class ViewFlyerFragment extends Fragment {
 
@@ -35,7 +35,7 @@ public class ViewFlyerFragment extends Fragment {
 
         container.addView(imageViewTouch);
 
-        ImageLoader photoLoader = VolleySingleton.getInstance(null).getPhotoLoader();
+        ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         photoLoader.get(event.getCoverUrl(), new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {

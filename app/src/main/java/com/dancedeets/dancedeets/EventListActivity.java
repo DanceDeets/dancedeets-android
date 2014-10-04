@@ -20,12 +20,10 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        VolleySingleton.getInstance(getApplicationContext());
+        VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_event_list);
-
-        Log.i(LOG_TAG, "onCreate");
 
         if (findViewById(R.id.event_info_fragment) != null) {
             // The detail container view will be present only in the
@@ -41,37 +39,10 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         }
 
         if (savedInstanceState == null) {
-            // TODO: If exposing deep links into your app, handle intents here.
             handleIntent(getIntent());
         }
     }
 
-/* DEBUGGING: The "Up" button doesn't seem to do anything in some cases, trying to investigate why...
-    public boolean onNavigateUp() {
-        Log.i(LOG_TAG, "onNavigateUp");
-        return super.onNavigateUp();
-    }
-
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        CharSequence titleCondensed = item.getTitleCondensed();
-        Log.i(LOG_TAG, "onMenuItemSelected, featureId is " + featureId + ", item is " + item);
-
-        switch (featureId) {
-            case Window.FEATURE_OPTIONS_PANEL:
-                Log.i(LOG_TAG, "FEATURE_OPTIONS_PANEL, mParent is " + getParent());
-                break;
-        }
-        return super.onMenuItemSelected(featureId, item);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        Log.i(LOG_TAG, "onCreateView name " + name + ", isChild? " + isChild());
-
-        return super.onCreateView(name, context, attrs);
-    }
-*/
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -87,7 +58,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
             fragment.mLocation = null;
-            fragment.initializeFromLocation();
+            fragment.initializeGoogleApiClient();
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
@@ -105,24 +76,20 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
     @Override
     public void onEventSelected(Event event) {
         Bundle bundle = event.getBundle();
-        Log.i(LOG_TAG, "Sending Bundle: " + bundle);
+        Log.i(LOG_TAG, "Sending Event: " + event);
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
-            Log.i(LOG_TAG, "Replacing fragment for info page.");
             EventInfoFragment fragment = new EventInfoFragment();
             fragment.setArguments(bundle);
             getFragmentManager().beginTransaction()
                     .replace(R.id.event_info_fragment, fragment)
-                    // Add this transaction to the back stack
-                    .addToBackStack(null)
                     .commit();
 
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
-            Log.i(LOG_TAG, "Creating intent for info page.");
             Intent detailIntent = new Intent(this, EventInfoActivity.class);
             detailIntent.putExtras(bundle);
             startActivity(detailIntent);
