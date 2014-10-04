@@ -2,6 +2,7 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -55,9 +56,12 @@ public class EventInfoActivity extends Activity {
 
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Intent upIntent = NavUtils.getParentActivityIntent(this);
-                Log.i(LOG_TAG, "Navigating Home with Intent: " + upIntent);
+                String parentName = NavUtils.getParentActivityName(this);
+                final ComponentName target = new ComponentName(this, parentName);
+                Intent upIntent = new Intent().setComponent(target);
+                Log.i(LOG_TAG, "Home Selected: Navigating Home with Intent: " + upIntent);
                 if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                    Log.d(LOG_TAG, "Home Selected: Should recreate task");
                     // This activity is NOT part of this app's task, so create a new task
                     // when navigating up, with a synthesized back stack.
                     TaskStackBuilder.create(this)
@@ -66,6 +70,7 @@ public class EventInfoActivity extends Activity {
                                     // Navigate up to the closest parent
                             .startActivities();
                 } else {
+                    Log.i(LOG_TAG, "Home Selected: Navigating up to previous task");
                     // This activity is part of this app's task, so simply
                     // navigate up to the logical parent activity.
                     NavUtils.navigateUpTo(this, upIntent);
