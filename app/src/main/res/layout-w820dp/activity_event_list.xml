@@ -2,7 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/event_list_activity"
+    android:id="@+id/event_list_twopane_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -19,7 +19,7 @@
     <FrameLayout
         android:id="@+id/event_info_fragment"
         android:layout_width="0px"
-        android:layout_weight="1.2"
+        android:layout_weight="0"
         android:layout_height="match_parent"
         />
 </LinearLayout>

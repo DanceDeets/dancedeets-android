@@ -5,6 +5,8 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 
 public class EventListActivity extends Activity implements EventListFragment.Callbacks {
@@ -86,6 +88,14 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             getFragmentManager().beginTransaction()
                     .replace(R.id.event_info_fragment, fragment)
                     .commit();
+
+            // Make the view visible, if it was still collapsed from initialization.
+            View v = findViewById(R.id.event_info_fragment);
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)v.getLayoutParams();
+            if (params.weight != 1.2) {
+                params.weight = 1.2f;
+                v.setLayoutParams(params);
+            }
 
         } else {
             // In single-pane mode, simply start the detail activity
