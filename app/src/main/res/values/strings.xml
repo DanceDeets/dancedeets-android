@@ -14,5 +14,6 @@
     <string name="search_hint">Enter Location</string>
     <string name="search_location">Location:</string>
     <string name="search_keywords">Keywords:</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

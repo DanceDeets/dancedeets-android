@@ -79,7 +79,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     Button mRetryButton;
     GoogleApiClient mGoogleApiClient;
 
-    SearchDialog mSearchDialog;
+    SearchDialogFragment mSearchDialog;
 
     public EventListFragment() {
     }
@@ -205,9 +205,16 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             return true;
         }
         if (id == R.id.action_search) {
-            mSearchDialog = new SearchDialog(getActivity());
-            mSearchDialog.show("test", false, getActivity().getComponentName(), null);
-            return true;
+            mSearchDialog = new SearchDialogFragment();
+            mSearchDialog.show(getFragmentManager(), "search");
+            mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
+                @Override
+                public void onSearch(String location, String keywords) {
+                    Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
+                    mLocation = location;
+                    fetchJsonData();
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }
@@ -352,9 +359,6 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     @Override
     public void onDestroy() {
-        if (mSearchDialog != null) {
-            mSearchDialog.dismiss();
-        }
         super.onDestroy();
     }
 
