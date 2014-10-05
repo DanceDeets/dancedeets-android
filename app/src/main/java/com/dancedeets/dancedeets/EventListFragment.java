@@ -42,7 +42,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
     private static final String STATE_EVENT_LIST = "event_list";
-    private static final String STATE_LOCATION = "location";
+    private static final String STATE_SEARCH_OPTIONS = "search_options";
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -69,7 +69,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     static final String LOG_TAG = "EventListFragment";
 
-    String mLocation;
+    SearchOptions mSearchOptions;
 
     ArrayList<Event> eventList;
     EventUIAdapter eventAdapter;
@@ -140,6 +140,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
         eventList = new ArrayList<Event>();
+        mSearchOptions = new SearchOptions();
         setHasOptionsMenu(true);
         initializeGoogleApiClient();
     }
@@ -176,10 +177,10 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
         // We reconnect every time the app wakes up, but we only need
         // to fetch on start if we have no location data (ie, app startup).
-        if (mLocation == null) {
+        if (mSearchOptions.location == null) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
-            mLocation = location.getLatitude() + "," + location.getLongitude();
+            mSearchOptions.location = location.getLatitude() + "," + location.getLongitude();
             // I think this gets done by onCreateOptionsMenu?
             fetchJsonData();
         }
@@ -211,7 +212,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 @Override
                 public void onSearch(String location, String keywords) {
                     Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
-                    mLocation = location;
+                    mSearchOptions.location = location;
+                    mSearchOptions.keywords = keywords;
                     fetchJsonData();
                 }
             });
@@ -266,7 +268,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
         } else {
             Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
-            builder.appendQueryParameter("location", mLocation);
+            builder.appendQueryParameter("location", mSearchOptions.location);
             builder.appendQueryParameter("keywords", "");
             builder.appendQueryParameter("distance", "10");
             builder.appendQueryParameter("distance_units", "miles");
@@ -318,9 +320,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 onEventListFilled();
             }
             // If we saved the json, use it, otherwise fetch it from the server
-            if (savedInstanceState.containsKey(STATE_LOCATION)) {
-                mLocation = savedInstanceState.getString(STATE_LOCATION);
-                Log.i(LOG_TAG, "Loading bundle-saved location: " + mLocation);
+            if (savedInstanceState.containsKey(STATE_SEARCH_OPTIONS)) {
+                mSearchOptions = (SearchOptions)savedInstanceState.getParcelable(STATE_SEARCH_OPTIONS);
+                Log.i(LOG_TAG, "Loading bundle-saved location: " + mSearchOptions);
                 //TODO: save this somewhere, and figure out if we want to do this in the activity or the fragment
             }
         }
@@ -399,9 +401,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
             outState.putParcelableArray(STATE_EVENT_LIST, bundleList);
         }
-        if (mLocation != null) {
-            Log.d(LOG_TAG, "Location is " + mLocation);
-            outState.putString(STATE_LOCATION, mLocation);
+        if (mSearchOptions != null) {
+            outState.putParcelable(STATE_SEARCH_OPTIONS, mSearchOptions);
         }
         Log.d(LOG_TAG, "Bundle saved is " + outState);
     }
@@ -414,7 +415,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
         getListView().setChoiceMode(
-                activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
+                true ? ListView.CHOICE_MODE_SINGLE
                         : ListView.CHOICE_MODE_NONE);
     }
 

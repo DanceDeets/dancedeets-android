@@ -59,13 +59,13 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         if (Intent.ACTION_MAIN.equals(intent.getAction())) {
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
-            fragment.mLocation = null;
+            fragment.mSearchOptions.location = null;
             fragment.initializeGoogleApiClient();
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
             //TODO: make a better API for this
-            fragment.mLocation = intent.getStringExtra(SearchManager.QUERY);
+            fragment.mSearchOptions.location = intent.getStringExtra(SearchManager.QUERY);
             fragment.fetchJsonData();
 
         }
