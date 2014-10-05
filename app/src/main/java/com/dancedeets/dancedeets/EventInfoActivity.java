@@ -10,6 +10,11 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.IntentCompat;
 import android.view.MenuItem;
 
+import com.parse.ParseAnalytics;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class EventInfoActivity extends Activity {
 
@@ -44,7 +49,9 @@ public class EventInfoActivity extends Activity {
             Fragment f = new EventInfoFragment();
             f.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
-
+            Map<String,String> dimensions = new HashMap<String, String>();
+            dimensions.put("Fragment", "Event Info");
+            ParseAnalytics.trackEvent("Fragment", dimensions);
         }
     }
 
