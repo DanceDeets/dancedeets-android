@@ -2,14 +2,11 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.ListFragment;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -83,6 +79,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     Button mRetryButton;
     GoogleApiClient mGoogleApiClient;
 
+    SearchDialog mSearchDialog;
+
     public EventListFragment() {
     }
 
@@ -95,13 +93,13 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             int requestCode, int resultCode, Intent data) {
         // Decide what to do based on the original request code
         switch (requestCode) {
-            case GooglePlayUtil.CONNECTION_FAILURE_RESOLUTION_REQUEST :
+            case GooglePlayUtil.CONNECTION_FAILURE_RESOLUTION_REQUEST:
             /*
              * If the result code is Activity.RESULT_OK, try
              * to connect again
              */
                 switch (resultCode) {
-                    case Activity.RESULT_OK :
+                    case Activity.RESULT_OK:
                     /*
                      * Try the request again
                      */
@@ -186,32 +184,15 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             fetchJsonData();
         }
     }
+
     public void onConnectionSuspended(int cause) {
         Log.i(LOG_TAG, "GoogleApiClient.onConnectionSuspended: " + cause);
     }
 
     @Override
-    public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.events_list, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager =
-                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        Log.i(LOG_TAG, "onCreateOptionsMenu, with Location: " + mLocation);
-        if (mLocation != null) {
-            // triggers a search intent, which then triggers a query
-            searchView.setQuery(mLocation, false);
-        }
-    }
-
-    public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setQuery(mLocation, false);
-        searchView.clearFocus();
     }
 
     @Override
@@ -223,8 +204,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_search) {
+            mSearchDialog = new SearchDialog(getActivity());
+            mSearchDialog.show("test", false, getActivity().getComponentName(), null);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -233,8 +220,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
                 container, false);
-        mEmptyText = (TextView)mEmptyListView.findViewById(R.id.empty_events_list_text);
-        mRetryButton = (Button)mEmptyListView.findViewById(R.id.retry_button);
+        mEmptyText = (TextView) mEmptyListView.findViewById(R.id.empty_events_list_text);
+        mRetryButton = (Button) mEmptyListView.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -338,7 +325,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
          * And within the List, it will then alternate with the EmptyView.
          */
         ViewParent listContainerView = view.findViewById(android.R.id.list).getParent();
-        ((ViewGroup)listContainerView).addView(mEmptyListView);
+        ((ViewGroup) listContainerView).addView(mEmptyListView);
         getListView().setEmptyView(mEmptyListView);
     }
 
@@ -361,6 +348,14 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
         // Reset the active callbacks interface to the dummy implementation.
         mCallbacks = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mSearchDialog != null) {
+            mSearchDialog.dismiss();
+        }
+        super.onDestroy();
     }
 
     @Override

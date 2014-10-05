@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_bar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:background="?android:attr/actionModeBackground"
+    android:orientation="horizontal">
+
+    <!-- Grouped to allow tapping on either item to exit search mode -->
+    <LinearLayout
+        android:id="@android:id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="?android:attr/homeAsUpIndicator"/>
+
+        <ImageView
+            android:id="@+id/search_app_icon"
+            android:layout_height="32dip"
+            android:layout_width="32dip"
+            android:layout_gravity="center_vertical"
+            android:scaleType="centerInside"
+            />
+
+    </LinearLayout>
+
+    <!-- Actual search view with search icon, text field, close
+        and voice buttons -->
+    <SearchView
+        android:id="@+id/search_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxWidth="600dip"
+        android:layout_gravity="center_vertical"
+        />
+</LinearLayout>
+<!--
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/search_location_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_location"
+        android:paddingBottom="20dp"
+        />
+    <SearchView
+        android:id="@+id/search_location"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/search_location_label"
+        android:layout_toRightOf="@id/search_location_label"
+        android:paddingBottom="20dp"
+        />
+    <TextView
+        android:id="@+id/search_keywords_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_keywords"
+        android:layout_below="@id/search_location"
+        />
+    <SearchView
+        android:id="@+id/search_keywords"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/search_keywords_label"
+        android:layout_toRightOf="@id/search_keywords_label"
+        android:layout_below="@id/search_location"
+        />
+</RelativeLayout>
+-->

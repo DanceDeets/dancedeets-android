@@ -12,5 +12,7 @@
     <string name="no_events">No events found.</string>
     <string name="action_refresh">Refresh Events</string>
     <string name="search_hint">Enter Location</string>
+    <string name="search_location">Location:</string>
+    <string name="search_keywords">Keywords:</string>
 
 </resources>
