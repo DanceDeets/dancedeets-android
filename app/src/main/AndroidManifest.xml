@@ -41,8 +41,7 @@
         <activity
             android:name=".EventInfoActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:parentActivityName="com.dancedeets.dancedeets.EventListActivity">
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.dancedeets.dancedeets.EventListActivity" />
@@ -50,8 +49,7 @@
         <activity
             android:name=".ViewFlyerActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:parentActivityName="com.dancedeets.dancedeets.EventInfoActivity">
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.dancedeets.dancedeets.EventInfoActivity" />
