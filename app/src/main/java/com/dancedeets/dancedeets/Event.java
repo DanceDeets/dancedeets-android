@@ -1,6 +1,8 @@
 package com.dancedeets.dancedeets;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +15,7 @@ import java.util.Date;
 /**
  * Created by lambert on 2014/10/02.
  */
-public class Event {
+public class Event implements Parcelable {
     Bundle mBundle;
     static DateFormat localizedFormat = DateFormat.getDateTimeInstance();
 
@@ -105,5 +107,27 @@ public class Event {
 
     public String getFacebookUrl() {
         return "http://www.facebook.com/events/" + getId() + "/";
+    }
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeBundle(mBundle);
+    }
+
+    public static final Parcelable.Creator<Event> CREATOR
+            = new Parcelable.Creator<Event>() {
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
+
+    private Event(Parcel in) {
+        mBundle = in.readBundle();
     }
 }

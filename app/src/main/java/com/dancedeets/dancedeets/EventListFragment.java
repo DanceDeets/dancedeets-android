@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -71,7 +70,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     SearchOptions mSearchOptions;
 
-    ArrayList<Event> eventList;
+    ArrayList<Event> mEventList;
     EventUIAdapter eventAdapter;
 
     View mEmptyListView;
@@ -124,7 +123,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSONException: " + e);
             }
-            eventList.add(event);
+            mEventList.add(event);
         }
         onEventListFilled();
     }
@@ -139,7 +138,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
-        eventList = new ArrayList<Event>();
+        mEventList = new ArrayList<Event>();
         mSearchOptions = new SearchOptions();
         setHasOptionsMenu(true);
         initializeGoogleApiClient();
@@ -238,7 +237,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
         });
 
-        eventAdapter = new EventUIAdapter(inflater.getContext(), eventList, R.layout.event_row);
+        eventAdapter = new EventUIAdapter(inflater.getContext(), mEventList, R.layout.event_row);
         Volley.newRequestQueue(inflater.getContext());
 
         return rootView;
@@ -253,7 +252,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
          * https://code.google.com/p/android/issues/detail?id=76779
          */
         setListShown(false);
-        eventList.clear();
+        mEventList.clear();
         Log.i(LOG_TAG, "fetchJsonData");
 
         boolean SANS_INTERNET = false;
@@ -311,12 +310,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                         .getInt(STATE_ACTIVATED_POSITION));
             }
             if (savedInstanceState.containsKey(STATE_EVENT_LIST)) {
-                Parcelable[] bundleList = savedInstanceState.getParcelableArray(STATE_EVENT_LIST);
-                eventList.clear();
-                eventList.ensureCapacity(bundleList.length);
-                for (int i = 0; i < bundleList.length; ++i) {
-                    eventList.add(new Event((Bundle) bundleList[i]));
-                }
+                ArrayList<Event> eventList = savedInstanceState.getParcelableArrayList(STATE_EVENT_LIST);
+                mEventList.addAll(eventList);
                 onEventListFilled();
             }
             // If we saved the json, use it, otherwise fetch it from the server
@@ -369,7 +364,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Event event = eventList.get(position);
+        Event event = mEventList.get(position);
         Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         if (event.getCoverUrl() != null) {
@@ -392,14 +387,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
-        if (eventList != null) {
-            Bundle[] bundleList = new Bundle[eventList.size()];
-            int i = 0;
-            for (Event event : eventList) {
-                bundleList[i] = event.getBundle();
-                i++;
-            }
-            outState.putParcelableArray(STATE_EVENT_LIST, bundleList);
+        if (mEventList != null) {
+            outState.putParcelableArrayList(STATE_EVENT_LIST, mEventList);
         }
         if (mSearchOptions != null) {
             outState.putParcelable(STATE_SEARCH_OPTIONS, mSearchOptions);
