@@ -6,7 +6,8 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.widget.SearchView;
+import android.view.View;
+import android.widget.EditText;
 
 /**
  * Created by lambert on 2014/10/05.
@@ -15,6 +16,11 @@ public class SearchDialogFragment extends DialogFragment {
 
     final static String LOG_TAG = "SearchDialogFragment";
     private OnSearchListener mOnClickListener;
+    private SearchOptions mSearchOptions;
+
+    public void setSearchOptions(SearchOptions searchOptions) {
+        mSearchOptions = searchOptions;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -22,20 +28,24 @@ public class SearchDialogFragment extends DialogFragment {
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
+        View view = inflater.inflate(R.layout.event_search_options, null);
+        EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
+        searchLocation.setText(mSearchOptions.location);
+        builder.getContext();
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.event_search_options, null))
+        builder.setView(view)
                 // Add action buttons
                 .setPositiveButton(R.string.action_search, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Dialog d = (Dialog) dialog;
-                        SearchView searchLocation = ((SearchView) d.findViewById(R.id.search_location));
-                        SearchView searchKeywords = ((SearchView) d.findViewById(R.id.search_keywords));
+                        EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
+                        EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
 
                         mOnClickListener.onSearch(
-                                searchLocation.getQuery().toString(),
-                                searchKeywords.getQuery().toString());
+                                searchLocation.getText().toString(),
+                                searchKeywords.getText().toString());
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

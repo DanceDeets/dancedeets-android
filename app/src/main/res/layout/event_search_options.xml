@@ -9,7 +9,7 @@
         android:text="@string/search_location"
         android:paddingBottom="20dp"
         />
-    <SearchView
+    <EditText
         android:id="@+id/search_location"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         android:text="@string/search_keywords"
         android:layout_below="@id/search_location"
         />
-    <SearchView
+    <EditText
         android:id="@+id/search_keywords"
         android:layout_width="200dp"
         android:layout_height="wrap_content"

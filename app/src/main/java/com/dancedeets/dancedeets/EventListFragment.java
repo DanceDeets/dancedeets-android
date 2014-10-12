@@ -218,6 +218,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         }
         if (id == R.id.action_search) {
             mSearchDialog = new SearchDialogFragment();
+            mSearchDialog.setSearchOptions(mSearchOptions);
             mSearchDialog.show(getFragmentManager(), "search");
             mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
                 @Override
