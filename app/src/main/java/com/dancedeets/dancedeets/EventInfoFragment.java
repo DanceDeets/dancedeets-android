@@ -19,10 +19,18 @@ import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.List;
+import java.util.Locale;
 
 public class EventInfoFragment extends Fragment {
 
@@ -81,6 +89,9 @@ public class EventInfoFragment extends Fragment {
                     startActivity(intent);
                 }
                 return true;
+            case R.id.action_translate:
+                translatePage();
+                return true;
             case R.id.action_add_to_calendar:
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mEvent.getLocation());
@@ -106,6 +117,42 @@ public class EventInfoFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public void translatePage() {
+        Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t?client=at&v=1.0").buildUpon()
+                .appendQueryParameter("sl", "auto")
+                .appendQueryParameter("tl", Locale.getDefault().getLanguage())
+                .build();// android language
+        RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
+        TextView description = (TextView) getView().findViewById(R.id.description);
+        String body = "text=" + Uri.encode(description.getText().toString());
+
+        JsonArrayRequest jsonRequest = new JsonArrayRequest(
+                Request.Method.POST,
+                translateUrl.toString(),
+                body,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.i(LOG_TAG, "YAY" + response);
+                        TextView description = (TextView) getView().findViewById(R.id.description);
+                        try {
+                            description.setText(response.getString(0));
+                        } catch (JSONException error) {
+                            Log.e(LOG_TAG, "Translation failed: " + error);
+                            Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(LOG_TAG, "Translation failed: " + error);
+                        Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+                    }
+                });
+        jsonRequest.setShouldCache(false);
+        queue.add(jsonRequest);
+
+    }
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -15,5 +15,6 @@
     <string name="search_location">Location:</string>
     <string name="search_keywords">Keywords:</string>
     <string name="cancel">Cancel</string>
+    <string name="menu_translate">Translate</string>
 
 </resources>

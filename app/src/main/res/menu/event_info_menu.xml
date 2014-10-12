@@ -31,6 +31,12 @@
         android:title="@string/menu_view_map"
         >
     </item>
+
+    <item
+        android:id="@+id/action_translate"
+        android:title="@string/menu_translate"
+        >
+    </item>
 <!--
     <item
         android:id="@+id/action_view_map"
