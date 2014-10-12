@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
@@ -60,13 +61,28 @@ public class EventInfoFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
+            case R.id.action_view_map:
+                // "geo:0,0?q=lat,lng(label)"
+                // "geo:0,0?q=my+street+address"
+                Uri mapUrl = Uri.parse("geo:0,0?q=" + Uri.encode(mEvent.getLocation()));
+                intent = new Intent(Intent.ACTION_VIEW, mapUrl);
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+                return true;
             case R.id.action_view_facebook:
+                Uri facebookUrl = Uri.parse(mEvent.getFacebookUrl());
+                intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
+                }
                 return true;
             case R.id.action_add_to_calendar:
-                Intent intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
+                intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mEvent.getLocation());
                 intent.putExtra(CalendarContract.Events.TITLE, mEvent.getTitle());
                 intent.putExtra(

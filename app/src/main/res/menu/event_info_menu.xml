@@ -23,7 +23,13 @@
         android:id="@+id/action_view_facebook"
         android:icon="@drawable/ic_menu_facebook"
         android:title="@string/menu_view_facebook"
-    >
+        >
+    </item>
+
+    <item
+        android:id="@+id/action_view_map"
+        android:title="@string/menu_view_map"
+        >
     </item>
 <!--
     <item
