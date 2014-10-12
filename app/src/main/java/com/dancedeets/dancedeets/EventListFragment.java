@@ -2,7 +2,9 @@ package com.dancedeets.dancedeets;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -171,6 +173,19 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         super.onStop();
     }
 
+    class FetchCityTask extends ReverseGeocodeTask {
+
+        public FetchCityTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(Address address) {
+            mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
+            Log.i(LOG_TAG, mSearchOptions.location);
+            fetchJsonData();
+        }
+    }
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
@@ -178,10 +193,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // to fetch on start if we have no location data (ie, app startup).
         if (mSearchOptions.location == null) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            Log.i(LOG_TAG, "Loc is " + location.getLatitude() + ", " + location.getLongitude());
-            mSearchOptions.location = location.getLatitude() + "," + location.getLongitude();
-            // I think this gets done by onCreateOptionsMenu?
-            fetchJsonData();
+            (new FetchCityTask(getActivity())).execute(location);
         }
     }
 
