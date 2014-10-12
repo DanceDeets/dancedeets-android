@@ -8,12 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Logger;
-import com.google.android.gms.analytics.Tracker;
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
-import com.parse.ParseInstallation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,15 +26,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
     public void onStart() {
         super.onStart();
-        //TODO: Move this to the Application?
-        GoogleAnalytics.getInstance(this).setDryRun(false);
-        GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
-        GoogleAnalytics.getInstance(this).enableAutoActivityReports(getApplication());
-        Tracker mGATracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.activity_tracker);
-        mGATracker.enableAutoActivityTracking(true);
-        Parse.initialize(getApplication(), "pTFDiCGQv0TJ3z3TwBaMdnEIhXYCa9bD9g6GPNNH", "gIYvPu8KgIizCu19a9UW7QrugJlXzBGQPpyxIHyC");
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-        Map<String,String> dimensions = new HashMap<String, String>();
+        Map<String, String> dimensions = new HashMap<String, String>();
         dimensions.put("Fragment", "Event List");
         ParseAnalytics.trackEvent("Fragment", dimensions);
     }
@@ -66,6 +53,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
         if (savedInstanceState == null) {
             handleIntent(getIntent());
+            ParseAnalytics.trackAppOpened(getIntent());
         }
     }
 
