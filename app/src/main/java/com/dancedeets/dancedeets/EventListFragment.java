@@ -281,7 +281,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         } else {
             Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
             builder.appendQueryParameter("location", mSearchOptions.location);
-            builder.appendQueryParameter("keywords", "");
+            builder.appendQueryParameter("keywords", mSearchOptions.keywords);
             builder.appendQueryParameter("distance", "10");
             builder.appendQueryParameter("distance_units", "miles");
             final Uri uri = builder.build();
