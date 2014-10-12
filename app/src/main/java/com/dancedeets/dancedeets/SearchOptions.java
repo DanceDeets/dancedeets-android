@@ -32,6 +32,8 @@ public class SearchOptions implements Parcelable {
     };
 
     public SearchOptions() {
+        location = "";
+        keywords = "";
     }
 
     private SearchOptions(Parcel in) {
