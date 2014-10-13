@@ -24,6 +24,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -379,17 +380,18 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Event event = mEventList.get(position);
         Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
+        VolleySingleton volley = VolleySingleton.getInstance();
+        // Prefetch Images
         if (event.getCoverUrl() != null) {
-            VolleySingleton volley = VolleySingleton.getInstance();
             volley.prefetchPhoto(event.getCoverUrl());
-            // TODO: Initiate a prefetch. But since it may take a bit to transfer activities
-            // we should ensure that the server responds with a small cachable TTL
-            // so that this will stick around in cache until the activity comes up.
-            // And we should verify this cache is working.
-            //JsonObjectRequest r = new JsonObjectRequest();
-            //r.set(event.getApiDataUrl());
-            //volley.getRequestQueue().add(r);
         }
+        // Prefetch API data too
+        JsonObjectRequest r = new JsonObjectRequest(event.getApiDataUrl(), null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+            }
+        }, null);
+        volley.getRequestQueue().add(r);
 
 
         // Notify the active callbacks interface (the activity, if the
