@@ -40,6 +40,9 @@ public class EventInfoFragment extends Fragment {
 
     protected Event mEvent;
 
+    protected View mRootView;
+    protected ShareActionProvider mShareActionProvider;
+
     public EventInfoFragment() {
     }
 
@@ -56,15 +59,18 @@ public class EventInfoFragment extends Fragment {
         inflater.inflate(R.menu.event_info_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+    }
+
+    protected void setUpShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         String url = formatShareText();
-        intent.putExtra(Intent.EXTRA_TEXT, url);
-        shareActionProvider.setShareIntent(intent);
+        intent.putExtra(Intent.EXTRA_TEXT,url);
+        mShareActionProvider.setShareIntent(intent);
     }
 
-    public String formatShareText() {
+    protected String formatShareText() {
         String url = mEvent.getUrl();
         return url;
     }
@@ -162,7 +168,7 @@ public class EventInfoFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_event_info,
+        mRootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
         Event tempEvent = Event.parse(getArguments());
 
@@ -173,7 +179,12 @@ public class EventInfoFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        setupView(rootView, response);
+                        try {
+                            onEventReceived(FullEvent.parse(response));
+                        } catch (JSONException e) {
+                            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
+                            return;
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -183,19 +194,19 @@ public class EventInfoFragment extends Fragment {
                     }
                 });
         VolleySingleton.getInstance().getRequestQueue().add(dataRequest);
-        return rootView;
+        return mRootView;
     }
 
-    public void setupView(View rootView, JSONObject response) {
-        try {
-            mEvent = FullEvent.parse(response);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
-            return;
-        }
+    public void onEventReceived(FullEvent event) {
+        mEvent = event;
         Log.i(LOG_TAG, "Received Event: " + mEvent);
+        setUpView();
+        setUpShareIntent();
+    }
+
+    public void setUpView() {
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
-        NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
+        NetworkImageView cover = (NetworkImageView) mRootView.findViewById(R.id.cover);
         cover.setImageUrl(mEvent.getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,13 +218,13 @@ public class EventInfoFragment extends Fragment {
             }
         });
 
-        TextView title = (TextView) rootView.findViewById(R.id.title);
+        TextView title = (TextView) mRootView.findViewById(R.id.title);
         title.setText(mEvent.getTitle());
-        TextView location = (TextView) rootView.findViewById(R.id.location);
+        TextView location = (TextView) mRootView.findViewById(R.id.location);
         location.setText(mEvent.getLocation());
-        TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
+        TextView startTime  = (TextView) mRootView.findViewById(R.id.start_time);
         startTime.setText(mEvent.getStartTimeString());
-        TextView description = (TextView) rootView.findViewById(R.id.description);
+        TextView description = (TextView) mRootView.findViewById(R.id.description);
         // TODO: Somehow linkify the links in description?
         // http://developer.android.com/reference/android/text/util/Linkify.html
         description.setText(mEvent.getDescription());
