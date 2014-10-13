@@ -28,7 +28,7 @@ public class ViewFlyerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Event event = Event.parse(getArguments());
+        FullEvent event = FullEvent.parse(getArguments());
         Log.i(LOG_TAG, "Received Bundle: " + getArguments());
         final ImageViewTouch imageViewTouch = new ImageViewTouch(getActivity(), null);
         imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
