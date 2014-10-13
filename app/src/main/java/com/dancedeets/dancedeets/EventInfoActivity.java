@@ -31,7 +31,8 @@ public class EventInfoActivity extends Activity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            setTitle(b.getString("title"));
+            Event event = Event.parse(b);
+            setTitle(event.getTitle());
         }
 
         // savedInstanceState is non-null when there is fragment state
