@@ -16,6 +16,8 @@
         android:layout_toEndOf="@id/search_location_label"
         android:layout_toRightOf="@id/search_location_label"
         android:paddingBottom="20dp"
+        android:selectAllOnFocus="true"
+        android:inputType="textAutoCorrect|textCapWords"
         />
     <TextView
         android:id="@+id/search_keywords_label"
@@ -31,5 +33,7 @@
         android:layout_toEndOf="@id/search_keywords_label"
         android:layout_toRightOf="@id/search_keywords_label"
         android:layout_below="@id/search_location"
+        android:selectAllOnFocus="true"
+        android:inputType="textAutoCorrect"
         />
 </RelativeLayout>

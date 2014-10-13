@@ -3,10 +3,12 @@ package com.dancedeets.dancedeets;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 /**
@@ -29,7 +31,7 @@ public class SearchDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View view = inflater.inflate(R.layout.event_search_options, null);
-        EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
+        final EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
         searchLocation.setText(mSearchOptions.location);
         builder.getContext();
         // Inflate and set the layout for the dialog
@@ -52,6 +54,18 @@ public class SearchDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
+        searchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                searchLocation.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager.showSoftInput(searchLocation, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
+            }
+        });
         return builder.create();
     }
 
