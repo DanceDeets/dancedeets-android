@@ -123,8 +123,10 @@ public class EventInfoFragment extends Fragment {
                 .appendQueryParameter("tl", Locale.getDefault().getLanguage())
                 .build();// android language
         RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
-        TextView description = (TextView) getView().findViewById(R.id.description);
-        String body = "text=" + Uri.encode(description.getText().toString());
+        TextView titleView = (TextView) getView().findViewById(R.id.title);
+        TextView descriptionView = (TextView) getView().findViewById(R.id.description);
+        String body = "q=" + Uri.encode(titleView.getText().toString())
+                + "&q=" + Uri.encode(descriptionView.getText().toString());
 
         JsonArrayRequest jsonRequest = new JsonArrayRequest(
                 Request.Method.POST,
@@ -134,9 +136,11 @@ public class EventInfoFragment extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
                         Log.i(LOG_TAG, "YAY" + response);
-                        TextView description = (TextView) getView().findViewById(R.id.description);
+                        TextView titleView = (TextView) getView().findViewById(R.id.title);
+                        TextView descriptionView = (TextView) getView().findViewById(R.id.description);
                         try {
-                            description.setText(response.getString(0));
+                            titleView.setText(response.getJSONArray(0).getString(0));
+                            descriptionView.setText(response.getJSONArray(1).getString(0));
                         } catch (JSONException error) {
                             Log.e(LOG_TAG, "Translation failed: " + error);
                             Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
