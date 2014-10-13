@@ -42,14 +42,14 @@ public class Event implements Parcelable {
             Date date = isoDateFormat.parse(startTimeString);
             mBundle.putLong("start_time", date.getTime());
         } catch (ParseException e) {
-            new JSONException("ParseException on date string: " + startTimeString + ": " + e);
+            throw new JSONException("ParseException on date string: " + startTimeString + ": " + e);
         }
         String endTimeString = jsonEvent.getString("end_time");
         try {
             Date date = isoDateFormat.parse(endTimeString);
             mBundle.putLong("end_time", date.getTime());
         } catch (ParseException e) {
-            new JSONException("ParseException on date string: " + endTimeString + ": " + e);
+            throw new JSONException("ParseException on date string: " + endTimeString + ": " + e);
         }
     }
 
