@@ -25,7 +25,7 @@
             android:layout_alignWithParentIfMissing="true"
             android:layout_below="@id/cover"
             android:gravity="center_vertical"
-            android:text="Event Title"
+            android:text=""
             android:textSize="20sp" />
 
         <TextView
@@ -35,7 +35,7 @@
             android:layout_below="@id/title"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:text="Event Location"
+            android:text=""
             android:textSize="14sp" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_below="@id/location"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:text="Event Start Date/Time"
+            android:text=""
             android:textSize="14sp" />
 
         <TextView
@@ -53,7 +53,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/start_time"
-            android:text="Event Description"
+            android:text=""
             android:textSize="14sp" />
 
     </RelativeLayout>
