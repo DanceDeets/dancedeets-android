@@ -24,10 +24,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
@@ -155,8 +157,8 @@ public class EventInfoFragment extends Fragment {
                 });
         jsonRequest.setShouldCache(false);
         queue.add(jsonRequest);
-
     }
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -165,6 +167,24 @@ public class EventInfoFragment extends Fragment {
                 container, false);
 
         mEvent = new Event(getArguments());
+
+        Log.i(LOG_TAG, "Retrieving: " + mEvent.getApiDataUrl());
+        JsonObjectRequest dataRequest = new JsonObjectRequest(
+                mEvent.getApiDataUrl(),
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i(LOG_TAG, "Got response: " + response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(LOG_TAG, "Error retrieving data: " + error);
+                    }
+                });
+        VolleySingleton.getInstance().getRequestQueue().add(dataRequest);
 
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
         Log.i(LOG_TAG, "Received Event via Bundle: " + mEvent);

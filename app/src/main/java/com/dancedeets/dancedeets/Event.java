@@ -108,6 +108,11 @@ public class Event implements Parcelable {
     public String getFacebookUrl() {
         return "http://www.facebook.com/events/" + getId() + "/";
     }
+
+    public String getApiDataUrl() {
+        return "http://www.dancedeets.com/api/events/" + getId();
+    }
+
     public int describeContents() {
         return 0;
     }

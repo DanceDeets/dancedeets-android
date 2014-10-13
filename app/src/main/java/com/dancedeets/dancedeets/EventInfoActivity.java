@@ -49,6 +49,7 @@ public class EventInfoActivity extends Activity {
             Fragment f = new EventInfoFragment();
             f.setArguments(getIntent().getExtras());
             getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+
             Map<String,String> dimensions = new HashMap<String, String>();
             dimensions.put("Fragment", "Event Info");
             ParseAnalytics.trackEvent("Fragment", dimensions);

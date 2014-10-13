@@ -383,7 +383,15 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         if (event.getCoverUrl() != null) {
             VolleySingleton volley = VolleySingleton.getInstance();
             volley.prefetchPhoto(event.getCoverUrl());
+            // TODO: Initiate a prefetch. But since it may take a bit to transfer activities
+            // we should ensure that the server responds with a small cachable TTL
+            // so that this will stick around in cache until the activity comes up.
+            // And we should verify this cache is working.
+            //JsonObjectRequest r = new JsonObjectRequest();
+            //r.set(event.getApiDataUrl());
+            //volley.getRequestQueue().add(r);
         }
+
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
