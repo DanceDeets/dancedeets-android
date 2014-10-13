@@ -6,7 +6,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,7 +14,7 @@ import java.util.Date;
 /**
  * Created by lambert on 2014/10/02.
  */
-public class Event implements Serializable {
+public class Event extends IdEvent {
 
     static String LOG_TAG = "Event";
 
@@ -24,7 +23,6 @@ public class Event implements Serializable {
 
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    protected String mId;
     protected String mTitle;
     protected String mLocation;
     protected String mDescription;
@@ -74,22 +72,12 @@ public class Event implements Serializable {
         return event;
     }
 
-    public String getId() {
-        return mId;
-    }
-
     public String getTitle() {
         return mTitle;
     }
 
     public String getCoverUrl() {
         return mCoverUrl;
-    }
-
-    public Bundle getBundle() {
-        Bundle b = new Bundle();
-        b.putSerializable("EVENT", this);
-        return b;
     }
 
     public String getThumbnailUrl() {
@@ -126,17 +114,5 @@ public class Event implements Serializable {
 
     public String getDescription() {
         return mDescription;
-    }
-
-    public String getUrl() {
-        return "http://www.dancedeets.com/events/" + getId() + "/";
-    }
-
-    public String getFacebookUrl() {
-        return "http://www.facebook.com/events/" + getId() + "/";
-    }
-
-    public String getApiDataUrl() {
-        return "http://www.dancedeets.com/api/events/" + getId();
     }
 }

@@ -16,5 +16,6 @@
     <string name="search_keywords">Keywords:</string>
     <string name="cancel">Cancel</string>
     <string name="menu_translate">Translate</string>
+    <string name="filter_title_viewevent">DanceDeets Event</string>
 
 </resources>

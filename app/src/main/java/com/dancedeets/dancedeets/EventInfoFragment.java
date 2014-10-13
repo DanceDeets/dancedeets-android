@@ -119,8 +119,6 @@ public class EventInfoFragment extends Fragment {
                     Toast.makeText(getActivity(), "Could not find your Calendar!", Toast.LENGTH_SHORT).show();
                 }
                 return true;
-                //case R.id.action_view_map:
-            //    return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -170,7 +168,7 @@ public class EventInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
-        Event tempEvent = Event.parse(getArguments());
+        IdEvent tempEvent = IdEvent.parse(getArguments());
 
         Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
         JsonObjectRequest dataRequest = new JsonObjectRequest(
@@ -200,6 +198,10 @@ public class EventInfoFragment extends Fragment {
     public void onEventReceived(FullEvent event) {
         mEvent = event;
         Log.i(LOG_TAG, "Received Event: " + mEvent);
+        // Sometimes we might load an event by id, and not get a title until here:
+        if (getActivity() instanceof EventInfoActivity) {
+            getActivity().setTitle(event.getTitle());
+        }
         setUpView();
         setUpShareIntent();
     }
