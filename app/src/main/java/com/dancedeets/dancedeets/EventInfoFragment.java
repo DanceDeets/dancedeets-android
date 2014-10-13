@@ -196,12 +196,14 @@ public class EventInfoFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        FullEvent event;
                         try {
-                            onEventReceived(FullEvent.parse(response));
+                            event = FullEvent.parse(response);
                         } catch (JSONException e) {
                             Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
                             return;
                         }
+                        onEventReceived(event);
                     }
                 },
                 new Response.ErrorListener() {
