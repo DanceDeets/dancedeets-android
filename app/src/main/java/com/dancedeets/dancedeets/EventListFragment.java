@@ -330,8 +330,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             // If we saved the json, use it, otherwise fetch it from the server
             if (savedInstanceState.containsKey(STATE_SEARCH_OPTIONS)) {
                 mSearchOptions = (SearchOptions)savedInstanceState.getParcelable(STATE_SEARCH_OPTIONS);
-                Log.i(LOG_TAG, "Loading bundle-saved location: " + mSearchOptions);
-                //TODO: save this somewhere, and figure out if we want to do this in the activity or the fragment
+                Log.i(LOG_TAG, "Loading bundle-saved search options: " + mSearchOptions);
             }
         }
 
