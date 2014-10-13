@@ -3,6 +3,7 @@ package com.dancedeets.dancedeets;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,12 +61,12 @@ public class FullEvent extends Event {
 
         if (!jsonEvent.isNull("cover")) {
             JSONObject cover = jsonEvent.getJSONObject("cover");
-            cover.getString("cover_id");
-            cover.getJSONArray("images");
+            // What to do with cover.getString("cover_id"), or the various image dimensions
+            JSONArray coverImages = cover.getJSONArray("images");
+            event.mCoverUrl = ((JSONObject) coverImages.get(0)).getString("source");
         }
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
-        event.mCoverUrl = ((JSONObject) jsonEvent.getJSONObject("cover").getJSONArray("images").get(0)).getString("source");
         event.mLocation = jsonEvent.getJSONObject("venue").getString("name");
 
         return event;
