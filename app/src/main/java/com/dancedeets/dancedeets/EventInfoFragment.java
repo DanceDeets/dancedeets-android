@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,8 @@ public class EventInfoFragment extends Fragment {
     protected Event mEvent;
 
     protected View mRootView;
+    protected View mProgressContainer;
+    protected View mEventInfoContainer;
     protected ShareActionProvider mShareActionProvider;
 
     public EventInfoFragment() {
@@ -60,6 +63,11 @@ public class EventInfoFragment extends Fragment {
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        // Sometimes the event gets loaded before the share menu is set up,
+        // so this check handles that possibility and ensures the share intent is set.
+        if (mEvent != null) {
+            setUpShareIntent();
+        }
     }
 
     protected void setUpShareIntent() {
@@ -67,6 +75,8 @@ public class EventInfoFragment extends Fragment {
         intent.setType("text/plain");
         String url = formatShareText();
         intent.putExtra(Intent.EXTRA_TEXT,url);
+        // Sometimes we receive an event so quickly, it happens before the menu can be shown...
+        // so we cannot rely on mShareActionProvider here. Maybe we should get rid of the
         mShareActionProvider.setShareIntent(intent);
     }
 
@@ -168,6 +178,15 @@ public class EventInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
+        mProgressContainer = mRootView.findViewById(R.id.progress_container);
+        mEventInfoContainer = mRootView.findViewById(R.id.event_info);
+        // Show the progress bar until we receive data
+        mProgressContainer.setVisibility(View.VISIBLE);
+        mEventInfoContainer.setVisibility(View.GONE);
+
+        View loadingView = inflater.inflate(R.layout.loading_layout,
+                container, false);
+        ((ViewGroup)mRootView).addView(loadingView);
         IdEvent tempEvent = IdEvent.parse(getArguments());
 
         Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
@@ -203,7 +222,17 @@ public class EventInfoFragment extends Fragment {
             getActivity().setTitle(event.getTitle());
         }
         setUpView();
-        setUpShareIntent();
+        // Only call this if we've set up the menu already..
+        // otherwise, we set it up later, at the same time as the menu
+        if (mShareActionProvider != null) {
+            setUpShareIntent();
+        }
+        mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+                getActivity(), android.R.anim.fade_out));
+        mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
+                getActivity(), android.R.anim.fade_in));
+        mProgressContainer.setVisibility(View.GONE);
+        mEventInfoContainer.setVisibility(View.VISIBLE);
     }
 
     public void setUpView() {

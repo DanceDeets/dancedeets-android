@@ -17,5 +17,6 @@
     <string name="cancel">Cancel</string>
     <string name="menu_translate">Translate</string>
     <string name="filter_title_viewevent">DanceDeets Event</string>
+    <string name="loading">Loading...</string>
 
 </resources>

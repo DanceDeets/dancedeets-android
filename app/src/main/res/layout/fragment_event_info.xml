@@ -1,60 +1,70 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <include layout="@layout/loading_layout"/>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
+        android:id="@+id/event_info"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-        >
+        android:layout_height="wrap_content">
 
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/cover"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:contentDescription="@null"
-            android:src="@null" />
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            >
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_below="@id/cover"
-            android:gravity="center_vertical"
-            android:text=""
-            android:textSize="20sp" />
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/cover"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:contentDescription="@null"
+                android:src="@null" />
 
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text=""
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_below="@id/cover"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/start_time"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/location"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text=""
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text=""
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/start_time"
-            android:text=""
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/location"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text=""
+                android:textSize="14sp" />
 
-    </RelativeLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/start_time"
+                android:text=""
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+    </ScrollView>
+    <include layout="@layout/loading_layout"/>
+</FrameLayout>
