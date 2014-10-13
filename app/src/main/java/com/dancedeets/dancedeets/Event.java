@@ -19,7 +19,8 @@ public class Event implements Serializable {
 
     static String LOG_TAG = "Event";
 
-    static DateFormat localizedFormat = DateFormat.getDateTimeInstance();
+    static DateFormat localizedDateFormat = DateFormat.getDateInstance();
+    static DateFormat localizedDateTimeFormat = DateFormat.getDateTimeInstance();
 
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -29,6 +30,7 @@ public class Event implements Serializable {
     protected String mDescription;
     protected long mStartTime;
     protected long mEndTime;
+    protected boolean mAllDayEvent;
 
     protected String mImageUrl;
     protected String mCoverUrl;
@@ -99,7 +101,11 @@ public class Event implements Serializable {
     }
 
     public String getStartTimeString() {
-        return localizedFormat.format(getStartTimeLong());
+        if (mAllDayEvent) {
+            return localizedDateFormat.format(getStartTimeLong());
+        } else {
+            return localizedDateTimeFormat.format(getStartTimeLong());
+        }
     }
 
     public long getEndTimeLong() {
@@ -107,7 +113,11 @@ public class Event implements Serializable {
     }
 
     public String getEndTimeString() {
-        return localizedFormat.format(getEndTimeLong());
+        if (mAllDayEvent) {
+            return localizedDateFormat.format(getEndTimeLong());
+        } else {
+            return localizedDateTimeFormat.format(getEndTimeLong());
+        }
     }
 
     public String getLocation() {

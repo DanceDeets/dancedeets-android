@@ -18,7 +18,8 @@ public class FullEvent extends Event {
 
     static String LOG_TAG = "FullEvent";
 
-    static DateFormat isoDateFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     protected FullEvent() {}
 
@@ -35,15 +36,21 @@ public class FullEvent extends Event {
 
         String startTimeString = jsonEvent.getString("start_time");
         try {
-            Date date = isoDateFormatWithTZ.parse(startTimeString);
+            Date date = isoDateTimeFormatWithTZ.parse(startTimeString);
             event.mStartTime = date.getTime();
-        } catch (ParseException e) {
-            throw new JSONException("ParseException on start_time string: " + startTimeString + ": " + e);
+        } catch (ParseException e1) {
+            try {
+                Date date = isoDateFormat.parse(startTimeString);
+                event.mStartTime = date.getTime();
+                event.mAllDayEvent = true;
+            } catch (ParseException e2) {
+                throw new JSONException("ParseException on start_time string: " + startTimeString);
+            }
         }
         String endTimeString = jsonEvent.optString("end_time", null);
         if (endTimeString != null) {
             try {
-                Date date = isoDateFormatWithTZ.parse(endTimeString);
+                Date date = isoDateTimeFormatWithTZ.parse(endTimeString);
                 event.mEndTime = date.getTime();
             } catch (ParseException e) {
                 // Don't make this a fatal error, so we still see the events in the list view!
