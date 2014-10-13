@@ -119,7 +119,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             Event event = null;
             try {
                 JSONObject jsonEvent = response.getJSONObject(i);
-                event = new Event(jsonEvent);
+                event = Event.parse(jsonEvent);
                 // Prefetch images so scrolling "just works"
                 volley.prefetchThumbnail(event.getThumbnailUrl());
             } catch (JSONException e) {
@@ -323,7 +323,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                         .getInt(STATE_ACTIVATED_POSITION));
             }
             if (savedInstanceState.containsKey(STATE_EVENT_LIST)) {
-                ArrayList<Event> eventList = savedInstanceState.getParcelableArrayList(STATE_EVENT_LIST);
+                ArrayList<Event> eventList = (ArrayList<Event>)savedInstanceState.getSerializable(STATE_EVENT_LIST);
                 mEventList.addAll(eventList);
                 onEventListFilled();
             }
@@ -409,7 +409,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
         if (mEventList != null) {
-            outState.putParcelableArrayList(STATE_EVENT_LIST, mEventList);
+            outState.putSerializable(STATE_EVENT_LIST, mEventList);
         }
         if (mSearchOptions != null) {
             outState.putParcelable(STATE_SEARCH_OPTIONS, mSearchOptions);
@@ -424,9 +424,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     public void setActivateOnItemClick(boolean activateOnItemClick) {
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
-        getListView().setChoiceMode(
-                true ? ListView.CHOICE_MODE_SINGLE
-                        : ListView.CHOICE_MODE_NONE);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
 
     private void setActivatedPosition(int position) {

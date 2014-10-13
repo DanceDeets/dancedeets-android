@@ -1,12 +1,12 @@
 package com.dancedeets.dancedeets;
 
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,70 +15,87 @@ import java.util.Date;
 /**
  * Created by lambert on 2014/10/02.
  */
-public class Event implements Parcelable {
-    Bundle mBundle;
+public class Event implements Serializable {
+
+    static String LOG_TAG = "Event";
+
     static DateFormat localizedFormat = DateFormat.getDateTimeInstance();
 
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    public Event(Bundle b) {
-        mBundle = (Bundle)b.clone();
+    protected String mId;
+    protected String mTitle;
+    protected String mLocation;
+    protected String mDescription;
+    protected long mStartTime;
+    protected long mEndTime;
+
+    protected String mImageUrl;
+    protected String mCoverUrl;
+
+
+    protected Event() {
     }
 
-    public Event(JSONObject jsonEvent) throws JSONException {
-        mBundle = new Bundle();
-        mBundle.putString("image_url", jsonEvent.getString("image_url"));
+    static public Event parse(Bundle b) {
+        Event event = (Event)b.getSerializable("EVENT");
+        return event;
+    }
+
+    static public Event parse(JSONObject jsonEvent) throws JSONException {
+        Event event = new Event();
+        event.mImageUrl = jsonEvent.getString("image_url");
         if (!jsonEvent.isNull("cover_url")) {
-            mBundle.putString("cover_url", jsonEvent.getJSONObject("cover_url").getString("source"));
+            event.mCoverUrl = jsonEvent.getJSONObject("cover_url").getString("source");
         }
 
-        mBundle.putString("id", jsonEvent.getString("id"));
-        mBundle.putString("title", jsonEvent.getString("title"));
-        mBundle.putString("location", jsonEvent.getString("location"));
-        mBundle.putString("description", jsonEvent.getString("description"));
+        event.mId = jsonEvent.getString("id");
+        event.mTitle = jsonEvent.getString("title");
+        event.mLocation = jsonEvent.getString("location");
+        event.mDescription = jsonEvent.getString("description");
 
-        String startTimeString = jsonEvent.getString("end_time");
+        String startTimeString = jsonEvent.getString("start_time");
         try {
             Date date = isoDateFormat.parse(startTimeString);
-            mBundle.putLong("start_time", date.getTime());
+            event.mStartTime = date.getTime();
         } catch (ParseException e) {
-            throw new JSONException("ParseException on date string: " + startTimeString + ": " + e);
+            throw new JSONException("ParseException on start_time string: " + startTimeString + ": " + e);
         }
         String endTimeString = jsonEvent.getString("end_time");
         try {
             Date date = isoDateFormat.parse(endTimeString);
-            mBundle.putLong("end_time", date.getTime());
+            event.mEndTime = date.getTime();
         } catch (ParseException e) {
-            throw new JSONException("ParseException on date string: " + endTimeString + ": " + e);
+            // Don't make this a fatal error, so we still see the events in the list view!
+            Log.e(LOG_TAG, "ParseException on end_time string: " + endTimeString + ": " + e);
         }
+        return event;
     }
 
     public String getId() {
-        return mBundle.getString("id");
+        return mId;
     }
 
     public String getTitle() {
-        return mBundle.getString("title");
+        return mTitle;
     }
 
     public String getCoverUrl() {
-        if (mBundle.containsKey("cover_url")) {
-            return mBundle.getString("cover_url");
-        } else {
-            return null;
-        }
+        return mCoverUrl;
     }
 
     public Bundle getBundle() {
-        return (Bundle)mBundle.clone();
+        Bundle b = new Bundle();
+        b.putSerializable("EVENT", this);
+        return b;
     }
 
     public String getThumbnailUrl() {
-        return mBundle.getString("image_url");
+        return mImageUrl;
     }
 
     public long getStartTimeLong() {
-        return mBundle.getLong("start_time");
+        return mStartTime;
     }
 
     public String getStartTimeString() {
@@ -86,7 +103,7 @@ public class Event implements Parcelable {
     }
 
     public long getEndTimeLong() {
-        return mBundle.getLong("end_time");
+        return mEndTime;
     }
 
     public String getEndTimeString() {
@@ -94,11 +111,11 @@ public class Event implements Parcelable {
     }
 
     public String getLocation() {
-        return mBundle.getString("location");
+        return mLocation;
     }
 
     public String getDescription() {
-        return mBundle.getString("description");
+        return mDescription;
     }
 
     public String getUrl() {
@@ -111,28 +128,5 @@ public class Event implements Parcelable {
 
     public String getApiDataUrl() {
         return "http://www.dancedeets.com/api/events/" + getId();
-    }
-
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeBundle(mBundle);
-    }
-
-    public static final Parcelable.Creator<Event> CREATOR
-            = new Parcelable.Creator<Event>() {
-        public Event createFromParcel(Parcel in) {
-            return new Event(in);
-        }
-
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
-
-    private Event(Parcel in) {
-        mBundle = in.readBundle();
     }
 }

@@ -162,20 +162,18 @@ public class EventInfoFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
-        View rootView = inflater.inflate(R.layout.fragment_event_info,
+        final View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
+        Event tempEvent = Event.parse(getArguments());
 
-        mEvent = new Event(getArguments());
-
-        Log.i(LOG_TAG, "Retrieving: " + mEvent.getApiDataUrl());
+        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
         JsonObjectRequest dataRequest = new JsonObjectRequest(
-                mEvent.getApiDataUrl(),
+                tempEvent.getApiDataUrl(),
                 null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i(LOG_TAG, "Got response: " + response);
+                        setupView(rootView, response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -185,9 +183,19 @@ public class EventInfoFragment extends Fragment {
                     }
                 });
         VolleySingleton.getInstance().getRequestQueue().add(dataRequest);
+        return rootView;
+    }
 
+    public void setupView(View rootView, JSONObject response) {
+        try {
+            mEvent = FullEvent.parse(response);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
+            return;
+        }
+        Log.i(LOG_TAG, "Received Event: " + mEvent);
+        ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
-        Log.i(LOG_TAG, "Received Event via Bundle: " + mEvent);
         cover.setImageUrl(mEvent.getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,10 +214,9 @@ public class EventInfoFragment extends Fragment {
         TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
         startTime.setText(mEvent.getStartTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
-        // TODO: Somehow linkify the links in description? Maybe I need to use a web view?
+        // TODO: Somehow linkify the links in description?
+        // http://developer.android.com/reference/android/text/util/Linkify.html
         description.setText(mEvent.getDescription());
-
-        return rootView;
     }
 
     /* check if intent is available */
