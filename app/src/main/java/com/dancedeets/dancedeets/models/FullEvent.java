@@ -69,9 +69,10 @@ public class FullEvent extends Event {
         }
         JSONObject jsonVenue = jsonEvent.getJSONObject("venue");
         event.mVenue = Venue.parse(jsonVenue);
+        event.mLocation = event.mVenue.getName();
+
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
-        event.mLocation = jsonEvent.getJSONObject("venue").getString("name");
 
         return event;
     }
@@ -80,4 +81,7 @@ public class FullEvent extends Event {
         return mCoverData;
     }
 
+    public Venue getVenue() {
+        return mVenue;
+    }
 }

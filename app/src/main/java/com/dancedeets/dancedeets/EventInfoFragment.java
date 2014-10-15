@@ -27,9 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
-import com.dancedeets.dancedeets.models.Event;
 import com.dancedeets.dancedeets.models.FullEvent;
 import com.dancedeets.dancedeets.models.IdEvent;
+import com.dancedeets.dancedeets.models.Venue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +42,7 @@ public class EventInfoFragment extends Fragment {
 
     static final String LOG_TAG = "EventInfoFragment";
 
-    protected Event mEvent;
+    protected FullEvent mEvent;
 
     protected View mRootView;
     protected View mProgressContainer;
@@ -97,7 +97,12 @@ public class EventInfoFragment extends Fragment {
             case R.id.action_view_map:
                 // "geo:0,0?q=lat,lng(label)"
                 // "geo:0,0?q=my+street+address"
-                Uri mapUrl = Uri.parse("geo:0,0?q=" + Uri.encode(mEvent.getLocation()));
+                Venue venue = mEvent.getVenue();
+                double lat = venue.getLatitude();
+                double lng = venue.getLongitude();
+                String name = venue.getName();
+                Uri mapUrl = Uri.parse("geo:"+lat+","+lng+"?q=" + Uri.encode(name));
+                Log.i(LOG_TAG, "map url is "+mapUrl);
                 intent = new Intent(Intent.ACTION_VIEW, mapUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivity(intent);
