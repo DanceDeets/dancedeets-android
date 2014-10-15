@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
 * Created by lambert on 2014/10/14.
 */
-class CoverImage implements Serializable {
+public class CoverImage implements Serializable {
     protected String mSourceUrl;
     protected int mWidth;
     protected int mHeight;

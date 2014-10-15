@@ -11,7 +11,7 @@ import java.util.List;
 /**
 * Created by lambert on 2014/10/14.
 */
-class CoverData implements Serializable {
+public class CoverData implements Serializable {
     protected String mId;
 
     protected List<CoverImage> mCovers;
