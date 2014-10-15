@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.dancedeets.dancedeets.models.Event;
 
 import java.util.List;
 

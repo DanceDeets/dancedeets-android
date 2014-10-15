@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.dancedeets.models;
 
 import android.os.Bundle;
 import android.util.Log;

@@ -12,6 +12,8 @@ import android.support.v4.content.IntentCompat;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.dancedeets.models.IdEvent;
 import com.parse.ParseAnalytics;
 
 import java.util.HashMap;

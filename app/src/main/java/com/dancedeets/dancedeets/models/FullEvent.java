@@ -1,9 +1,8 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.dancedeets.models;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,10 +21,14 @@ public class FullEvent extends Event {
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-    protected FullEvent() {}
+    protected CoverData mCoverData;
+    protected Venue mVenue;
+
+    protected FullEvent() {
+    }
 
     static public FullEvent parse(Bundle b) {
-        return (FullEvent)Event.parse(b);
+        return (FullEvent) Event.parse(b);
     }
 
     static public FullEvent parse(JSONObject jsonEvent) throws JSONException {
@@ -60,15 +63,21 @@ public class FullEvent extends Event {
         }
 
         if (!jsonEvent.isNull("cover")) {
-            JSONObject cover = jsonEvent.getJSONObject("cover");
-            // What to do with cover.getString("cover_id"), or the various image dimensions
-            JSONArray coverImages = cover.getJSONArray("images");
-            event.mCoverUrl = ((JSONObject) coverImages.get(0)).getString("source");
+            JSONObject jsonCover = jsonEvent.getJSONObject("cover");
+            event.mCoverData = CoverData.parse(jsonCover);
+            event.mCoverUrl = event.mCoverData.getLargestCover().getSourceUrl();
         }
+        JSONObject jsonVenue = jsonEvent.getJSONObject("venue");
+        event.mVenue = Venue.parse(jsonVenue);
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
         event.mLocation = jsonEvent.getJSONObject("venue").getString("name");
 
         return event;
     }
+
+    public CoverData getCoverData() {
+        return mCoverData;
+    }
+
 }

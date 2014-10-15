@@ -27,6 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.dancedeets.models.FullEvent;
+import com.dancedeets.dancedeets.models.IdEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;

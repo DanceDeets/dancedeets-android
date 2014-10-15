@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.dancedeets.dancedeets.models.Event;
 import com.parse.ParseAnalytics;
 
 import java.util.HashMap;
