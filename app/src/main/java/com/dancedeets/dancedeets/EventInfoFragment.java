@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dancedeets.dancedeets.models.FullEvent;
 import com.dancedeets.dancedeets.models.IdEvent;
+import com.dancedeets.dancedeets.models.NamedPerson;
 import com.dancedeets.dancedeets.models.Venue;
 
 import org.json.JSONArray;
@@ -246,6 +247,8 @@ public class EventInfoFragment extends Fragment {
     }
 
     public void setUpView() {
+        List<NamedPerson> adminList = mEvent.getAdmins();
+        Log.i(LOG_TAG, "admin list: "+adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         NetworkImageView cover = (NetworkImageView) mRootView.findViewById(R.id.cover);
         cover.setImageUrl(mEvent.getCoverUrl(), photoLoader);

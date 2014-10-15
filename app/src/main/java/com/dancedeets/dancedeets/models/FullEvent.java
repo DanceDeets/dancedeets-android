@@ -3,13 +3,16 @@ package com.dancedeets.dancedeets.models;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Represents an Event as returned by /api/events/XXX with the full set of fields.
@@ -23,6 +26,7 @@ public class FullEvent extends Event {
 
     protected CoverData mCoverData;
     protected Venue mVenue;
+    protected List<NamedPerson> mAdminList;
 
     protected FullEvent() {
     }
@@ -74,6 +78,13 @@ public class FullEvent extends Event {
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
 
+        JSONArray jsonAdmins = jsonEvent.getJSONArray("admins");
+        event.mAdminList = new ArrayList<NamedPerson>(jsonAdmins.length());
+        for (int i=0; i<jsonAdmins.length(); i++) {
+            JSONObject jsonAdmin = jsonAdmins.getJSONObject(i);
+            NamedPerson admin = new NamedPerson(jsonAdmin.getString("id"), jsonAdmin.getString("name"));
+            event.mAdminList.add(admin);
+        }
         return event;
     }
 
@@ -83,5 +94,10 @@ public class FullEvent extends Event {
 
     public Venue getVenue() {
         return mVenue;
+    }
+
+    // TODO: this is returning a mutable list, and violates our immutability guarantees.
+    public List<NamedPerson> getAdmins() {
+        return mAdminList;
     }
 }
