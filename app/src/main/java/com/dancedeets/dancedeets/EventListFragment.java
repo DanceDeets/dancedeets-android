@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
@@ -196,7 +197,22 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         if (mSearchOptions.location == null) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Reverse geocoding: " + location);
-            (new FetchCityTask(getActivity())).execute(location);
+            SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
+            if (location != null) {
+                pref.edit()
+                        .putFloat("latitude", (float)location.getLatitude())
+                        .putFloat("longitude", (float)location.getLongitude())
+                        .apply();
+            } else if (pref.getFloat("latitude", -1) != -1) {
+                location = new Location("Saved Preference File");
+                location.setLatitude(pref.getFloat("latitude", -1));
+                location.setLongitude(pref.getFloat("longitude", -1));
+            }
+            if (location != null) {
+                (new FetchCityTask(getActivity())).execute(location);
+            } else {
+                showSearchDialog();
+            }
         }
     }
 
@@ -220,23 +236,26 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             return true;
         }
         if (id == R.id.action_search) {
-            mSearchDialog = new SearchDialogFragment();
-            mSearchDialog.setSearchOptions(mSearchOptions);
-            mSearchDialog.show(getFragmentManager(), "search");
-            mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
-                @Override
-                public void onSearch(String location, String keywords) {
-                    Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
-                    mSearchOptions.location = location;
-                    mSearchOptions.keywords = keywords;
-                    fetchJsonData();
-                }
-            });
+            showSearchDialog();
         }
         return super.onOptionsItemSelected(item);
     }
 
 
+    public void showSearchDialog() {
+        mSearchDialog = new SearchDialogFragment();
+        mSearchDialog.setSearchOptions(mSearchOptions);
+        mSearchDialog.show(getFragmentManager(), "search");
+        mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
+            @Override
+            public void onSearch(String location, String keywords) {
+                Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
+                mSearchOptions.location = location;
+                mSearchOptions.keywords = keywords;
+                fetchJsonData();
+            }
+        });
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
