@@ -1,6 +1,7 @@
 package com.dancedeets.dancedeets;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class ViewFlyerFragment extends Fragment {
         imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
         container.addView(imageViewTouch);
+        container.setBackgroundColor(Color.BLACK);
 
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         photoLoader.get(event.getCoverUrl(), new ImageLoader.ImageListener() {
