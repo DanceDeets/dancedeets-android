@@ -24,22 +24,22 @@ public class EventUIAdapter extends BaseAdapter {
         TextView startTime;
     }
     private LayoutInflater mInflater;
-    private List<Event> mEventBundleList;
+    private List<Event> mEventList;
     private int mResource;
 
     public EventUIAdapter(Context context, List<Event> eventBundleList, int resource) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mEventBundleList = eventBundleList;
+        mEventList = eventBundleList;
         mResource = resource;
 
     }
     public int getCount() {
-        return mEventBundleList.size();
+        return mEventList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mEventBundleList.get(position);
+        return mEventList.get(position);
     }
 
     @Override
