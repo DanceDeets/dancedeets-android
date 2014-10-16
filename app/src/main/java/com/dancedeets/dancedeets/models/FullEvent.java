@@ -78,12 +78,14 @@ public class FullEvent extends Event {
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
 
-        JSONArray jsonAdmins = jsonEvent.getJSONArray("admins");
-        event.mAdminList = new ArrayList<NamedPerson>(jsonAdmins.length());
-        for (int i=0; i<jsonAdmins.length(); i++) {
-            JSONObject jsonAdmin = jsonAdmins.getJSONObject(i);
-            NamedPerson admin = new NamedPerson(jsonAdmin.getString("id"), jsonAdmin.getString("name"));
-            event.mAdminList.add(admin);
+        if (!jsonEvent.isNull("admins")) {
+            JSONArray jsonAdmins = jsonEvent.getJSONArray("admins");
+            event.mAdminList = new ArrayList<NamedPerson>(jsonAdmins.length());
+            for (int i = 0; i < jsonAdmins.length(); i++) {
+                JSONObject jsonAdmin = jsonAdmins.getJSONObject(i);
+                NamedPerson admin = new NamedPerson(jsonAdmin.getString("id"), jsonAdmin.getString("name"));
+                event.mAdminList.add(admin);
+            }
         }
         return event;
     }

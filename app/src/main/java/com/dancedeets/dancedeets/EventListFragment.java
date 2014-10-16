@@ -195,6 +195,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // to fetch on start if we have no location data (ie, app startup).
         if (mSearchOptions.location == null) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Log.i(LOG_TAG, "Reverse geocoding: " + location);
             (new FetchCityTask(getActivity())).execute(location);
         }
     }
