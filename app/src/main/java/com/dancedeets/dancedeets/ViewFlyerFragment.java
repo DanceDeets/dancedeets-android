@@ -68,8 +68,7 @@ public class ViewFlyerFragment extends Fragment {
         final ImageViewTouch imageViewTouch = new ImageViewTouch(getActivity(), null);
         imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
-        container.addView(imageViewTouch);
-        container.setBackgroundColor(Color.BLACK);
+        imageViewTouch.setBackgroundColor(Color.BLACK);
 
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         photoLoader.get(mEvent.getCoverUrl(), new ImageLoader.ImageListener() {
@@ -88,7 +87,7 @@ public class ViewFlyerFragment extends Fragment {
                 Log.e(LOG_TAG, "Failed to load flyer image for display: " + error);
             }
         });
-        return null;
+        return imageViewTouch;
     }
 
     public void setupShareIntent() {
