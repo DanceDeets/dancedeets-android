@@ -61,13 +61,15 @@ public class Event extends IdEvent {
         } catch (ParseException e) {
             throw new JSONException("ParseException on start_time string: " + startTimeString + ": " + e);
         }
-        String endTimeString = jsonEvent.getString("end_time");
-        try {
-            Date date = isoDateFormat.parse(endTimeString);
-            event.mEndTime = date.getTime();
-        } catch (ParseException e) {
-            // Don't make this a fatal error, so we still see the events in the list view!
-            Log.e(LOG_TAG, "ParseException on end_time string: " + endTimeString + ": " + e);
+        if (!jsonEvent.isNull("end_time")) {
+            String endTimeString = jsonEvent.getString("end_time");
+            try {
+                Date date = isoDateFormat.parse(endTimeString);
+                event.mEndTime = date.getTime();
+            } catch (ParseException e) {
+                // Don't make this a fatal error, so we still see the events in the list view!
+                Log.e(LOG_TAG, "ParseException on end_time string: " + endTimeString + ": " + e);
+            }
         }
         return event;
     }
