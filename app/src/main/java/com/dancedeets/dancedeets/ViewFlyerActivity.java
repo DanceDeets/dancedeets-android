@@ -9,6 +9,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.dancedeets.dancedeets.models.Event;
+
 /**
  * Shows zoomable/pannable event flyers, when clicked on from the event info page.
  */
@@ -27,7 +29,11 @@ public class ViewFlyerActivity extends Activity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            setTitle("Flyer for " + b.getString("title"));
+            Event event = Event.parse(b);
+            if (event != null) {
+                setTitle(event.getTitle());
+                setTitle("Flyer for " + event.getTitle());
+            }
         }
 
         // savedInstanceState is non-null when there is fragment state
