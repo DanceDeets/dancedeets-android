@@ -3,14 +3,20 @@ package com.dancedeets.dancedeets;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.IntentCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.dancedeets.dancedeets.models.Event;
 import com.dancedeets.dancedeets.models.IdEvent;
@@ -24,6 +30,8 @@ import java.util.Map;
 public class EventInfoActivity extends Activity {
 
     private static String LOG_TAG = "EventInfoActivity";
+
+    protected ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +63,6 @@ public class EventInfoActivity extends Activity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Fragment f = new EventInfoFragment();
-
             if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
                 Log.i(LOG_TAG, "Viewing URL: " + getIntent().getData());
                 Uri url = getIntent().getData();
@@ -74,6 +81,15 @@ public class EventInfoActivity extends Activity {
             dimensions.put("Fragment", "Event Info");
             ParseAnalytics.trackEvent("Fragment", dimensions);
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        PagerAdapter mEventInfoPagerAdapter = null;//new EventInfoPagerAdapter();
+        mViewPager = new ViewPager(context);
+        mViewPager.setAdapter(mEventInfoPagerAdapter);
+        return mViewPager;
     }
 
     @Override

@@ -55,8 +55,8 @@ public class FullEvent extends Event {
                 throw new JSONException("ParseException on start_time string: " + startTimeString);
             }
         }
-        String endTimeString = jsonEvent.optString("end_time", null);
-        if (endTimeString != null) {
+        if (!jsonEvent.isNull("end_time")) {
+            String endTimeString = jsonEvent.getString("end_time");
             try {
                 Date date = isoDateTimeFormatWithTZ.parse(endTimeString);
                 event.mEndTime = date.getTime();
