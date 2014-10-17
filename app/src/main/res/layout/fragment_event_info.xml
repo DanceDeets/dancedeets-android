@@ -20,10 +20,11 @@
 
             <com.android.volley.toolbox.NetworkImageView
                 android:id="@+id/cover"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:contentDescription="@null"
+                android:layout_centerInParent="true"
                 android:src="@null" />
 
             <TextView
@@ -32,7 +33,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignWithParentIfMissing="true"
                 android:layout_below="@id/cover"
-                android:gravity="center_vertical"
                 android:text=""
                 android:textSize="20sp" />
 

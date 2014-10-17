@@ -43,6 +43,8 @@ public class EventInfoFragment extends Fragment {
 
     static final String LOG_TAG = "EventInfoFragment";
 
+    static final String STATE_EVENT = "STATE_EVENT";
+
     protected FullEvent mEvent;
 
     protected View mRootView;
@@ -76,9 +78,13 @@ public class EventInfoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        // We may have a pending data request when this gets destroyed...
-        // This ensures the callback isn't called on a dead Fragment reference.
-        mDataRequest.cancel();
+        // If we restored this fragment, and grabbed mEvent from a bundle
+        // then mDataRequest is never initialized.
+        if (mDataRequest != null) {
+            // We may have a pending data request when this gets destroyed...
+            // This ensures the callback isn't called on a dead Fragment reference.
+            mDataRequest.cancel();
+        }
         super.onDestroy();
     }
 
@@ -194,7 +200,8 @@ public class EventInfoFragment extends Fragment {
                             Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
                         }
                     }
-                }, new Response.ErrorListener() {
+                },
+                new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(LOG_TAG, "Translation failed: " + error);
@@ -216,39 +223,50 @@ public class EventInfoFragment extends Fragment {
         mProgressContainer.setVisibility(View.VISIBLE);
         mEventInfoContainer.setVisibility(View.GONE);
 
-        View loadingView = inflater.inflate(R.layout.loading_layout,
-                container, false);
-        ((ViewGroup) mRootView).addView(loadingView);
-        IdEvent tempEvent = IdEvent.parse(getArguments());
-
-        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-        mDataRequest = new JsonObjectRequest(
-                tempEvent.getApiDataUrl(),
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        FullEvent event;
-                        try {
-                            event = FullEvent.parse(response);
-                        } catch (JSONException e) {
-                            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
-                            return;
-                        }
-                        onEventReceived(event);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Error retrieving data: " + error);
-                    }
-                });
-        VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
         return mRootView;
     }
 
-    public void onEventReceived(FullEvent event) {
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(STATE_EVENT, mEvent);
+    }
+
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            FullEvent event = (FullEvent)savedInstanceState.getSerializable(STATE_EVENT);
+            onEventReceived(event, false);
+        } else {
+            IdEvent tempEvent = IdEvent.parse(getArguments());
+
+            Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
+            mDataRequest = new JsonObjectRequest(
+                    tempEvent.getApiDataUrl(),
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            FullEvent event;
+                            try {
+                                event = FullEvent.parse(response);
+                            } catch (JSONException e) {
+                                Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
+                                return;
+                            }
+                            onEventReceived(event, true);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e(LOG_TAG, "Error retrieving data: " + error);
+                        }
+                    });
+            VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
+
+        }
+    }
+    public void onEventReceived(FullEvent event, boolean animate) {
+
         mEvent = event;
         if (mOnEventReceivedListener != null) {
             mOnEventReceivedListener.onEventReceived(event);
@@ -260,10 +278,12 @@ public class EventInfoFragment extends Fragment {
         if (mShareActionProvider != null) {
             setUpShareIntent();
         }
-        mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-                getActivity(), android.R.anim.fade_out));
-        mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
-                getActivity(), android.R.anim.fade_in));
+        if (animate) {
+            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+                    getActivity(), android.R.anim.fade_out));
+            mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
+                    getActivity(), android.R.anim.fade_in));
+        }
         mProgressContainer.setVisibility(View.GONE);
         mEventInfoContainer.setVisibility(View.VISIBLE);
     }
