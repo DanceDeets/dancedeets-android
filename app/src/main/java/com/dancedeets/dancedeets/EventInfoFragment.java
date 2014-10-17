@@ -49,14 +49,37 @@ public class EventInfoFragment extends Fragment {
     protected View mProgressContainer;
     protected View mEventInfoContainer;
     protected ShareActionProvider mShareActionProvider;
+    protected JsonObjectRequest mDataRequest;
+    private OnEventReceivedListener mOnEventReceivedListener;
+
+    public interface OnEventReceivedListener {
+        public void onEventReceived(FullEvent event);
+    }
 
     public EventInfoFragment() {
     }
+
+    public FullEvent getEvent() {
+        return mEvent;
+    }
+
+    public void setOnEventReceivedListener(OnEventReceivedListener mOnEventReceivedListener) {
+        this.mOnEventReceivedListener = mOnEventReceivedListener;
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        // We may have a pending data request when this gets destroyed...
+        // This ensures the callback isn't called on a dead Fragment reference.
+        mDataRequest.cancel();
+        super.onDestroy();
     }
 
     @Override
@@ -78,7 +101,7 @@ public class EventInfoFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         String url = formatShareText();
-        intent.putExtra(Intent.EXTRA_TEXT,url);
+        intent.putExtra(Intent.EXTRA_TEXT, url);
         // Sometimes we receive an event so quickly, it happens before the menu can be shown...
         // so we cannot rely on mShareActionProvider here. Maybe we should get rid of the
         mShareActionProvider.setShareIntent(intent);
@@ -102,8 +125,8 @@ public class EventInfoFragment extends Fragment {
                 double lat = venue.getLatitude();
                 double lng = venue.getLongitude();
                 String name = venue.getName();
-                Uri mapUrl = Uri.parse("geo:"+lat+","+lng+"?q=" + Uri.encode(name));
-                Log.i(LOG_TAG, "map url is "+mapUrl);
+                Uri mapUrl = Uri.parse("geo:" + lat + "," + lng + "?q=" + Uri.encode(name));
+                Log.i(LOG_TAG, "map url is " + mapUrl);
                 intent = new Intent(Intent.ACTION_VIEW, mapUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivity(intent);
@@ -195,11 +218,11 @@ public class EventInfoFragment extends Fragment {
 
         View loadingView = inflater.inflate(R.layout.loading_layout,
                 container, false);
-        ((ViewGroup)mRootView).addView(loadingView);
+        ((ViewGroup) mRootView).addView(loadingView);
         IdEvent tempEvent = IdEvent.parse(getArguments());
 
         Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-        JsonObjectRequest dataRequest = new JsonObjectRequest(
+        mDataRequest = new JsonObjectRequest(
                 tempEvent.getApiDataUrl(),
                 null,
                 new Response.Listener<JSONObject>() {
@@ -221,17 +244,16 @@ public class EventInfoFragment extends Fragment {
                         Log.e(LOG_TAG, "Error retrieving data: " + error);
                     }
                 });
-        VolleySingleton.getInstance().getRequestQueue().add(dataRequest);
+        VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
         return mRootView;
     }
 
     public void onEventReceived(FullEvent event) {
         mEvent = event;
-        Log.i(LOG_TAG, "Received Event: " + mEvent);
-        // Sometimes we might load an event by id, and not get a title until here:
-        if (getActivity() instanceof EventInfoActivity) {
-            getActivity().setTitle(event.getTitle());
+        if (mOnEventReceivedListener != null) {
+            mOnEventReceivedListener.onEventReceived(event);
         }
+
         setUpView();
         // Only call this if we've set up the menu already..
         // otherwise, we set it up later, at the same time as the menu
@@ -244,6 +266,13 @@ public class EventInfoFragment extends Fragment {
                 getActivity(), android.R.anim.fade_in));
         mProgressContainer.setVisibility(View.GONE);
         mEventInfoContainer.setVisibility(View.VISIBLE);
+    }
+
+    public String getTitle() {
+        if (mEvent != null) {
+            return mEvent.getTitle();
+        }
+        return null;
     }
 
     public void setUpView() {

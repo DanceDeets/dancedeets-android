@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
 
@@ -68,7 +69,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         /**
          * Callback for when an item has been selected.
          */
-        public void onEventSelected(Event event);
+        public void onEventSelected(List<Event> allEvents, int positionSelected);
     }
 
     static final String LOG_TAG = "EventListFragment";
@@ -421,7 +422,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
-            mCallbacks.onEventSelected(event);
+            mCallbacks.onEventSelected(mEventList, position);
         }
     }
 

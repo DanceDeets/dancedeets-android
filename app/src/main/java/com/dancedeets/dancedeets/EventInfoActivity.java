@@ -1,29 +1,21 @@
 package com.dancedeets.dancedeets;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.IntentCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.dancedeets.dancedeets.models.Event;
-import com.dancedeets.dancedeets.models.IdEvent;
+import com.dancedeets.dancedeets.models.FullEvent;
 import com.parse.ParseAnalytics;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -31,24 +23,39 @@ public class EventInfoActivity extends Activity {
 
     private static String LOG_TAG = "EventInfoActivity";
 
+    public static String ARG_EVENT = "EVENT";
+    public static String ARG_EVENT_ID_LIST = "EVENT_ID_LIST";
+    public static String ARG_EVENT_INDEX = "EVENT_INDEX";
+
     protected ViewPager mViewPager;
+    protected EventInfoPagerAdapter mEventInfoPagerAdapter;
+    protected String[] mEventIdList;
+    protected int mEventIndex;
+    protected EventInfoFragment mOldFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
-
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.event_info_pager);
+
+        Bundle b = getIntent().getExtras();
+        mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
+        mEventIndex = b.getInt(ARG_EVENT_INDEX);
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mEventIdList);
+        Event event = (Event)b.getSerializable(ARG_EVENT);
+
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        Bundle b = getIntent().getExtras();
-        if (b != null) {
-            Event event = Event.parse(b);
-            if (event != null) {
-                setTitle(event.getTitle());
-            }
-        }
+        mViewPager = (ViewPager)findViewById(R.id.event_pager);
+        mViewPager.setAdapter(mEventInfoPagerAdapter);
+
+        mViewPager.setCurrentItem(mEventIndex);
+
+        setTitleOnPageChange(event);
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -62,6 +69,7 @@ public class EventInfoActivity extends Activity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
+/*TODO: FIXME
             Fragment f = new EventInfoFragment();
             if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
                 Log.i(LOG_TAG, "Viewing URL: " + getIntent().getData());
@@ -69,27 +77,59 @@ public class EventInfoActivity extends Activity {
                 List<String> pathSegments = url.getPathSegments();
                 if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                     String eventId = pathSegments.get(1);
-                    IdEvent event = new IdEvent(eventId);
-                    f.setArguments(event.getBundle());
+                    IdEvent idEvent = new IdEvent(eventId);
+                    f.setArguments(idEvent.getBundle());
                 }
             } else {
-                f.setArguments(getIntent().getExtras());
+                f.setArguments(event.getBundle());
             }
             getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
-
+*/
             Map<String,String> dimensions = new HashMap<String, String>();
             dimensions.put("Fragment", "Event Info");
             ParseAnalytics.trackEvent("Fragment", dimensions);
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        PagerAdapter mEventInfoPagerAdapter = null;//new EventInfoPagerAdapter();
-        mViewPager = new ViewPager(context);
-        mViewPager.setAdapter(mEventInfoPagerAdapter);
-        return mViewPager;
+    /**
+     * Ensures that the title is set for the relevant Fragment correctly.
+     * It should properly handle the race conditions of switching to an uninitialized Fragment,
+     * as well as preventing the case of an old uninitialized Fragment initializing,
+     * and overwriting the current title with an incorrect one.
+     */
+    public void setTitleOnPageChange(Event currentEvent) {
+        // Since onPageSelected is not called until the first swipe, initialize the title here.
+        if (currentEvent != null) {
+            setTitle(currentEvent.getTitle());
+        }
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                Log.i(LOG_TAG, "onPageSelected: " + position);
+                // If we have an mOldFragment, we have a pending listener on it. Since it is no
+                // longer the current fragment, we should destroy any listeners we attached to it.
+                // Otherwise the callback an old fragment could overwrite the current correct title.
+                if (mOldFragment != null) {
+                    mOldFragment.setOnEventReceivedListener(null);
+                    mOldFragment = null;
+                }
+                //TODO: crash bug: onPageSelected gets called before anything has been populated.
+                EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
+                // This may return null, if the event API fetch hasn't returned yet
+                if (fragment.getEvent() != null) {
+                    setTitle(fragment.getEvent().getTitle());
+                } else {
+                    // So set our title later, when it does load
+                    fragment.setOnEventReceivedListener(new EventInfoFragment.OnEventReceivedListener() {
+                        @Override
+                        public void onEventReceived(FullEvent event) {
+                            setTitle(event.getTitle());
+                        }
+                    });
+                    mOldFragment = fragment;
+                }
+            }
+        });
     }
 
     @Override

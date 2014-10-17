@@ -12,6 +12,7 @@ import com.dancedeets.dancedeets.models.Event;
 import com.parse.ParseAnalytics;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -89,10 +90,11 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
      * the item with the given ID was selected.
      */
     @Override
-    public void onEventSelected(Event event) {
-        Bundle bundle = event.getBundle();
+    public void onEventSelected(List<Event> allEvents, int positionSelected) {
+        Event event = allEvents.get(positionSelected);
         Log.i(LOG_TAG, "Sending Event: " + event);
         if (mTwoPane) {
+            Bundle bundle = event.getBundle();
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
@@ -111,6 +113,16 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             }
 
         } else {
+            Bundle bundle = new Bundle();
+            String[] eventIdList = new String[allEvents.size()];
+            int i = 0;
+            for (Event otherEvent : allEvents) {
+                eventIdList[i++] = otherEvent.getId();
+            }
+            bundle.putStringArray(EventInfoActivity.ARG_EVENT_ID_LIST, eventIdList);
+            bundle.putInt(EventInfoActivity.ARG_EVENT_INDEX, positionSelected);
+            bundle.putSerializable(EventInfoActivity.ARG_EVENT, event);
+
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, EventInfoActivity.class);
