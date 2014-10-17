@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
 
-    private String LOG_TAG = "EventInfoPagerAdapter";
+    private static final String LOG_TAG = "EventInfoPagerAdapter";
 
     protected String[] mEventList;
 

@@ -21,11 +21,11 @@ import java.util.Map;
 
 public class EventInfoActivity extends Activity {
 
-    private static String LOG_TAG = "EventInfoActivity";
+    private static final String LOG_TAG = "EventInfoActivity";
 
-    public static String ARG_EVENT = "EVENT";
-    public static String ARG_EVENT_ID_LIST = "EVENT_ID_LIST";
-    public static String ARG_EVENT_INDEX = "EVENT_INDEX";
+    public static final String ARG_EVENT = "EVENT";
+    public static final String ARG_EVENT_ID_LIST = "EVENT_ID_LIST";
+    public static final String ARG_EVENT_INDEX = "EVENT_INDEX";
 
     protected ViewPager mViewPager;
     protected EventInfoPagerAdapter mEventInfoPagerAdapter;

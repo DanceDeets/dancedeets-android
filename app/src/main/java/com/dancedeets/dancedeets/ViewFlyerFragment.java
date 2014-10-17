@@ -33,7 +33,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
  */
 public class ViewFlyerFragment extends Fragment {
 
-    static final String LOG_TAG = "ViewFlyerFragment";
+    private static final String LOG_TAG = "ViewFlyerFragment";
 
     protected FullEvent mEvent;
     protected Bitmap mBitmap;

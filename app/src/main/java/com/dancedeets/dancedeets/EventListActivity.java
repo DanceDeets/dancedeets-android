@@ -18,13 +18,13 @@ import java.util.Map;
 
 public class EventListActivity extends Activity implements EventListFragment.Callbacks {
 
+    private static final String LOG_TAG = "EventListActivity";
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
-
-    static final String LOG_TAG = "EventListActivity";
 
     public void onStart() {
         super.onStart();

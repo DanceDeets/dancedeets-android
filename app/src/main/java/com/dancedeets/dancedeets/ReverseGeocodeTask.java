@@ -22,7 +22,7 @@ import java.util.Locale;
 public abstract class ReverseGeocodeTask extends
         AsyncTask<Location, Void, Address> {
 
-    private static String LOG_TAG = "ReverseGeocodeTask";
+    private static final String LOG_TAG = "ReverseGeocodeTask";
 
     private Context mContext;
 

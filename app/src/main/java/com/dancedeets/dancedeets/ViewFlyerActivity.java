@@ -16,7 +16,7 @@ import com.dancedeets.dancedeets.models.Event;
  */
 public class ViewFlyerActivity extends Activity {
 
-    private static String LOG_TAG = "ViewFlyerActivity";
+    private static final String LOG_TAG = "ViewFlyerActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

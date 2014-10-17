@@ -16,7 +16,8 @@ import android.widget.EditText;
  */
 public class SearchDialogFragment extends DialogFragment {
 
-    final static String LOG_TAG = "SearchDialogFragment";
+    private static final String LOG_TAG = "SearchDialogFragment";
+
     private OnSearchListener mOnClickListener;
     private SearchOptions mSearchOptions;
 

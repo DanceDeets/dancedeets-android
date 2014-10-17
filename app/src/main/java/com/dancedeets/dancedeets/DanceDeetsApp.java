@@ -13,7 +13,7 @@ import com.parse.ParseInstallation;
  */
 public class DanceDeetsApp extends Application {
 
-    public static String SAVED_DATA_FILENAME = "SAVED_DATA";
+    public static final String SAVED_DATA_FILENAME = "SAVED_DATA";
 
     public void onCreate() {
         initializeGoogle();

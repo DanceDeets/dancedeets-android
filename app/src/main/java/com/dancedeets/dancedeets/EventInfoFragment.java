@@ -41,9 +41,9 @@ import java.util.Locale;
 
 public class EventInfoFragment extends Fragment {
 
-    static final String LOG_TAG = "EventInfoFragment";
+    private static final String LOG_TAG = "EventInfoFragment";
 
-    static final String STATE_EVENT = "STATE_EVENT";
+    private static final String STATE_EVENT = "STATE_EVENT";
 
     protected FullEvent mEvent;
 
