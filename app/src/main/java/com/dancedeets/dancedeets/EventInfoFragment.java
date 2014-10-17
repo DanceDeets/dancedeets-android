@@ -233,38 +233,48 @@ public class EventInfoFragment extends Fragment {
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            FullEvent event = (FullEvent)savedInstanceState.getSerializable(STATE_EVENT);
-            onEventReceived(event, false);
+            FullEvent event = (FullEvent) savedInstanceState.getSerializable(STATE_EVENT);
+            // Sometimes we rotate the screen before the event can be loaded.
+            // Let's not mark it as received here...but instead let natural event loading happen.
+            if (event != null) {
+                onEventReceived(event, false);
+            } else {
+                loadEventFromArguments();
+            }
         } else {
-            IdEvent tempEvent = IdEvent.parse(getArguments());
-
-            Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-            mDataRequest = new JsonObjectRequest(
-                    tempEvent.getApiDataUrl(),
-                    null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            FullEvent event;
-                            try {
-                                event = FullEvent.parse(response);
-                            } catch (JSONException e) {
-                                Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
-                                return;
-                            }
-                            onEventReceived(event, true);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "Error retrieving data: " + error);
-                        }
-                    });
-            VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
-
+            loadEventFromArguments();
         }
     }
+
+    public void loadEventFromArguments() {
+        IdEvent tempEvent = IdEvent.parse(getArguments());
+
+        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
+        mDataRequest = new JsonObjectRequest(
+                tempEvent.getApiDataUrl(),
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        FullEvent event;
+                        try {
+                            event = FullEvent.parse(response);
+                        } catch (JSONException e) {
+                            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
+                            return;
+                        }
+                        onEventReceived(event, true);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(LOG_TAG, "Error retrieving data: " + error);
+                    }
+                });
+        VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
+    }
+
     public void onEventReceived(FullEvent event, boolean animate) {
 
         mEvent = event;
