@@ -185,9 +185,6 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
         @Override
         protected void onPostExecute(Address address) {
-            if (address == null || mSearchOptions == null) {
-                Log.e(LOG_TAG, "so is " + mSearchOptions + ", addr is " + address);
-            }
             mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
             Log.i(LOG_TAG, mSearchOptions.location);
             fetchJsonData();
