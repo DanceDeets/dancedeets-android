@@ -3,6 +3,7 @@ package com.dancedeets.dancedeets;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
@@ -16,6 +17,7 @@ import com.dancedeets.dancedeets.models.FullEvent;
 import com.parse.ParseAnalytics;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -40,55 +42,58 @@ public class EventInfoActivity extends Activity {
 
         setContentView(R.layout.event_info_pager);
 
-        Bundle b = getIntent().getExtras();
-        mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
-        mEventIndex = b.getInt(ARG_EVENT_INDEX);
-        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mEventIdList);
-        Event event = (Event)b.getSerializable(ARG_EVENT);
-
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         mViewPager = (ViewPager)findViewById(R.id.event_pager);
-        mViewPager.setAdapter(mEventInfoPagerAdapter);
-
         mViewPager.setCurrentItem(mEventIndex);
 
-        setTitleOnPageChange(event);
+        setTitleOnPageChange();
 
-        // savedInstanceState is non-null when there is fragment state
-        // saved from previous configurations of this activity
-        // (e.g. when rotating the screen from portrait to landscape).
-        // In this case, the fragment will automatically be re-added
-        // to its container so we don't need to manually add it.
-        // For more information, see the Fragments API guide at:
-        //
-        // http://developer.android.com/guide/components/fragments.html
-        //
+
         if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-/*TODO: FIXME
-            Fragment f = new EventInfoFragment();
-            if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
-                Log.i(LOG_TAG, "Viewing URL: " + getIntent().getData());
-                Uri url = getIntent().getData();
-                List<String> pathSegments = url.getPathSegments();
-                if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
-                    String eventId = pathSegments.get(1);
-                    IdEvent idEvent = new IdEvent(eventId);
-                    f.setArguments(idEvent.getBundle());
-                }
-            } else {
-                f.setArguments(event.getBundle());
-            }
-            getFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
-*/
+            handleIntent(getIntent());
+
             Map<String,String> dimensions = new HashMap<String, String>();
             dimensions.put("Fragment", "Event Info");
             ParseAnalytics.trackEvent("Fragment", dimensions);
         }
+    }
+
+    public void handleIntent(Intent intent) {
+        if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            Uri url = intent.getData();
+            Log.i(LOG_TAG, "Viewing URL: " + url);
+            List<String> pathSegments = url.getPathSegments();
+            if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
+                String eventId = pathSegments.get(1);
+                mEventIdList = new String[]{eventId};
+                mEventIndex = 0;
+            }
+        } else {
+            Bundle b = intent.getExtras();
+            mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
+            mEventIndex = b.getInt(ARG_EVENT_INDEX);
+
+            Event event = (Event)b.getSerializable(ARG_EVENT);
+            // Since onPageSelected is not called until the first swipe, initialize the title here.
+            if (event != null) {
+                setTitle(event.getTitle());
+            }
+        }
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mEventIdList);
+
+        mViewPager.setAdapter(mEventInfoPagerAdapter);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // getIntent return the intent that started this activity,
+        // so call setIntent in case we ever want to call getIntent.
+        setIntent(intent);
+        handleIntent(intent);
     }
 
     /**
@@ -97,11 +102,7 @@ public class EventInfoActivity extends Activity {
      * as well as preventing the case of an old uninitialized Fragment initializing,
      * and overwriting the current title with an incorrect one.
      */
-    public void setTitleOnPageChange(Event currentEvent) {
-        // Since onPageSelected is not called until the first swipe, initialize the title here.
-        if (currentEvent != null) {
-            setTitle(currentEvent.getTitle());
-        }
+    public void setTitleOnPageChange() {
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
