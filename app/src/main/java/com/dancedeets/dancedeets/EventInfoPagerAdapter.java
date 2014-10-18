@@ -4,7 +4,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v13.app.FragmentCompat;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.dancedeets.dancedeets.models.IdEvent;
@@ -19,14 +21,16 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
     private static final String LOG_TAG = "EventInfoPagerAdapter";
 
     protected String[] mEventList;
+    protected EventInfoFragment.OnEventReceivedListener mOnEventReceivedListener;
 
     // We have no way to grab the fragment for a given position, which makes it near-impossible to implement getItem().
     // So we need to override instantiateItem/destroyItem to keep track of fragments, so we can find a title.
     protected ArrayList<EventInfoFragment> mFragments;
     protected FragmentManager mFragmentManager;
 
-    public EventInfoPagerAdapter(FragmentManager fm, String[] eventList) {
+    public EventInfoPagerAdapter(FragmentManager fm, EventInfoFragment.OnEventReceivedListener listener, String[] eventList) {
         super(fm);
+        mOnEventReceivedListener = listener;
         mFragmentManager = fm;
         mEventList = eventList;
         mFragments = new ArrayList<EventInfoFragment>();
@@ -42,6 +46,7 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         EventInfoFragment fragment = (EventInfoFragment)super.instantiateItem(container, position);
+        fragment.setOnEventReceivedListener(mOnEventReceivedListener);
         // Grow the array as necessary, like super.instantiateItem does
         while (mFragments.size() <= position) {
             mFragments.add(null);
@@ -79,15 +84,15 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
         Parcelable p = super.saveState();
         Bundle bundle = new Bundle();
         bundle.putParcelable(STATE_SUPERCLASS, p);
-        int[] fragmentIds = new int[mFragments.size()];
-        for (int i = 0; i < mFragments.size(); i++) {
-            if (mFragments.get(i) != null) {
-                fragmentIds[i] = mFragments.get(i).getId();
-            } else {
-                fragmentIds[i] = -1;
+
+        Bundle fragmentsBundle = new Bundle();
+        for (int i=0; i<mFragments.size(); i++) {
+            Fragment f = mFragments.get(i);
+            if (f != null) {
+                mFragmentManager.putFragment(fragmentsBundle, Integer.toString(i), f);
             }
         }
-        bundle.putIntArray(STATE_FRAGMENT_IDS, fragmentIds);
+        bundle.putBundle(STATE_FRAGMENT_IDS, fragmentsBundle);
         return bundle;
     }
 
@@ -96,14 +101,23 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
         Bundle bundle = (Bundle)state;
         if (bundle != null) {
             super.restoreState(bundle.getParcelable(STATE_SUPERCLASS), loader);
-            int[] fragmentIds = bundle.getIntArray(STATE_FRAGMENT_IDS);
+            Bundle fragmentsBundle = bundle.getBundle(STATE_FRAGMENT_IDS);
             mFragments.clear();
-            mFragments.ensureCapacity(fragmentIds.length);
-            for (int i = 0; i < fragmentIds.length; i++) {
-                mFragments.add(i, null);
-                if (fragmentIds[i] != -1) {
-                    mFragments.set(i, (EventInfoFragment)mFragmentManager.findFragmentById(fragmentIds[i]));
+            mFragments.ensureCapacity(fragmentsBundle.size());
+            Iterable<String> keys = fragmentsBundle.keySet();
+            for (String key: keys) {
+                int index = Integer.parseInt(key);
+                Fragment f = mFragmentManager.getFragment(fragmentsBundle, key);
+                if (f != null) {
+                    while (mFragments.size() <= index) {
+                        mFragments.add(null);
+                    }
+                    FragmentCompat.setMenuVisibility(f, false);
+                    mFragments.set(index, (EventInfoFragment)f);
+                } else {
+                    Log.w(LOG_TAG, "Bad fragment at key " + key);
                 }
+
             }
         }
     }
