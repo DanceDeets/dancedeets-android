@@ -11,7 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testPackageName "com.dancedeets.dancedeets.tests"
+        testApplicationId "com.dancedeets.dancedeets.tests"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     buildTypes {
