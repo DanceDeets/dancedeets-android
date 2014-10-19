@@ -124,10 +124,16 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        // getIntent return the intent that started this activity,
-        // so call setIntent in case we ever want to call getIntent.
-        setIntent(intent);
-        handleIntent(intent);
+        // getIntent returns the intent that started this activity, so let's update with setIntent.
+        // However, sometimes we have app-internal "up" navigation with only a Component set...
+        // and that leaves the EventInfoActivity with nothing to work with, and no saved state.
+        // So instead, take the incoming intent (which may be minimal), and overlay it with the data
+        // from the old intent, and construct a new intent for use in setIntent and handleIntent.
+        Intent newIntent = (Intent) intent.clone();
+        newIntent.fillIn(getIntent(), 0);
+        setIntent(newIntent);
+
+        handleIntent(newIntent);
     }
 
     @Override
