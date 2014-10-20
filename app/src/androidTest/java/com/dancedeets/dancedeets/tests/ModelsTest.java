@@ -2,7 +2,7 @@ package com.dancedeets.dancedeets.tests;
 
 import android.test.InstrumentationTestCase;
 
-import com.dancedeets.dancedeets.models.FullEvent;
+import com.dancedeets.dancedeets.models.Venue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,16 +35,49 @@ public class ModelsTest extends InstrumentationTestCase {
             inputStream.close();
         }
 
-        String jsonString = writer.toString();
-        return jsonString;
+        return writer.toString();
+    }
+    private JSONObject getJsonObjectFromResource(int resource) {
+        try {
+            InputStream inputStream = getInstrumentation().getContext().getResources().openRawResource(resource);
+            String jsonEvent = readTextFile(inputStream);
+            return new JSONObject(jsonEvent);
+        } catch (JSONException e) {
+            fail("JSONException when loading resource: " + resource + ": " + e);
+        } catch (IOException e) {
+            fail("IOException when loading resource: " + resource + ": " + e);
+        }
+        return null;
     }
 
-    public void testSomething() throws JSONException, IOException {
-        // We need to grab from the resources of the test file
-        InputStream inputStream = getInstrumentation().getContext().getResources().openRawResource(R.raw.fullevent_example_json);
-        String jsonEvent = readTextFile(inputStream);
-        FullEvent event = FullEvent.parse(new JSONObject(jsonEvent));
+    public void testVenueEverything() throws JSONException {
+        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_everything));
 
-        assertEquals(event.getTitle(), "ROOTSNYC OCTOBER 2014");
+        assertEquals("Venue Name", venue.getName());
+        assertEquals(41.0, venue.getLatLong().getLatitude());
+        assertEquals(-74.0, venue.getLatLong().getLongitude());
+    }
+
+    public void testVenueEverythingExceptZip() throws JSONException {
+        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_everything_except_zip));
+
+        assertEquals("Venue Name", venue.getName());
+        assertEquals(41.0, venue.getLatLong().getLatitude());
+        assertEquals(-74.0, venue.getLatLong().getLongitude());
+    }
+
+    public void testVenueNameIdGeocodeOnly() throws JSONException {
+        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_name_id_geocode_only));
+
+        assertEquals("Venue Name", venue.getName());
+        assertEquals(41.0, venue.getLatLong().getLatitude());
+        assertEquals(-74.0, venue.getLatLong().getLongitude());
+    }
+
+    public void testVenueNameOnly() throws JSONException {
+        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_name_only));
+
+        assertEquals("Venue Name", venue.getName());
+        assertNull(venue.getLatLong());
     }
 }

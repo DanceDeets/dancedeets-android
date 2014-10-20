@@ -10,11 +10,28 @@ import java.io.Serializable;
 */
 public class Venue implements Serializable {
 
+    public static class LatLong {
+        protected double mLatitude;
+        protected double mLongitude;
+
+        public LatLong(double latitude, double longitude) {
+            mLatitude = latitude;
+            mLongitude = longitude;
+        }
+
+        public double getLatitude() {
+            return mLatitude;
+        }
+
+        public double getLongitude() {
+            return mLongitude;
+        }
+    }
+
     protected String mId;
     protected String mName;
 
-    protected double mLatitude;
-    protected double mLongitude;
+    protected LatLong mLatLong;
 
     protected String mStreet;
     protected String mCity;
@@ -33,20 +50,19 @@ public class Venue implements Serializable {
         // "name": "KAI studio",
         // "id": "158623004183893"},
 
-        venue.mId = jsonObject.getString("id");
+        venue.mId = jsonObject.optString("id", null);
         venue.mName = jsonObject.getString("name");
         if (!jsonObject.isNull("geocode")) {
             JSONObject geocode = jsonObject.getJSONObject("geocode");
-            venue.mLatitude = geocode.getDouble("latitude");
-            venue.mLongitude = geocode.getDouble("longitude");
+            venue.mLatLong = new LatLong(geocode.getDouble("latitude"), geocode.getDouble("longitude"));
         }
         if (!jsonObject.isNull("address")) {
             JSONObject address = jsonObject.getJSONObject("address");
-            venue.mStreet = address.getString("street");
-            venue.mCity = address.getString("city");
-            venue.mState = address.getString("state");
-            venue.mZip = address.getString("zip");
-            venue.mCountry = address.getString("country");
+            venue.mStreet = address.optString("street", null);
+            venue.mCity = address.optString("city", null);
+            venue.mState = address.optString("state", null);
+            venue.mZip = address.optString("zip", null);
+            venue.mCountry = address.optString("country", null);
         }
         return venue;
     }
@@ -55,12 +71,7 @@ public class Venue implements Serializable {
         return mName;
     }
 
-    public double getLatitude() {
-        return mLatitude;
+    public LatLong getLatLong() {
+        return mLatLong;
     }
-
-    public double getLongitude() {
-        return mLongitude;
-    }
-
 }

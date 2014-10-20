@@ -128,10 +128,9 @@ public class EventInfoFragment extends Fragment {
                 // "geo:0,0?q=lat,lng(label)"
                 // "geo:0,0?q=my+street+address"
                 Venue venue = mEvent.getVenue();
-                double lat = venue.getLatitude();
-                double lng = venue.getLongitude();
+                Venue.LatLong latLong = venue.getLatLong();
                 String name = venue.getName();
-                Uri mapUrl = Uri.parse("geo:" + lat + "," + lng + "?q=" + Uri.encode(name));
+                Uri mapUrl = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude() + "?q=" + Uri.encode(name));
                 Log.i(LOG_TAG, "map url is " + mapUrl);
                 intent = new Intent(Intent.ACTION_VIEW, mapUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
