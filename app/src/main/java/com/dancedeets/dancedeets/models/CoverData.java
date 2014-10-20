@@ -46,4 +46,13 @@ public class CoverData implements Serializable {
         return largestCover;
     }
 
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        CoverData other = (CoverData)o;
+        return (mId.equals(other.mId) &&
+                mCovers.equals(other.mCovers)
+        );
+    }
 }

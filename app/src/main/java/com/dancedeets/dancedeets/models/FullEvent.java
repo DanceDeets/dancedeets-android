@@ -78,12 +78,15 @@ public class FullEvent extends Event {
         //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
         // event.mImageUrl = jsonEvent.getString("image_url");
 
-        if (!jsonEvent.isNull("admins")) {
+        if (jsonEvent.isNull("admins")) {
+            event.mAdminList = new ArrayList<NamedPerson>();
+        } else {
             JSONArray jsonAdmins = jsonEvent.getJSONArray("admins");
             event.mAdminList = new ArrayList<NamedPerson>(jsonAdmins.length());
             for (int i = 0; i < jsonAdmins.length(); i++) {
                 JSONObject jsonAdmin = jsonAdmins.getJSONObject(i);
-                NamedPerson admin = new NamedPerson(jsonAdmin.getString("id"), jsonAdmin.getString("name"));
+                NamedPerson admin = NamedPerson.parse(jsonAdmin);
+
                 event.mAdminList.add(admin);
             }
         }
@@ -101,5 +104,17 @@ public class FullEvent extends Event {
     // TODO: this is returning a mutable list, and violates our immutability guarantees.
     public List<NamedPerson> getAdmins() {
         return mAdminList;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        FullEvent other = (FullEvent)o;
+        return (super.equals(o) &&
+                (mCoverData == null ? other.mCoverData == null : mCoverData.equals(other.mCoverData)) &&
+                mVenue.equals(other.mVenue) &&
+                mAdminList.equals(other.mAdminList)
+        );
     }
 }

@@ -26,6 +26,14 @@ public class Venue implements Serializable {
         public double getLongitude() {
             return mLongitude;
         }
+
+        public boolean equals(Object o) {
+            if (!(o instanceof LatLong)) {
+                return false;
+            }
+            LatLong otherLatLong = (LatLong)o;
+            return mLatitude == otherLatLong.mLatitude && mLongitude == otherLatLong.mLongitude;
+        }
     }
 
     protected String mId;
@@ -73,5 +81,21 @@ public class Venue implements Serializable {
 
     public LatLong getLatLong() {
         return mLatLong;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        Venue other = (Venue)o;
+        return ((mId == null ? other.mId == null : mId.equals(other.mId)) &&
+                (mName == null ? other.mName == null : mName.equals(other.mName)) &&
+                (mLatLong == null ? other.mLatLong == null : mLatLong.equals(other.mLatLong)) &&
+                (mStreet == null ? other.mStreet == null : mStreet.equals(other.mStreet)) &&
+                (mCity == null ? other.mCity == null : mCity.equals(other.mCity)) &&
+                (mState == null ? other.mState == null : mState.equals(other.mState)) &&
+                (mZip == null ? other.mZip == null : mZip.equals(other.mZip)) &&
+                (mCountry == null ? other.mCountry == null : mCountry.equals(other.mCountry))
+        );
     }
 }

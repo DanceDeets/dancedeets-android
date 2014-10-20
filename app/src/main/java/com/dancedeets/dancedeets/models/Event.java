@@ -150,4 +150,21 @@ public class Event extends IdEvent {
     public String getDescription() {
         return mDescription;
     }
+
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        Event other = (Event)o;
+        return (super.equals(o) &&
+                mTitle.equals(other.mTitle) &&
+                mLocation.equals(other.mLocation) &&
+                mDescription.equals(other.mDescription) &&
+                (mImageUrl == null ? other.mImageUrl == null : mImageUrl.equals(other.mImageUrl)) &&
+                (mCoverUrl == null ? other.mCoverUrl == null : mCoverUrl.equals(other.mCoverUrl)) &&
+                mStartTime == other.mStartTime &&
+                mEndTime == other.mEndTime &&
+                mAllDayEvent == other.mAllDayEvent
+        );
+    }
 }

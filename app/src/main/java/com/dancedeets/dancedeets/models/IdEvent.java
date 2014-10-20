@@ -43,4 +43,13 @@ public class IdEvent implements Serializable {
     public String getApiDataUrl() {
         return "http://www.dancedeets.com/api/events/" + getId();
     }
+
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        IdEvent other = (IdEvent)o;
+        return mId.equals(other.mId);
+    }
+
 }

@@ -35,4 +35,15 @@ public class CoverImage implements Serializable {
     public int getHeight() {
         return mHeight;
     }
+
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (((Object)this).getClass() != o.getClass()) return false;
+        CoverImage other = (CoverImage)o;
+        return (mSourceUrl.equals(other.mSourceUrl) &&
+                mWidth == other.mWidth &&
+                mHeight == other.mHeight
+        );
+    }
 }
