@@ -2,6 +2,7 @@ package com.dancedeets.dancedeets.tests;
 
 import android.test.InstrumentationTestCase;
 
+import com.dancedeets.dancedeets.models.CoverData;
 import com.dancedeets.dancedeets.models.Venue;
 
 import org.json.JSONException;
@@ -79,5 +80,13 @@ public class ModelsTest extends InstrumentationTestCase {
 
         assertEquals("Venue Name", venue.getName());
         assertNull(venue.getLatLong());
+    }
+
+    public void testCoverUnsorted() throws JSONException {
+        CoverData coverData = CoverData.parse(getJsonObjectFromResource(R.raw.cover_unsorted));
+
+        assertEquals("Cover ID", coverData.getId());
+        assertEquals(2048, coverData.getLargestCover().getHeight());
+        assertEquals(1365, coverData.getLargestCover().getWidth());
     }
 }
