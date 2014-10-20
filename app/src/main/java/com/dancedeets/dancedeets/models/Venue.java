@@ -10,7 +10,7 @@ import java.io.Serializable;
 */
 public class Venue implements Serializable {
 
-    public static class LatLong {
+    public static class LatLong implements Serializable {
         protected double mLatitude;
         protected double mLongitude;
 

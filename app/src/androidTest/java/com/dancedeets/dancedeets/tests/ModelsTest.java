@@ -10,9 +10,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -109,5 +113,18 @@ public class ModelsTest extends InstrumentationTestCase {
         FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_allday));
         assertEquals("Oct 15, 2014", event.getStartTimeString(Locale.US));
         assertNull(event.getEndTimeString(Locale.US));
+    }
+
+    public void testFullEventSerialization() throws JSONException, ClassNotFoundException, IOException {
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_example_json));
+
+        ByteArrayOutputStream baoStream = new ByteArrayOutputStream();
+        ObjectOutputStream ooStream = new ObjectOutputStream(baoStream);
+        ooStream.writeObject(event);
+        byte[] bytes = baoStream.toByteArray();
+        ByteArrayInputStream baiStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream oiStream = new ObjectInputStream(baiStream);
+        FullEvent roundTripEvent = (FullEvent)oiStream.readObject();
+        assertEquals(event, roundTripEvent);
     }
 }
