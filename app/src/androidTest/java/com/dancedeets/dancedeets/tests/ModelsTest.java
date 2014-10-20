@@ -3,6 +3,7 @@ package com.dancedeets.dancedeets.tests;
 import android.test.InstrumentationTestCase;
 
 import com.dancedeets.dancedeets.models.CoverData;
+import com.dancedeets.dancedeets.models.FullEvent;
 import com.dancedeets.dancedeets.models.Venue;
 
 import org.json.JSONException;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Locale;
 
 /**
  * Created by lambert on 2014/10/19.
@@ -88,5 +90,24 @@ public class ModelsTest extends InstrumentationTestCase {
         assertEquals("Cover ID", coverData.getId());
         assertEquals(2048, coverData.getLargestCover().getHeight());
         assertEquals(1365, coverData.getLargestCover().getWidth());
+    }
+
+    public void testEventStartAndEndTime() throws JSONException {
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_start_and_end_time));
+        assertEquals("Oct 15, 2014 10:00 PM", event.getStartTimeString(Locale.US));
+        assertEquals("Oct 16, 2014 4:00 AM", event.getEndTimeString(Locale.US));
+    }
+
+    public void testEventStartTimeOnly() throws JSONException {
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_no_end_time));
+        assertEquals("Oct 15, 2014 10:00 PM", event.getStartTimeString(Locale.US));
+        assertNull(event.getEndTimeString(Locale.US));
+        assertEquals(0, event.getEndTimeLong());
+    }
+
+    public void testEventAllDay() throws JSONException {
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_allday));
+        assertEquals("Oct 15, 2014", event.getStartTimeString(Locale.US));
+        assertNull(event.getEndTimeString(Locale.US));
     }
 }
