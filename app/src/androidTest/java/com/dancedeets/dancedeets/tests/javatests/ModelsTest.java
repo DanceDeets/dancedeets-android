@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets.tests;
+package com.dancedeets.dancedeets.tests.javatests;
 
 import android.test.InstrumentationTestCase;
 
@@ -58,7 +58,7 @@ public class ModelsTest extends InstrumentationTestCase {
     }
 
     public void testVenueEverything() throws JSONException {
-        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_everything));
+        Venue venue = Venue.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.venue_everything));
 
         assertEquals("Venue Name", venue.getName());
         assertEquals(41.0, venue.getLatLong().getLatitude());
@@ -66,7 +66,7 @@ public class ModelsTest extends InstrumentationTestCase {
     }
 
     public void testVenueEverythingExceptZip() throws JSONException {
-        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_everything_except_zip));
+        Venue venue = Venue.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.venue_everything_except_zip));
 
         assertEquals("Venue Name", venue.getName());
         assertEquals(41.0, venue.getLatLong().getLatitude());
@@ -74,7 +74,7 @@ public class ModelsTest extends InstrumentationTestCase {
     }
 
     public void testVenueNameIdGeocodeOnly() throws JSONException {
-        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_name_id_geocode_only));
+        Venue venue = Venue.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.venue_name_id_geocode_only));
 
         assertEquals("Venue Name", venue.getName());
         assertEquals(41.0, venue.getLatLong().getLatitude());
@@ -82,14 +82,14 @@ public class ModelsTest extends InstrumentationTestCase {
     }
 
     public void testVenueNameOnly() throws JSONException {
-        Venue venue = Venue.parse(getJsonObjectFromResource(R.raw.venue_name_only));
+        Venue venue = Venue.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.venue_name_only));
 
         assertEquals("Venue Name", venue.getName());
         assertNull(venue.getLatLong());
     }
 
     public void testCoverUnsorted() throws JSONException {
-        CoverData coverData = CoverData.parse(getJsonObjectFromResource(R.raw.cover_unsorted));
+        CoverData coverData = CoverData.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.cover_unsorted));
 
         assertEquals("Cover ID", coverData.getId());
         assertEquals(2048, coverData.getLargestCover().getHeight());
@@ -97,26 +97,26 @@ public class ModelsTest extends InstrumentationTestCase {
     }
 
     public void testEventStartAndEndTime() throws JSONException {
-        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_start_and_end_time));
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.fullevent_start_and_end_time));
         assertEquals("Oct 15, 2014 10:00 PM", event.getStartTimeString(Locale.US));
         assertEquals("Oct 16, 2014 4:00 AM", event.getEndTimeString(Locale.US));
     }
 
     public void testEventStartTimeOnly() throws JSONException {
-        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_no_end_time));
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.fullevent_no_end_time));
         assertEquals("Oct 15, 2014 10:00 PM", event.getStartTimeString(Locale.US));
         assertNull(event.getEndTimeString(Locale.US));
         assertEquals(0, event.getEndTimeLong());
     }
 
     public void testEventAllDay() throws JSONException {
-        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_allday));
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.fullevent_allday));
         assertEquals("Oct 15, 2014", event.getStartTimeString(Locale.US));
         assertNull(event.getEndTimeString(Locale.US));
     }
 
     public void testFullEventSerialization() throws JSONException, ClassNotFoundException, IOException {
-        FullEvent event = FullEvent.parse(getJsonObjectFromResource(R.raw.fullevent_example_json));
+        FullEvent event = FullEvent.parse(getJsonObjectFromResource(com.dancedeets.dancedeets.tests.R.raw.fullevent_example_json));
 
         ByteArrayOutputStream baoStream = new ByteArrayOutputStream();
         ObjectOutputStream ooStream = new ObjectOutputStream(baoStream);
