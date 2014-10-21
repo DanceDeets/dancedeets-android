@@ -14,11 +14,8 @@ import android.view.MenuItem;
 
 import com.dancedeets.dancedeets.models.Event;
 import com.dancedeets.dancedeets.models.FullEvent;
-import com.parse.ParseAnalytics;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class EventInfoActivity extends Activity implements EventInfoFragment.OnEventReceivedListener {
@@ -69,9 +66,10 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
         });
 
         if (savedInstanceState == null) {
-            Map<String,String> dimensions = new HashMap<String, String>();
-            dimensions.put("Fragment", "Event Info");
-            ParseAnalytics.trackEvent("Fragment", dimensions);
+            // TODO: PARSE
+            // Map<String,String> dimensions = new HashMap<String, String>();
+            // dimensions.put("Fragment", "Event Info");
+            // ParseAnalytics.trackEvent("Fragment", dimensions);
         }
     }
 

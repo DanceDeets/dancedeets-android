@@ -15,8 +15,8 @@ public class RobolectricGradleTestRunner extends RobolectricTestRunner {
 
    @Override
     protected AndroidManifest getAppManifest(Config config) {
-        String manifestProperty = "../app/build/intermediates/manifests/test/debug/AndroidManifest.xml";
-        String resProperty = "../app/build/intermediates/res/debug";
+        String manifestProperty = "./build/intermediates/manifests/full/debug/AndroidManifest.xml";
+        String resProperty = "./build/intermediates/res/debug";
         return new AndroidManifest(Fs.fileFromPath(manifestProperty), Fs.fileFromPath(resProperty)) {
             @Override
             public int getTargetSdkVersion() {

@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.dancedeets.dancedeets.models.Event;
-import com.parse.ParseAnalytics;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,8 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         super.onStart();
         Map<String, String> dimensions = new HashMap<String, String>();
         dimensions.put("Fragment", "Event List");
-        ParseAnalytics.trackEvent("Fragment", dimensions);
+        //TODO: PARSE
+        // ParseAnalytics.trackEvent("Fragment", dimensions);
     }
 
     @Override
@@ -55,7 +55,8 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
         if (savedInstanceState == null) {
             handleIntent(getIntent());
-            ParseAnalytics.trackAppOpened(getIntent());
+            //TODO: PARSE
+            // ParseAnalytics.trackAppOpened(getIntent());
         }
     }
 

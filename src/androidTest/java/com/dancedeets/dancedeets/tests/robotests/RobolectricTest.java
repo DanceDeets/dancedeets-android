@@ -2,7 +2,7 @@ package com.dancedeets.dancedeets.tests.robotests;
 
 import android.app.Activity;
 
-import com.dancedeets.dancedeets.EventInfoActivity;
+import com.dancedeets.dancedeets.EventListActivity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ public class RobolectricTest {
 
     @Test
     public void testSomething() throws Exception {
-        Activity activity = Robolectric.buildActivity(EventInfoActivity.class).create().get();
+        Activity activity = Robolectric.buildActivity(EventListActivity.class).create().get();
         assertTrue(activity != null);
     }
 }

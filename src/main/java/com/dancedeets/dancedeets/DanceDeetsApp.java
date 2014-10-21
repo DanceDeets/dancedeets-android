@@ -24,8 +24,8 @@ public class DanceDeetsApp extends Application {
         GoogleAnalytics.getInstance(this).setDryRun(false);
         GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
         GoogleAnalytics.getInstance(this).enableAutoActivityReports(this);
-        Tracker mGATracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.activity_tracker);
-        mGATracker.enableAutoActivityTracking(true);
+        Tracker gaTracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.activity_tracker);
+        gaTracker.enableAutoActivityTracking(true);
     }
 
     protected void initializeParse() {
