@@ -7,4 +7,7 @@ import android.app.Fragment;
  */
 public abstract class RetainedState extends Fragment {
 
+    public RetainedState() {
+    }
+
 }

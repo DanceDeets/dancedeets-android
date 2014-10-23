@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,6 +30,10 @@ import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.IdEvent;
 import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.models.Venue;
+import com.dancedeets.android.uistate.BundledState;
+import com.dancedeets.android.uistate.DerivedState;
+import com.dancedeets.android.uistate.RetainedState;
+import com.dancedeets.android.uistate.StateFragment;
 import com.dancedeets.dancedeets.R;
 
 import org.json.JSONArray;
@@ -40,20 +43,24 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-public class EventInfoFragment extends Fragment {
+public class EventInfoFragment extends StateFragment<EventInfoFragment.MyBundledState, EventInfoFragment.MyDerivedState, EventInfoFragment.MyRetainedState> {
+
+    static protected class MyBundledState extends BundledState {
+        protected FullEvent mEvent;
+    }
+    static protected class MyDerivedState extends DerivedState {
+        protected View mRootView;
+        protected View mProgressContainer;
+        protected View mEventInfoContainer;
+        protected ShareActionProvider mShareActionProvider;
+
+        private OnEventReceivedListener mOnEventReceivedListener;
+    }
+    static public class MyRetainedState extends RetainedState {
+        protected JsonObjectRequest mDataRequest;
+    }
 
     private static final String LOG_TAG = "EventInfoFragment";
-
-    private static final String STATE_EVENT = "STATE_EVENT";
-
-    protected FullEvent mEvent;
-
-    protected View mRootView;
-    protected View mProgressContainer;
-    protected View mEventInfoContainer;
-    protected ShareActionProvider mShareActionProvider;
-    protected JsonObjectRequest mDataRequest;
-    private OnEventReceivedListener mOnEventReceivedListener;
 
     public interface OnEventReceivedListener {
         public void onEventReceived(FullEvent event);
@@ -63,30 +70,39 @@ public class EventInfoFragment extends Fragment {
     }
 
     public FullEvent getEvent() {
-        return mEvent;
+        return getBundledState().mEvent;
     }
 
     public void setOnEventReceivedListener(OnEventReceivedListener mOnEventReceivedListener) {
-        this.mOnEventReceivedListener = mOnEventReceivedListener;
+        getDerivedState().mOnEventReceivedListener = mOnEventReceivedListener;
     }
 
+
+    @Override
+    protected MyBundledState buildBundledState() {
+        return new MyBundledState();
+    }
+
+    @Override
+    protected MyDerivedState buildDerivedState() {
+        return new MyDerivedState();
+    }
+
+    @Override
+    protected MyRetainedState buildRetainedState() {
+        return new MyRetainedState();
+    }
+
+    @Override
+    public String getUniqueTag() {
+        IdEvent tempEvent = IdEvent.parse(getArguments());
+        return LOG_TAG + tempEvent.getId();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onDestroy() {
-        // If we restored this fragment, and grabbed mEvent from a bundle
-        // then mDataRequest is never initialized.
-        if (mDataRequest != null) {
-            // We may have a pending data request when this gets destroyed...
-            // This ensures the callback isn't called on a dead Fragment reference.
-            mDataRequest.cancel();
-        }
-        super.onDestroy();
     }
 
     @Override
@@ -96,10 +112,10 @@ public class EventInfoFragment extends Fragment {
         inflater.inflate(R.menu.event_info_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        getDerivedState().mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         // Sometimes the event gets loaded before the share menu is set up,
         // so this check handles that possibility and ensures the share intent is set.
-        if (mEvent != null) {
+        if (getEvent() != null) {
             setUpShareIntent();
         }
     }
@@ -111,11 +127,11 @@ public class EventInfoFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_TEXT, url);
         // Sometimes we receive an event so quickly, it happens before the menu can be shown...
         // so we cannot rely on mShareActionProvider here. Maybe we should get rid of the
-        mShareActionProvider.setShareIntent(intent);
+        getDerivedState().mShareActionProvider.setShareIntent(intent);
     }
 
     protected String formatShareText() {
-        String url = mEvent.getUrl();
+        String url = getEvent().getUrl();
         return url;
     }
 
@@ -128,7 +144,7 @@ public class EventInfoFragment extends Fragment {
             case R.id.action_view_map:
                 // "geo:0,0?q=lat,lng(label)"
                 // "geo:0,0?q=my+street+address"
-                Venue venue = mEvent.getVenue();
+                Venue venue = getEvent().getVenue();
                 Venue.LatLong latLong = venue.getLatLong();
                 String name = venue.getName();
                 Uri mapUrl = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude() + "?q=" + Uri.encode(name));
@@ -139,7 +155,7 @@ public class EventInfoFragment extends Fragment {
                 }
                 return true;
             case R.id.action_view_facebook:
-                Uri facebookUrl = Uri.parse(mEvent.getFacebookUrl());
+                Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
                 intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivity(intent);
@@ -150,17 +166,17 @@ public class EventInfoFragment extends Fragment {
                 return true;
             case R.id.action_add_to_calendar:
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mEvent.getLocation());
-                intent.putExtra(CalendarContract.Events.TITLE, mEvent.getTitle());
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getLocation());
+                intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                        mEvent.getStartTimeLong());
+                        getEvent().getStartTimeLong());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_END_TIME,
-                        mEvent.getEndTimeLong());
+                        getEvent().getEndTimeLong());
                 intent.putExtra(
                         CalendarContract.Events.DESCRIPTION,
-                        mEvent.getDescription());
+                        getEvent().getDescription());
                 if (isAvailable(getActivity(), intent)) {
                     startActivity(intent);
                 } else {
@@ -215,43 +231,30 @@ public class EventInfoFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_event_info,
+        getDerivedState().mRootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
-        mProgressContainer = mRootView.findViewById(R.id.progress_container);
-        mEventInfoContainer = mRootView.findViewById(R.id.event_info);
+        getDerivedState().mProgressContainer = getDerivedState().mRootView.findViewById(R.id.progress_container);
+        getDerivedState().mEventInfoContainer = getDerivedState().mRootView.findViewById(R.id.event_info);
         // Show the progress bar until we receive data
-        mProgressContainer.setVisibility(View.VISIBLE);
-        mEventInfoContainer.setVisibility(View.GONE);
+        getDerivedState().mProgressContainer.setVisibility(View.VISIBLE);
+        getDerivedState().mEventInfoContainer.setVisibility(View.GONE);
 
-        return mRootView;
-    }
-
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(STATE_EVENT, mEvent);
+        return getDerivedState().mRootView;
     }
 
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            FullEvent event = (FullEvent) savedInstanceState.getSerializable(STATE_EVENT);
-            // Sometimes we rotate the screen before the event can be loaded.
-            // Let's not mark it as received here...but instead let natural event loading happen.
-            if (event != null) {
-                onEventReceived(event, false);
-            } else {
-                loadEventFromArguments();
-            }
+        if (getEvent() != null) {
+            onEventReceived(getEvent(), false);
         } else {
             loadEventFromArguments();
         }
     }
 
-    public void loadEventFromArguments() {
-        IdEvent tempEvent = IdEvent.parse(getArguments());
-
-        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-        mDataRequest = new JsonObjectRequest(
-                tempEvent.getApiDataUrl(),
+    // This is done in a static method, so there are no references to this Fragment leaked
+    private static JsonObjectRequest constructEventRequest(String url, final RetainedState retainedState) {
+        return new JsonObjectRequest(
+                url,
                 null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -263,7 +266,7 @@ public class EventInfoFragment extends Fragment {
                             Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
                             return;
                         }
-                        onEventReceived(event, true);
+                        ((EventInfoFragment)retainedState.getTargetFragment()).onEventReceived(event, true);
                     }
                 },
                 new Response.ErrorListener() {
@@ -272,65 +275,71 @@ public class EventInfoFragment extends Fragment {
                         Log.e(LOG_TAG, "Error retrieving data: " + error);
                     }
                 });
-        VolleySingleton.getInstance().getRequestQueue().add(mDataRequest);
+    }
+
+    public void loadEventFromArguments() {
+        IdEvent tempEvent = IdEvent.parse(getArguments());
+
+        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
+        getRetainedState().mDataRequest = constructEventRequest(tempEvent.getApiDataUrl(), getRetainedState());
+        VolleySingleton.getInstance().getRequestQueue().add(getRetainedState().mDataRequest);
     }
 
     public void onEventReceived(FullEvent event, boolean animate) {
-
-        mEvent = event;
-        if (mOnEventReceivedListener != null) {
-            mOnEventReceivedListener.onEventReceived(event);
+        getBundledState().mEvent = event;
+        if (getDerivedState().mOnEventReceivedListener != null) {
+            getDerivedState().mOnEventReceivedListener.onEventReceived(event);
         }
 
         setUpView();
         // Only call this if we've set up the menu already..
         // otherwise, we set it up later, at the same time as the menu
-        if (mShareActionProvider != null) {
+        if (getDerivedState().mShareActionProvider != null) {
             setUpShareIntent();
         }
         if (animate) {
-            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+            getDerivedState().mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
                     getActivity(), android.R.anim.fade_out));
-            mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
+            getDerivedState().mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
                     getActivity(), android.R.anim.fade_in));
         }
-        mProgressContainer.setVisibility(View.GONE);
-        mEventInfoContainer.setVisibility(View.VISIBLE);
+        getDerivedState().mProgressContainer.setVisibility(View.GONE);
+        getDerivedState().mEventInfoContainer.setVisibility(View.VISIBLE);
     }
 
     public String getTitle() {
-        if (mEvent != null) {
-            return mEvent.getTitle();
+        if (getEvent() != null) {
+            return getEvent().getTitle();
         }
         return null;
     }
 
     public void setUpView() {
-        List<NamedPerson> adminList = mEvent.getAdmins();
+        List<NamedPerson> adminList = getEvent().getAdmins();
         Log.i(LOG_TAG, "admin list: "+adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
-        NetworkImageView cover = (NetworkImageView) mRootView.findViewById(R.id.cover);
-        cover.setImageUrl(mEvent.getCoverUrl(), photoLoader);
+        NetworkImageView cover = (NetworkImageView) getDerivedState().mRootView.findViewById(R.id.cover);
+        cover.setImageUrl(getEvent().getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG, "Creating intent for flyer view.");
                 Intent detailIntent = new Intent(getActivity(), ViewFlyerActivity.class);
-                detailIntent.putExtras(mEvent.getBundle());
+                detailIntent.putExtras(getEvent().getBundle());
                 startActivity(detailIntent);
             }
         });
 
-        TextView title = (TextView) mRootView.findViewById(R.id.title);
-        title.setText(mEvent.getTitle());
-        TextView location = (TextView) mRootView.findViewById(R.id.location);
-        location.setText(mEvent.getLocation());
-        TextView startTime  = (TextView) mRootView.findViewById(R.id.start_time);
-        startTime.setText(mEvent.getStartTimeString());
-        TextView description = (TextView) mRootView.findViewById(R.id.description);
+        TextView title = (TextView) getDerivedState().mRootView.findViewById(R.id.title);
+        title.setText(getEvent().getTitle());
+        TextView location = (TextView) getDerivedState().mRootView.findViewById(R.id.location);
+        location.setText(getEvent().getLocation());
+        TextView startTime  = (TextView) getDerivedState().mRootView.findViewById(R.id.start_time);
+        startTime.setText(getEvent().getStartTimeString());
+        TextView description = (TextView) getDerivedState().mRootView.findViewById(R.id.description);
         // TODO: Somehow linkify the links in description?
         // http://developer.android.com/reference/android/text/util/Linkify.html
-        description.setText(mEvent.getDescription());
+        description.setText(getEvent().getDescription());
     }
 
     /* check if intent is available */

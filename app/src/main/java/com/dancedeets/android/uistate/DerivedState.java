@@ -8,7 +8,7 @@ import android.app.Fragment;
  */
 public abstract class DerivedState {
 
-    private DerivedState() {
+    public DerivedState() {
     }
 
     public void onActivityCreated(Fragment fragment) {
