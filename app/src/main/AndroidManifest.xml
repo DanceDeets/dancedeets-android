@@ -52,7 +52,7 @@
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dancedeets.dancedeets.EventListActivity" />
+                android:value="com.dancedeets.android.EventListActivity" />
             <intent-filter android:label="@string/filter_title_viewevent">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -69,7 +69,7 @@
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dancedeets.dancedeets.EventInfoActivity" />
+                android:value="com.dancedeets.android.EventInfoActivity" />
         </activity>
     </application>
 
