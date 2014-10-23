@@ -21,7 +21,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
-import com.dancedeets.android.uistate.DerivedState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
 import com.dancedeets.dancedeets.R;
@@ -37,30 +36,22 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
  */
 public class ViewFlyerFragment extends StateFragment<
         ViewFlyerFragment.MyBundledState,
-        ViewFlyerFragment.MyDerivedState,
         ViewFlyerFragment.MyRetainedState> {
 
     static protected class MyBundledState extends BundledState {
         protected FullEvent mEvent;
     }
-    static protected class MyDerivedState extends DerivedState {
-        protected ShareActionProvider mShareActionProvider;
-        protected ImageViewTouch mImageViewTouch;
-        protected Bitmap mBitmap;
-    }
     static public class MyRetainedState extends RetainedState {
     }
+    protected ShareActionProvider mShareActionProvider;
+    protected ImageViewTouch mImageViewTouch;
+    protected Bitmap mBitmap;
 
     private static final String LOG_TAG = "ViewFlyerFragment";
 
     @Override
     protected MyBundledState buildBundledState() {
         return new MyBundledState();
-    }
-
-    @Override
-    protected MyDerivedState buildDerivedState() {
-        return new MyDerivedState();
     }
 
     @Override
@@ -86,10 +77,10 @@ public class ViewFlyerFragment extends StateFragment<
         inflater.inflate(R.menu.view_flyer_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        getDerivedState().mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         // Sometimes the event gets loaded before the share menu is set up,
         // so this check handles that possibility and ensures the share intent is set.
-        if (getDerivedState().mBitmap != null) {
+        if (mBitmap != null) {
             setupShareIntent();
         }
     }
@@ -100,10 +91,9 @@ public class ViewFlyerFragment extends StateFragment<
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                 ViewFlyerFragment viewFlyerFragment = (ViewFlyerFragment)retainedState.getTargetFragment();
-                MyDerivedState derivedState = viewFlyerFragment.getDerivedState();
-                derivedState.mBitmap = response.getBitmap();
-                derivedState.mImageViewTouch.setImageBitmap(derivedState.mBitmap);
-                if (derivedState.mShareActionProvider != null) {
+                viewFlyerFragment.mBitmap = response.getBitmap();
+                viewFlyerFragment.mImageViewTouch.setImageBitmap(viewFlyerFragment.mBitmap);
+                if (viewFlyerFragment.mShareActionProvider != null) {
                     viewFlyerFragment.setupShareIntent();
                 }
 
@@ -121,13 +111,13 @@ public class ViewFlyerFragment extends StateFragment<
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getBundledState().mEvent = FullEvent.parse(getArguments());
         Log.i(LOG_TAG, "Received Bundle: " + getArguments());
-        getDerivedState().mImageViewTouch = new ImageViewTouch(getActivity(), null);
-        getDerivedState().mImageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
+        mImageViewTouch = new ImageViewTouch(getActivity(), null);
+        mImageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
-        getDerivedState().mImageViewTouch.setBackgroundColor(Color.BLACK);
+        mImageViewTouch.setBackgroundColor(Color.BLACK);
 
         loadPhoto(getBundledState().mEvent.getCoverUrl(), getRetainedState());
-        return getDerivedState().mImageViewTouch;
+        return mImageViewTouch;
     }
 
     public void setupShareIntent() {
@@ -136,7 +126,7 @@ public class ViewFlyerFragment extends StateFragment<
         Uri localImageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, image);
         try {
             OutputStream out = getActivity().getContentResolver().openOutputStream(localImageUri);
-            boolean success = getDerivedState().mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            boolean success = mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
             if (!success) {
                 Log.e(LOG_TAG, "Failed to write flyer to disk for sharing: " + localImageUri);
@@ -147,7 +137,7 @@ public class ViewFlyerFragment extends StateFragment<
                 intent.putExtra(Intent.EXTRA_STREAM, localImageUri);
                 // Share the title
                 intent.putExtra(Intent.EXTRA_TEXT, getBundledState().mEvent.getTitle());
-                getDerivedState().mShareActionProvider.setShareIntent(intent);
+                mShareActionProvider.setShareIntent(intent);
             }
 
         } catch (IOException e) {

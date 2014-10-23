@@ -8,27 +8,18 @@ import android.util.Log;
 /**
  * Created by lambert on 2014/10/23.
  */
-public abstract class StateFragment<Bundled extends BundledState, Derived extends DerivedState, Retained extends RetainedState> extends Fragment {
-    private Derived mDerived;
+public abstract class StateFragment<Bundled extends BundledState, Retained extends RetainedState> extends Fragment {
     private Bundled mBundled;
     private Retained mRetained;
 
     protected abstract Bundled buildBundledState();
-    protected abstract Derived buildDerivedState();
     protected abstract Retained buildRetainedState();
     // Must be unique
     public abstract String getUniqueTag();
 
 
-    public StateFragment() {
-        mDerived = buildDerivedState();
-    }
-
     protected Bundled getBundledState() {
         return mBundled;
-    }
-    protected Derived getDerivedState() {
-        return mDerived;
     }
     protected Retained getRetainedState() {
         return mRetained;
@@ -65,11 +56,6 @@ public abstract class StateFragment<Bundled extends BundledState, Derived extend
         super.onDestroy();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mDerived.onActivityCreated(this);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

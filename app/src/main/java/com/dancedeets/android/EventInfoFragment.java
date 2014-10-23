@@ -31,7 +31,6 @@ import com.dancedeets.android.models.IdEvent;
 import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
-import com.dancedeets.android.uistate.DerivedState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
 import com.dancedeets.dancedeets.R;
@@ -45,23 +44,20 @@ import java.util.Locale;
 
 public class EventInfoFragment extends StateFragment<
         EventInfoFragment.MyBundledState,
-        EventInfoFragment.MyDerivedState,
         EventInfoFragment.MyRetainedState> {
 
     static protected class MyBundledState extends BundledState {
         protected FullEvent mEvent;
     }
-    static protected class MyDerivedState extends DerivedState {
-        protected View mRootView;
-        protected View mProgressContainer;
-        protected View mEventInfoContainer;
-        protected ShareActionProvider mShareActionProvider;
-
-        private OnEventReceivedListener mOnEventReceivedListener;
-    }
     static public class MyRetainedState extends RetainedState {
         protected JsonObjectRequest mDataRequest;
     }
+    protected View mRootView;
+    protected View mProgressContainer;
+    protected View mEventInfoContainer;
+    protected ShareActionProvider mShareActionProvider;
+
+    private OnEventReceivedListener mOnEventReceivedListener;
 
     private static final String LOG_TAG = "EventInfoFragment";
 
@@ -77,18 +73,13 @@ public class EventInfoFragment extends StateFragment<
     }
 
     public void setOnEventReceivedListener(OnEventReceivedListener mOnEventReceivedListener) {
-        getDerivedState().mOnEventReceivedListener = mOnEventReceivedListener;
+        mOnEventReceivedListener = mOnEventReceivedListener;
     }
 
 
     @Override
     protected MyBundledState buildBundledState() {
         return new MyBundledState();
-    }
-
-    @Override
-    protected MyDerivedState buildDerivedState() {
-        return new MyDerivedState();
     }
 
     @Override
@@ -115,7 +106,7 @@ public class EventInfoFragment extends StateFragment<
         inflater.inflate(R.menu.event_info_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        getDerivedState().mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         // Sometimes the event gets loaded before the share menu is set up,
         // so this check handles that possibility and ensures the share intent is set.
         if (getEvent() != null) {
@@ -130,7 +121,7 @@ public class EventInfoFragment extends StateFragment<
         intent.putExtra(Intent.EXTRA_TEXT, url);
         // Sometimes we receive an event so quickly, it happens before the menu can be shown...
         // so we cannot rely on mShareActionProvider here. Maybe we should get rid of the
-        getDerivedState().mShareActionProvider.setShareIntent(intent);
+        mShareActionProvider.setShareIntent(intent);
     }
 
     protected String formatShareText() {
@@ -234,15 +225,15 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDerivedState().mRootView = inflater.inflate(R.layout.fragment_event_info,
+        mRootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
-        getDerivedState().mProgressContainer = getDerivedState().mRootView.findViewById(R.id.progress_container);
-        getDerivedState().mEventInfoContainer = getDerivedState().mRootView.findViewById(R.id.event_info);
+        mProgressContainer = mRootView.findViewById(R.id.progress_container);
+        mEventInfoContainer = mRootView.findViewById(R.id.event_info);
         // Show the progress bar until we receive data
-        getDerivedState().mProgressContainer.setVisibility(View.VISIBLE);
-        getDerivedState().mEventInfoContainer.setVisibility(View.GONE);
+        mProgressContainer.setVisibility(View.VISIBLE);
+        mEventInfoContainer.setVisibility(View.GONE);
 
-        return getDerivedState().mRootView;
+        return mRootView;
     }
 
     public void onActivityCreated (Bundle savedInstanceState) {
@@ -295,24 +286,24 @@ public class EventInfoFragment extends StateFragment<
 
     public void onEventReceived(FullEvent event, boolean animate) {
         getBundledState().mEvent = event;
-        if (getDerivedState().mOnEventReceivedListener != null) {
-            getDerivedState().mOnEventReceivedListener.onEventReceived(event);
+        if (mOnEventReceivedListener != null) {
+            mOnEventReceivedListener.onEventReceived(event);
         }
 
         setUpView();
         // Only call this if we've set up the menu already..
         // otherwise, we set it up later, at the same time as the menu
-        if (getDerivedState().mShareActionProvider != null) {
+        if (mShareActionProvider != null) {
             setUpShareIntent();
         }
         if (animate) {
-            getDerivedState().mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
+            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
                     getActivity(), android.R.anim.fade_out));
-            getDerivedState().mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
+            mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
                     getActivity(), android.R.anim.fade_in));
         }
-        getDerivedState().mProgressContainer.setVisibility(View.GONE);
-        getDerivedState().mEventInfoContainer.setVisibility(View.VISIBLE);
+        mProgressContainer.setVisibility(View.GONE);
+        mEventInfoContainer.setVisibility(View.VISIBLE);
     }
 
     public String getTitle() {
@@ -326,7 +317,7 @@ public class EventInfoFragment extends StateFragment<
         List<NamedPerson> adminList = getEvent().getAdmins();
         Log.i(LOG_TAG, "admin list: "+adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
-        NetworkImageView cover = (NetworkImageView) getDerivedState().mRootView.findViewById(R.id.cover);
+        NetworkImageView cover = (NetworkImageView) mRootView.findViewById(R.id.cover);
         cover.setImageUrl(getEvent().getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -338,13 +329,13 @@ public class EventInfoFragment extends StateFragment<
             }
         });
 
-        TextView title = (TextView) getDerivedState().mRootView.findViewById(R.id.title);
+        TextView title = (TextView) mRootView.findViewById(R.id.title);
         title.setText(getEvent().getTitle());
-        TextView location = (TextView) getDerivedState().mRootView.findViewById(R.id.location);
+        TextView location = (TextView) mRootView.findViewById(R.id.location);
         location.setText(getEvent().getLocation());
-        TextView startTime  = (TextView) getDerivedState().mRootView.findViewById(R.id.start_time);
+        TextView startTime  = (TextView) mRootView.findViewById(R.id.start_time);
         startTime.setText(getEvent().getStartTimeString());
-        TextView description = (TextView) getDerivedState().mRootView.findViewById(R.id.description);
+        TextView description = (TextView) mRootView.findViewById(R.id.description);
         // TODO: Somehow linkify the links in description?
         // http://developer.android.com/reference/android/text/util/Linkify.html
         description.setText(getEvent().getDescription());
