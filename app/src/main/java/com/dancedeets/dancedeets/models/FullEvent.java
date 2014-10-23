@@ -1,7 +1,6 @@
 package com.dancedeets.dancedeets.models;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,8 +17,6 @@ import java.util.List;
  * Represents an Event as returned by /api/events/XXX with the full set of fields.
  */
 public class FullEvent extends Event {
-
-    static String LOG_TAG = "FullEvent";
 
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -62,7 +59,7 @@ public class FullEvent extends Event {
                 event.mEndTime = date.getTime();
             } catch (ParseException e) {
                 // Don't make this a fatal error, so we still see the events in the list view!
-                Log.e(LOG_TAG, "ParseException on end_time string: " + endTimeString + ": " + e);
+                throw new JSONException("ParseException on end_time string: " + endTimeString);
             }
         }
 

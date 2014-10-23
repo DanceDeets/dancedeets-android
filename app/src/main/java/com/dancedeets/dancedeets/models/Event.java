@@ -1,7 +1,6 @@
 package com.dancedeets.dancedeets.models;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,8 +15,6 @@ import java.util.Locale;
  * Created by lambert on 2014/10/02.
  */
 public class Event extends IdEvent {
-
-    static String LOG_TAG = "Event";
 
     static DateFormat localizedDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
     static DateFormat localizedDateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
@@ -69,7 +66,7 @@ public class Event extends IdEvent {
                 event.mEndTime = date.getTime();
             } catch (ParseException e) {
                 // Don't make this a fatal error, so we still see the events in the list view!
-                Log.e(LOG_TAG, "ParseException on end_time string: " + endTimeString + ": " + e);
+                throw new JSONException("ParseException on end_time string: " + endTimeString);
             }
         }
         return event;
