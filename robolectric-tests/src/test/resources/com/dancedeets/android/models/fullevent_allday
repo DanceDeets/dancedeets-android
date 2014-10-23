@@ -1,0 +1,18 @@
+{
+   "description":"",
+   "venue":{
+      "name":"Venue Name"
+   },
+   "start_time":"2014-10-15",
+   "cover":null,
+   "admins":[],
+   "end_time":null,
+   "metadata":{
+      "added_time":"2014-10-02T02:30:59Z",
+      "added_person":0,
+      "dance_keywords":[],
+      "added_method":"CM_AUTO"
+   },
+   "id":"665111016929103",
+   "name":"ROOTSNYC OCTOBER 2014"
+}
