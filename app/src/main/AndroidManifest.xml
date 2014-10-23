@@ -15,7 +15,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="com.dancedeets.dancedeets.DanceDeetsApp"
+        android:name=".DanceDeetsApp"
         >
 
         <meta-data

@@ -1,0 +1,77 @@
+//
+//apply plugin: 'com.android.application'
+//apply plugin: 'robolectric'
+//
+//robolectric {
+//    include '**/*Test.class'
+//    exclude '**/espresso/**/*.class'
+//    jvmArgs '-XX:-UseSplitVerifier'
+//
+//}
+apply plugin: 'java'
+
+tasks.withType(Test) {
+    scanForTestClasses = false
+    include "**/*Test.class"
+
+    // Do we need this?
+    //exclude '**/espresso/**/*.class'
+
+    // set JVM arguments for the test JVM(s)
+    jvmArgs '-XX:-UseSplitVerifier'
+}
+
+// Copy our resources/ directory into the classes directory, for use by our tests.
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+processTestResources.dependsOn copyTestResources
+
+
+
+repositories {
+    mavenCentral()
+    // To grab the android files that are local in the Android Studio dir
+    mavenLocal()
+}
+
+// Set this in the .m2/settings.xml for running gradlew by hand:
+// <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+// xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+// xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+// http://maven.apache.org/xsd/settings-1.0.0.xsd">
+// <localRepository>/Applications/Android Studio.app/sdk/extras/android/m2repository</localRepository>
+// </settings>
+
+
+dependencies {
+
+    def androidModule = project(':app')
+    compile androidModule
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.robolectric:robolectric:2.3'
+
+    testCompile androidModule.android.applicationVariants.toList().first().javaCompile.classpath
+    testCompile androidModule.android.applicationVariants.toList().first().javaCompile.outputs.files
+    testCompile files(androidModule.plugins.findPlugin("com.android.application").getBootClasspath())
+}
+/* Maybe we want these tests?
+    androidTestCompile files('lib/espresso-1.1.jar', 'lib/testrunner-1.1.jar', 'lib/testrunner-runtime-1.1.jar')
+    androidTestCompile 'com.google.guava:guava:14.0.1'
+    androidTestCompile 'com.squareup.dagger:dagger:1.1.0'
+    androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
+*/
+
+apply plugin: 'idea'
+
+idea {
+    module {
+        testOutputDir = file('build/test-classes/debug')
+    }
+}
