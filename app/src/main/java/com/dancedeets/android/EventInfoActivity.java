@@ -49,23 +49,6 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
         // though really, we shouldn't reinitialize stuff if ViewPager will overwrite it.
         handleIntent(getIntent());
 
-        /**
-         * Ensures that the title is set for the relevant Fragment correctly.
-         * In the case of switching to a loaded fragment, set the title directly, below.
-         * In the case of switching to an unloaded fragment, we do nothing. The fragment
-         * will call us when the event is loaded, so that we can set the event title.
-         */
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
-                // This may return null, if the event API fetch hasn't returned yet
-                if (fragment.getEvent() != null) {
-                    setTitle(fragment.getEvent().getTitle());
-                }
-            }
-        });
-
         if (savedInstanceState == null) {
             // TODO: PARSE
             // Map<String,String> dimensions = new HashMap<String, String>();
@@ -95,7 +78,26 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
         }
         mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mEventIdList);
         mViewPager.setAdapter(mEventInfoPagerAdapter);
+
+        // Disable all callbacks, as we may not have set up any fragments for these pages yet.
+        mViewPager.setOnPageChangeListener(null);
         mViewPager.setCurrentItem(mEventIndex);
+        /**
+         * Ensures that the title is set for the relevant Fragment correctly when we change pages.
+         * In the case of switching to a loaded fragment, set the title directly, below.
+         * In the case of switching to an unloaded fragment, we do nothing. The fragment
+         * will call us when the event is loaded, so that we can set the event title.
+         */
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
+                // This may return null, if the event API fetch hasn't returned yet
+                if (fragment.getEvent() != null) {
+                    setTitle(fragment.getEvent().getTitle());
+                }
+            }
+        });
     }
 
     @Override
