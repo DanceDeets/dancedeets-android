@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -9,7 +9,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.android.models.Event;
 
 /**
  * Shows zoomable/pannable event flyers, when clicked on from the event info page.

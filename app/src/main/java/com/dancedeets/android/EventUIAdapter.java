@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,8 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.android.models.Event;
+import com.dancedeets.dancedeets.R;
 
 import java.util.List;
 

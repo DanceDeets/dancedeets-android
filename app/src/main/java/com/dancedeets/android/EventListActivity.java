@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -8,7 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.android.models.Event;
+import com.dancedeets.dancedeets.R;
 
 import java.util.HashMap;
 import java.util.List;

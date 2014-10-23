@@ -1,8 +1,8 @@
-package com.dancedeets.dancedeets.tests.robotests;
+package com.dancedeets.android.robotests;
 
 import android.app.Activity;
 
-import com.dancedeets.dancedeets.EventListActivity;
+import com.dancedeets.android.EventListActivity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

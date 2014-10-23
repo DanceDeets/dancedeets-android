@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -26,7 +26,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.dancedeets.dancedeets.models.Event;
+import com.dancedeets.android.models.Event;
+import com.dancedeets.dancedeets.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -300,7 +301,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 Log.e(LOG_TAG, "Error faking json response: " + exception);
             }
         } else {
-            Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
+            Uri.Builder builder = Uri.parse("http://www.com.dancedeets.android.com/events/feed").buildUpon();
             builder.appendQueryParameter("location", mSearchOptions.location);
             builder.appendQueryParameter("keywords", mSearchOptions.keywords);
             builder.appendQueryParameter("distance", "10");

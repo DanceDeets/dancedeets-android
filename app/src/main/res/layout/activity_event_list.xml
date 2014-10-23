@@ -2,7 +2,7 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/event_list_fragment"
-    android:name="com.dancedeets.dancedeets.EventListFragment"
+    android:name="com.dancedeets.android.EventListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EventList"

@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -27,10 +27,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
-import com.dancedeets.dancedeets.models.FullEvent;
-import com.dancedeets.dancedeets.models.IdEvent;
-import com.dancedeets.dancedeets.models.NamedPerson;
-import com.dancedeets.dancedeets.models.Venue;
+import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.IdEvent;
+import com.dancedeets.android.models.NamedPerson;
+import com.dancedeets.android.models.Venue;
+import com.dancedeets.dancedeets.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

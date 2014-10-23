@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/event_list_fragment"
-        android:name="com.dancedeets.dancedeets.EventListFragment"
+        android:name="com.dancedeets.android.EventListFragment"
         android:layout_width="0px"
         android:layout_weight="0.8"
         android:layout_height="match_parent"

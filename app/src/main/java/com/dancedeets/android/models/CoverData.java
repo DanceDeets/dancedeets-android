@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets.models;
+package com.dancedeets.android.models;
 
 import org.json.JSONArray;
 import org.json.JSONException;

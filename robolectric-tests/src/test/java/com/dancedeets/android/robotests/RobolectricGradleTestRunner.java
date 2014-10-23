@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets.tests.robotests;
+package com.dancedeets.android.robotests;
 
 import org.junit.runners.model.InitializationError;
 import org.robolectric.AndroidManifest;
@@ -15,7 +15,7 @@ public class RobolectricGradleTestRunner extends RobolectricTestRunner {
 
    @Override
     protected AndroidManifest getAppManifest(Config config) {
-        String manifestProperty = "./app/build/intermediates/manifests/full/debug/AndroidManifest.xml";
+        String manifestProperty = "./app/src/main/AndroidManifest.xml";
         String resProperty = "./app/build/intermediates/res/debug";
         return new AndroidManifest(Fs.fileFromPath(manifestProperty), Fs.fileFromPath(resProperty)) {
             @Override

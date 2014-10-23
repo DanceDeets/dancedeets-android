@@ -1,9 +1,6 @@
-package com.dancedeets.dancedeets.tests.javatests;
+package com.dancedeets.android.models;
 
-import com.dancedeets.dancedeets.models.CoverData;
-import com.dancedeets.dancedeets.models.FullEvent;
-import com.dancedeets.dancedeets.models.Venue;
-import com.dancedeets.dancedeets.tests.robotests.RobolectricGradleTestRunner;
+import com.dancedeets.android.robotests.RobolectricGradleTestRunner;
 
 import org.json.JSONException;
 import org.json.JSONObject;

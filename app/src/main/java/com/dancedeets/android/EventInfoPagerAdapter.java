@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -9,7 +9,7 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.dancedeets.dancedeets.models.IdEvent;
+import com.dancedeets.android.models.IdEvent;
 
 import java.util.ArrayList;
 

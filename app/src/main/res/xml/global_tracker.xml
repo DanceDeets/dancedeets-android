@@ -14,13 +14,13 @@
     <bool name="ga_dryRun">false</bool>
 
     <!-- The screen names that will appear in reports -->
-    <screenName name="com.dancedeets.dancedeets.EventListActivity">
+    <screenName name="com.dancedeets.android.EventListActivity">
         Event List
     </screenName>
-    <screenName name="com.dancedeets.dancedeets.EventInfoActivity">
+    <screenName name="com.dancedeets.android.EventInfoActivity">
         Event Info
     </screenName>
-    <screenName name="com.dancedeets.dancedeets.ViewFlyerActivity">
+    <screenName name="com.dancedeets.android.ViewFlyerActivity">
         Flyer View
     </screenName>
 

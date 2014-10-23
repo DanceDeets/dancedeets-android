@@ -5,13 +5,13 @@ android {
     buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "com.dancedeets.dancedeets"
+        applicationId "com.dancedeets.android"
         minSdkVersion 15
         targetSdkVersion 18
         versionCode 1
         versionName "1.0"
 
-        testApplicationId "com.dancedeets.dancedeets.tests"
+        testApplicationId "com.dancedeets.android.tests"
         //testInstrumentationRunner "android.test.InstrumentationTestRunner"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }

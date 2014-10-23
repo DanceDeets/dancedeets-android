@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -12,8 +12,9 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.dancedeets.dancedeets.models.Event;
-import com.dancedeets.dancedeets.models.FullEvent;
+import com.dancedeets.android.models.Event;
+import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.dancedeets.R;
 
 import java.util.List;
 

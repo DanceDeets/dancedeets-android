@@ -1,4 +1,4 @@
-package com.dancedeets.dancedeets;
+package com.dancedeets.android;
 
 import android.app.Fragment;
 import android.content.ContentValues;
@@ -20,7 +20,8 @@ import android.widget.ShareActionProvider;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.dancedeets.dancedeets.models.FullEvent;
+import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.dancedeets.R;
 
 import java.io.IOException;
 import java.io.OutputStream;
