@@ -43,7 +43,10 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-public class EventInfoFragment extends StateFragment<EventInfoFragment.MyBundledState, EventInfoFragment.MyDerivedState, EventInfoFragment.MyRetainedState> {
+public class EventInfoFragment extends StateFragment<
+        EventInfoFragment.MyBundledState,
+        EventInfoFragment.MyDerivedState,
+        EventInfoFragment.MyRetainedState> {
 
     static protected class MyBundledState extends BundledState {
         protected FullEvent mEvent;
@@ -266,7 +269,12 @@ public class EventInfoFragment extends StateFragment<EventInfoFragment.MyBundled
                             Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
                             return;
                         }
-                        ((EventInfoFragment)retainedState.getTargetFragment()).onEventReceived(event, true);
+                        // Sometimes the retainedState keeps a targetFragment even after it's detached,
+                        // since I can't hook into the lifecycle at the right point in time.
+                        // So double-check it's safe here first...
+                        if (retainedState.getTargetFragment().getActivity() != null) {
+                            ((EventInfoFragment) retainedState.getTargetFragment()).onEventReceived(event, true);
+                        }
                     }
                 },
                 new Response.ErrorListener() {

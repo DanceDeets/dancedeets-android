@@ -58,7 +58,9 @@ public abstract class StateFragment<Bundled extends BundledState, Derived extend
     @Override
     public void onDestroy() {
         if (!getActivity().isChangingConfigurations()) {
-            getActivity().getFragmentManager().beginTransaction().remove(mRetained);
+            if (isRemoving()) {
+                getActivity().getFragmentManager().beginTransaction().remove(mRetained).commitAllowingStateLoss();
+            }
         }
         super.onDestroy();
     }
