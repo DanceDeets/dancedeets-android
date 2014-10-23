@@ -33,7 +33,7 @@ public class IdEvent implements Serializable {
     }
 
     public String getUrl() {
-        return "http://www.com.dancedeets.android.com/events/" + getId() + "/";
+        return "http://www.dancedeets.com/events/" + getId() + "/";
     }
 
     public String getFacebookUrl() {
@@ -41,7 +41,7 @@ public class IdEvent implements Serializable {
     }
 
     public String getApiDataUrl() {
-        return "http://www.com.dancedeets.android.com/api/events/" + getId();
+        return "http://www.dancedeets.com/api/events/" + getId();
     }
 
     public boolean equals(Object o) {

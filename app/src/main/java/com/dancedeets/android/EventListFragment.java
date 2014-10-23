@@ -301,7 +301,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 Log.e(LOG_TAG, "Error faking json response: " + exception);
             }
         } else {
-            Uri.Builder builder = Uri.parse("http://www.com.dancedeets.android.com/events/feed").buildUpon();
+            Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
             builder.appendQueryParameter("location", mSearchOptions.location);
             builder.appendQueryParameter("keywords", mSearchOptions.keywords);
             builder.appendQueryParameter("distance", "10");
