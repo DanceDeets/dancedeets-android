@@ -72,8 +72,8 @@ public class EventInfoFragment extends StateFragment<
         return getBundledState().mEvent;
     }
 
-    public void setOnEventReceivedListener(OnEventReceivedListener mOnEventReceivedListener) {
-        mOnEventReceivedListener = mOnEventReceivedListener;
+    public void setOnEventReceivedListener(OnEventReceivedListener onEventReceivedListener) {
+        mOnEventReceivedListener = onEventReceivedListener;
     }
 
 
