@@ -16,6 +16,7 @@ import com.dancedeets.android.models.Event;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.dancedeets.R;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -29,13 +30,18 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
 
     protected ViewPager mViewPager;
     protected EventInfoPagerAdapter mEventInfoPagerAdapter;
-    protected String[] mEventIdList;
-    protected int mEventIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+
+        String tag = getUniqueTag();
+        if (savedInstanceState != null) {
+            mBundled = (Bundled) savedInstanceState.getSerializable(tag);
+        } else {
+            mBundled = buildBundledState();
+        }
 
         setContentView(R.layout.event_info_pager);
 
@@ -57,31 +63,65 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
         }
     }
 
+    static class Bundled implements Serializable {
+        public String[] mEventIdList;
+        public int mEventIndex;
+        Bundled() {
+            mEventIdList = new String[0];
+        }
+    }
+
+    Bundled mBundled;
+
+    public String getUniqueTag() {
+        return LOG_TAG;
+    }
+
+    private Bundled buildBundledState() {
+        return new Bundled();
+    }
+    protected Bundled getBundledState() {
+        return mBundled;
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(getUniqueTag(), mBundled);
+    }
+
     public void handleIntent(Intent intent) {
+        boolean loaded = false;
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             Uri url = intent.getData();
             Log.i(LOG_TAG, "Viewing URL: " + url);
             List<String> pathSegments = url.getPathSegments();
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
-                mEventIdList = new String[]{eventId};
-                mEventIndex = 0;
+                getBundledState().mEventIdList = new String[]{eventId};
+                getBundledState().mEventIndex = 0;
             }
-        } else {
+            loaded = true;
+        } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
-            mEventIndex = b.getInt(ARG_EVENT_INDEX);
+            getBundledState().mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
+            getBundledState().mEventIndex = b.getInt(ARG_EVENT_INDEX);
 
             Event event = (Event)b.getSerializable(ARG_EVENT);
             // Since onPageSelected is not called until the first swipe, initialize the title here.
             setTitle(event.getTitle());
+            loaded = true;
+        } else {
+            // This is a singleTop activity, so everything should be loaded/preserved already.
+            return;
         }
-        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mEventIdList);
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, getBundledState().mEventIdList);
         mViewPager.setAdapter(mEventInfoPagerAdapter);
 
         // Disable all callbacks, as we may not have set up any fragments for these pages yet.
         mViewPager.setOnPageChangeListener(null);
-        mViewPager.setCurrentItem(mEventIndex);
+        if (loaded) {
+            mViewPager.setCurrentItem(getBundledState().mEventIndex);
+        }
         /**
          * Ensures that the title is set for the relevant Fragment correctly when we change pages.
          * In the case of switching to a loaded fragment, set the title directly, below.
@@ -117,7 +157,7 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
 
     @Override
     public void onEventReceived(FullEvent event) {
-        if (mEventIdList[mViewPager.getCurrentItem()].equals(event.getId())) {
+        if (getBundledState().mEventIdList[mViewPager.getCurrentItem()].equals(event.getId())) {
             setTitle(event.getTitle());
         }
     }
@@ -125,16 +165,8 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        // getIntent returns the intent that started this activity, so let's update with setIntent.
-        // However, sometimes we have app-internal "up" navigation with only a Component set...
-        // and that leaves the EventInfoActivity with nothing to work with, and no saved state.
-        // So instead, take the incoming intent (which may be minimal), and overlay it with the data
-        // from the old intent, and construct a new intent for use in setIntent and handleIntent.
-        Intent newIntent = (Intent) intent.clone();
-        newIntent.fillIn(getIntent(), 0);
-        setIntent(newIntent);
-
-        handleIntent(newIntent);
+        setIntent(intent);
+        handleIntent(intent);
     }
 
     @Override
