@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.Event;
 import com.dancedeets.dancedeets.R;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
@@ -37,6 +39,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
 
@@ -84,7 +87,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     Button mRetryButton;
     GoogleApiClient mGoogleApiClient;
 
+    // These are exposed as member variables for the sake of testing.
     SearchDialogFragment mSearchDialog;
+    FusedLocationProviderApi mLocationProviderApi = LocationServices.FusedLocationApi;
+    FetchCityTask mFetchCityTask;
+    Geocoder mGeocoder;
 
     public EventListFragment() {
     }
@@ -146,6 +153,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Log.i(LOG_TAG, "onCreate");
         mEventList = new ArrayList<Event>();
         mSearchOptions = new SearchOptions();
+        mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         setHasOptionsMenu(true);
         initializeGoogleApiClient();
     }
@@ -179,24 +187,26 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     class FetchCityTask extends ReverseGeocodeTask {
 
-        public FetchCityTask(Context context) {
-            super(context);
+        public FetchCityTask(Geocoder geocoder) {
+            super(geocoder);
         }
 
         @Override
         protected void onPostExecute(Address address) {
-            mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
+            mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            Log.i(LOG_TAG, ""+address);
             Log.i(LOG_TAG, mSearchOptions.location);
             fetchJsonData();
         }
     }
+
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
         // We reconnect every time the app wakes up, but we only need
         // to fetch on start if we have no location data (ie, app startup).
-        if (mSearchOptions.location == null) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mSearchOptions.location.isEmpty()) {
+            Location location = mLocationProviderApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Reverse geocoding: " + location);
             SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
             if (location != null) {
@@ -210,7 +220,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 location.setLongitude(pref.getFloat("longitude", -1));
             }
             if (location != null) {
-                (new FetchCityTask(getActivity())).execute(location);
+                mFetchCityTask = new FetchCityTask(mGeocoder);
+                mFetchCityTask.execute(location);
             } else {
                 showSearchDialog();
             }

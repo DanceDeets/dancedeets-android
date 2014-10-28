@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -9,7 +8,6 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A subclass of AsyncTask that calls getFromLocation() in the
@@ -24,11 +22,11 @@ public abstract class ReverseGeocodeTask extends
 
     private static final String LOG_TAG = "ReverseGeocodeTask";
 
-    private Context mContext;
+    private Geocoder mGeocoder;
 
-    public ReverseGeocodeTask(Context context) {
+    public ReverseGeocodeTask(Geocoder geocoder) {
         super();
-        mContext = context;
+        mGeocoder = geocoder;
     }
 
     /**
@@ -42,8 +40,6 @@ public abstract class ReverseGeocodeTask extends
      */
     @Override
     protected Address doInBackground(Location... params) {
-        Geocoder geocoder =
-                new Geocoder(mContext, Locale.getDefault());
         // Get the current location from the input parameter list
         Location loc = params[0];
         // Create a list to contain the result address
@@ -52,7 +48,7 @@ public abstract class ReverseGeocodeTask extends
             /*
              * Return 1 address.
              */
-            addresses = geocoder.getFromLocation(loc.getLatitude(),
+            addresses = mGeocoder.getFromLocation(loc.getLatitude(),
                     loc.getLongitude(), 1);
         } catch (IOException e1) {
             Log.e(LOG_TAG,
