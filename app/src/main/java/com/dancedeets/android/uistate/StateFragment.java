@@ -3,7 +3,6 @@ package com.dancedeets.android.uistate;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 
 /**
  * Created by lambert on 2014/10/23.
@@ -40,7 +39,6 @@ public abstract class StateFragment<Bundled extends BundledState, Retained exten
                     .add(mRetained, fragmentTag)
                     .commit();
         }
-        Log.i("TEST", "onAttach fragment " + this + ", adding new retained state " + mRetained);
         mRetained.setTargetFragment(this, 0);
 
         super.onAttach(activity);
