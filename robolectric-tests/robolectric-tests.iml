@@ -78,6 +78,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="internal_impl-20.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="espresso-1.1-bundled" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_AndroidStudioProjects_DanceDeets_app_build_intermediates_classes_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_AndroidStudioProjects_DanceDeets_app_build_intermediates_dependency_cache_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="android" level="project" />

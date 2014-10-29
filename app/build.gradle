@@ -12,7 +12,6 @@ android {
         versionName "1.0"
 
         testApplicationId "com.dancedeets.android.tests"
-        //testInstrumentationRunner "android.test.InstrumentationTestRunner"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
     buildTypes {
@@ -39,4 +38,6 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.6'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
     compile files('libs/Parse-1.7.0.jar')
+
+    androidTestCompile files('libs/espresso-1.1-bundled.jar')
 }

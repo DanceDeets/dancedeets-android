@@ -84,6 +84,7 @@
     <orderEntry type="library" exported="" name="support-v13-20.0.0" level="project" />
     <orderEntry type="library" exported="" name="imagezoom-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="Parse-1.7.0" level="project" />
+    <orderEntry type="library" exported="" name="espresso-1.1-bundled" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-5.0.89" level="project" />
     <orderEntry type="library" exported="" name="support-v4-20.0.0" level="project" />
