@@ -40,7 +40,6 @@
     <orderEntry type="library" exported="" scope="TEST" name="commons-codec-1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.0.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="support-v4-19.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="fest-util-1.2.5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="fest-reflect-1.4.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-ant-tasks-2.1.3" level="project" />
@@ -71,13 +70,13 @@
     <orderEntry type="library" exported="" scope="TEST" name="Parse-1.7.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="internal_impl-20.0.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="library-1.0.6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="internal_impl-20.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="espresso-1.1-bundled" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_AndroidStudioProjects_DanceDeets_app_build_intermediates_classes_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_AndroidStudioProjects_DanceDeets_app_build_intermediates_dependency_cache_debug" level="project" />
