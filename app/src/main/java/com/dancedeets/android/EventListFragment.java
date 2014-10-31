@@ -21,6 +21,7 @@ import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -193,10 +194,16 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
         @Override
         protected void onPostExecute(Address address) {
-            mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
-            Log.i(LOG_TAG, ""+address);
-            Log.i(LOG_TAG, mSearchOptions.location);
-            fetchJsonData();
+            if (address != null) {
+                mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                fetchJsonData();
+            } else {
+                //TODO: better handle the case of address being null, which indicates no networked connectivity.
+                Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
+                Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
+                mSearchOptions.location = "";
+                fetchJsonData();
+            }
         }
     }
 
