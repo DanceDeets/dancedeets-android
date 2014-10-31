@@ -79,7 +79,11 @@ public final class VolleyIdlingResource implements IdlingResource {
 
     private void notifyIfIdleNow() {
         if (isIdleNow()) {
-            resourceCallback.onTransitionToIdle();
+            if (resourceCallback != null) {
+                resourceCallback.onTransitionToIdle();
+            } else {
+                Log.e(LOG_TAG, "Would notify that we are idle, but no resourceCallback.");
+            }
         }
     }
 

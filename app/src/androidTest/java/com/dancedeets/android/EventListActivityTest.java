@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
@@ -13,8 +14,6 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
 import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
-
-import java.io.File;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
@@ -29,8 +28,9 @@ import static org.hamcrest.text.StringContains.containsString;
  * Created by lambert on 2014/10/28.
  */
 public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
-    public EventListActivityTest() {
+    public EventListActivityTest() throws NoSuchFieldException {
         super(EventListActivity.class);
+        createVolleyForEspresso();
     }
 
     private VolleyDiskBasedHttpStack mHttpStack;
@@ -39,25 +39,22 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        createVolleyForEspresso();
-        getActivity();
     }
 
     protected void createVolleyForEspresso() throws NoSuchFieldException {
         // Construct our own queue, with a proper VolleyIdlingResource handler
         mHttpStack = new VolleyDiskBasedHttpStack();
         Network network = new BasicNetwork(mHttpStack);
-        File cacheDir = new File(getInstrumentation().getContext().getCacheDir(), "volleyTest");
-        mIdlingResource = new VolleyIdlingResource("Load Event List");
+        mIdlingResource = new VolleyIdlingResource("Volley Request Queue");
 
         Handler mHandler = new Handler(Looper.getMainLooper());
         // Wrap our normal ExecutorDelivery(Handler(MainLooper)) with one that notifies our idlingResource.
         ExecutorDelivery mDispatch = mIdlingResource.getExecutorDeliveryWrapper(mHandler);
         RequestQueue queue = new RequestQueue(new NoCache(), network, 4, mDispatch);
-        queue.start();
 
         VolleySingleton.createInstance(queue);
         Espresso.registerIdlingResources(mIdlingResource);
+        queue.start();
     }
 
     protected void setBlockVolleyResponses(boolean blockVolleyResponses) {
@@ -69,7 +66,9 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     }
 
     @SuppressWarnings("unchecked")
-    public void testEventNavigation() throws NoSuchFieldException {
+    public void testEventNavigation() {
+        getActivity();
+
         onView(withId(R.id.event_list_fragment));
         String eventTitle = "Mike's Popping Class @ Brooklyn Ballet";
         // Click on an event
@@ -79,18 +78,28 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     }
 
     @SuppressWarnings("unchecked")
-    public void testRotationDuringLoad() throws NoSuchFieldException {
+    public void testRotationDuringLoad() {
+        Log.i("TEST", "Blocking responses, but not blocking espresso");
         setBlockVolleyResponses(true);
         setWaitForVolley(false);
+
+        getActivity();
+
         onView(withId(R.id.event_list_fragment));
+        Log.i("TEST", "Rotating");
+        // Guarantee deconstruction and construction of views...is there a better way to do this?
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         // If this crashes, then we are not handling the orientation change correctly
-        setBlockVolleyResponses(false);
+        Log.i("TEST", "Letting responses finish, and making volley wait.");
         setWaitForVolley(true);
-        // Click on an event
-        onView(withText("Mike's Popping Class @ Brooklyn Ballet")).perform(click());
-        // Verify the description loaded
-        onView(withId(R.id.description)).check(matches(withText(containsString("Come learn something new"))));
+        setBlockVolleyResponses(false);
+        Log.i("TEST", "Verify data loaded.");
+        // We should verify that the event is displayed and shown, not try to click on it
+        String eventTitle = "Mike's Popping Class @ Brooklyn Ballet";
+        onView(withText(eventTitle)).perform(click());
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
 
