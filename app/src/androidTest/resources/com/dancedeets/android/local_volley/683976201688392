@@ -1,1 +1,55 @@
-{"description": "Come learn something new or just get in some practice time with Mike every Wednesdays from 8-10pm. Bring your music for end of the class jam session. All the funkiness for just Pay-What-You-Can! We need to collect at least $20 per class to cover studio rental cost.", "venue": {"geocode": {"latitude": 40.689547300699999, "longitude": -73.987409729299998}, "address": {"city": "Brooklyn", "state": "NY", "street": "160 Schermerhorn St", "zip": "11201", "country": "United States"}, "name": "Brooklyn Ballet", "id": "47762037213"}, "start_time": "2014-10-29T20:00:00-0400", "cover": {"images": [{"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/10534476_10152167536821816_6133769467903342782_n.jpg?oh=e80e4eceb143bff8a20382d3e476ddc5&oe=54DB5D18&__gda__=1424135271_a0fcb2410a1cd67052e35a7f162e44dd", "height": 960, "width": 543}, {"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/p480x480/10534476_10152167536821816_6133769467903342782_n.jpg?oh=bf2fbc186a244e73f25123fa2973d0d5&oe=54E89D12&__gda__=1425238020_a9a4c8d1294fe0e678911fad077f25dd", "height": 848, "width": 480}, {"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/p320x320/10534476_10152167536821816_6133769467903342782_n.jpg?oh=b93215ddc987b808f84d04366a06ccaa&oe=54EE2050&__gda__=1420457030_8b74f5a6ce5ce565763740239a649e7a", "height": 565, "width": 320}, {"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/p180x540/10534476_10152167536821816_6133769467903342782_n.jpg?oh=08e2a85d3923247918f9695542322f69&oe=54E07F75&__gda__=1420653667_e83b3721b31a2ec414fc5659a43fd8af", "height": 540, "width": 305}, {"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/p130x130/10534476_10152167536821816_6133769467903342782_n.jpg?oh=ac096d99856d4596773ffbbd20677267&oe=54F8A340&__gda__=1423689814_3d3bb25f90e38762857a24c7a090a95a", "height": 229, "width": 130}, {"source": "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/p75x225/10534476_10152167536821816_6133769467903342782_n.jpg?oh=bba0b8986b917ae6a49a1c5aae269e3a&oe=54E8F93E&__gda__=1420842389_3fbffd2ce1c1edb4c24a4a12896cbe8b", "height": 225, "width": 127}], "cover_id": "10152167536821816"}, "admins": [{"name": "Kai-Ti Kao", "id": "724201815"}], "end_time": "2014-11-19T22:00:00-0500", "metadata": {"added_time": "2014-07-31T02:39:21Z", "added_person": 0, "dance_keywords": ["class", "jam", "popping", "practice", "session"], "added_method": "CM_AUTO"}, "id": "683976201688392", "name": "Mike's Popping Class @ Brooklyn Ballet"}
+{  
+  "description":"Come learn something new or just get in some practice time with Mike every Wednesdays from 8-10pm. Bring your music for end of the class jam session. All the funkiness for just Pay-What-You-Can! We need to collect at least $20 per class to cover studio rental cost.",
+  "venue":{  
+    "geocode":{  
+      "latitude":40.689547300699999,
+      "longitude":-73.987409729299998
+    },
+    "address":{  
+      "city":"Brooklyn",
+      "state":"NY",
+      "street":"160 Schermerhorn St",
+      "zip":"11201",
+      "country":"United States"
+    },
+    "name":"Brooklyn Ballet",
+    "id":"47762037213"
+  },
+  "start_time":"2014-10-29T20:00:00-0400",
+  "cover":{  
+    "images":[  
+      {  
+        "source":"https://dummy/event_cover_pic.jpg",
+        "height":960,
+        "width":543
+      },
+      {  
+        "source":"https://dummy/event_cover_pic.jpg",
+        "height":225,
+        "width":127
+      }
+    ],
+    "cover_id":"10152167536821816"
+  },
+  "admins":[  
+    {  
+      "name":"Kai-Ti Kao",
+      "id":"724201815"
+    }
+  ],
+  "end_time":"2014-11-19T22:00:00-0500",
+  "metadata":{  
+    "added_time":"2014-07-31T02:39:21Z",
+    "added_person":0,
+    "dance_keywords":[  
+      "class",
+      "jam",
+      "popping",
+      "practice",
+      "session"
+    ],
+    "added_method":"CM_AUTO"
+  },
+  "id":"683976201688392",
+  "name":"Mike's Popping Class @ Brooklyn Ballet"
+}

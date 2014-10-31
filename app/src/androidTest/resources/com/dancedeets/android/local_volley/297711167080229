@@ -1,1 +1,49 @@
-{"description": "Roots NYC | Louie Vega + Tony Humphries\n\nVIP TABLE RESERVATIONS EMAIL: office@cieloclub.com\n\nDOORS: 10pm-4am\nAGE: 21+ ID Required\n\nCIELO, 18 Little W. 12th Street, NYC\nwww.cieloclub.com\nwww.instagram.com/cielonyc\nwww.twitter.com/cieloclub\nwww.facebook.com/cieloclub\nwww.youtube.com/cielonewyork", "venue": {"geocode": {"latitude": 40.739747153172999, "longitude": -74.006938412872003}, "address": {"city": "New York", "state": "NY", "street": "18 Little West 12th St", "zip": "10014", "country": "United States"}, "name": "Cielo", "id": "7909537919"}, "start_time": "2014-10-29T22:00:00-0400", "cover": {"images": [{"source": "https://scontent-b.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10414637_10152368971711937_5757070969727096715_n.jpg?oh=911e2a77436a21e1ef52040cd19f44f7&oe=54DA5A10", "height": 638, "width": 425}, {"source": "https://scontent-b.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/p180x540/10414637_10152368971711937_5757070969727096715_n.jpg?oh=94d6f43d31fce5a299613a1dde376a4d&oe=54B09E7D", "height": 540, "width": 359}, {"source": "https://scontent-b.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/p320x320/10414637_10152368971711937_5757070969727096715_n.jpg?oh=740971f1a6b85294d08ef3bcf9edcd95&oe=54F21D58", "height": 480, "width": 320}, {"source": "https://scontent-b.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/p75x225/10414637_10152368971711937_5757070969727096715_n.jpg?oh=aaff7e823d8a94a55c99257a3f0d8188&oe=54E56C36", "height": 225, "width": 149}, {"source": "https://scontent-b.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/p130x130/10414637_10152368971711937_5757070969727096715_n.jpg?oh=682dbffc75a15dac39a9fd1e5fc67f4a&oe=54B0E348", "height": 195, "width": 130}], "cover_id": "10152368971711937"}, "admins": null, "end_time": null, "metadata": {"added_time": "2014-09-11T02:21:50Z", "added_person": 0, "dance_keywords": ["doors", "louie vega", "roots nyc", "vip"], "added_method": "CM_AUTO"}, "id": "297711167080229", "name": "Roots NYC | Louie Vega + Tony Humphries"}
+{  
+  "description":"Roots NYC | Louie Vega + Tony Humphries\n\nVIP TABLE RESERVATIONS EMAIL: office@cieloclub.com\n\nDOORS: 10pm-4am\nAGE: 21+ ID Required\n\nCIELO, 18 Little W. 12th Street, NYC\nwww.cieloclub.com\nwww.instagram.com/cielonyc\nwww.twitter.com/cieloclub\nwww.facebook.com/cieloclub\nwww.youtube.com/cielonewyork",
+  "venue":{  
+    "geocode":{  
+      "latitude":40.739747153172999,
+      "longitude":-74.006938412872003
+    },
+    "address":{  
+      "city":"New York",
+      "state":"NY",
+      "street":"18 Little West 12th St",
+      "zip":"10014",
+      "country":"United States"
+    },
+    "name":"Cielo",
+    "id":"7909537919"
+  },
+  "start_time":"2014-10-29T22:00:00-0400",
+  "cover":{  
+    "images":[  
+      {  
+        "source":"https://dummy/event_cover_pic.jpg",
+        "height":960,
+        "width":543
+      },
+      {  
+        "source":"https://dummy/event_cover_pic.jpg",
+        "height":225,
+        "width":127
+      }
+    ],
+    "cover_id":"10152368971711937"
+  },
+  "admins":null,
+  "end_time":null,
+  "metadata":{  
+    "added_time":"2014-09-11T02:21:50Z",
+    "added_person":0,
+    "dance_keywords":[  
+      "doors",
+      "louie vega",
+      "roots nyc",
+      "vip"
+    ],
+    "added_method":"CM_AUTO"
+  },
+  "id":"297711167080229",
+  "name":"Roots NYC | Louie Vega + Tony Humphries"
+}
