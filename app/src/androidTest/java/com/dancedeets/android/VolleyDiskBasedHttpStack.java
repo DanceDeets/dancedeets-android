@@ -26,7 +26,18 @@ public class VolleyDiskBasedHttpStack implements HttpStack {
 
     private static final String LOG_TAG = "VolleyDiskBasedHttpStack";
 
+    private boolean mBlockResponses;
+
     public VolleyDiskBasedHttpStack() {
+        setBlockResponses(false);
+    }
+
+    public boolean isBlockResponses() {
+        return mBlockResponses;
+    }
+
+    public void setBlockResponses(boolean blockResponses) {
+        mBlockResponses = blockResponses;
     }
 
     protected HttpResponse constructHttpResponseForStream(InputStream stream) throws IOException {
@@ -56,6 +67,14 @@ public class VolleyDiskBasedHttpStack implements HttpStack {
         String url = request.getUrl();
         Log.i(LOG_TAG, "Loading URL: " + url);
         String path = getFilenameForUrl(url);
+        try {
+            while (isBlockResponses()) {
+                Thread.sleep(50);
+            }
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "Sleeping due to isBlockResponses interrupted: " + e);
+        }
+
         InputStream stream = getClass().getResourceAsStream("local_volley/" + path);
         if (stream != null) {
             return constructHttpResponseForStream(stream);

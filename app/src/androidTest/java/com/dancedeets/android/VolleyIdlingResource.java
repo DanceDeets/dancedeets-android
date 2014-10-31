@@ -20,26 +20,41 @@ import static com.google.android.apps.common.testing.testrunner.util.Checks.chec
  */
 public final class VolleyIdlingResource implements IdlingResource {
     private static final String LOG_TAG = "VolleyIdlingResource";
-    private final String resourceName;
+    private final String mResourceName;
+
+    private boolean mWaitForVolley;
 
     // written from main thread, read from any thread.
     private volatile ResourceCallback resourceCallback;
     private Field mCurrentRequests;
 
     public VolleyIdlingResource(String resourceName) throws NoSuchFieldException {
-        this.resourceName = checkNotNull(resourceName);
+        mResourceName = checkNotNull(resourceName);
 
         mCurrentRequests = RequestQueue.class.getDeclaredField("mCurrentRequests");
         mCurrentRequests.setAccessible(true);
+        setWaitForVolley(true);
     }
 
     @Override
     public String getName() {
-        return resourceName;
+        return mResourceName;
     }
+
+    public boolean isWaitForVolley() {
+        return mWaitForVolley;
+    }
+
+    public void setWaitForVolley(boolean waitForVolley) {
+        this.mWaitForVolley = waitForVolley;
+    }
+
 
     @Override
     public boolean isIdleNow() {
+        if (!isWaitForVolley()) {
+            return true;
+        }
         // Always use the current request queue, as opposed to grabbing the one in use when this class is constructed
         final RequestQueue volleyRequestQueue = VolleySingleton.getInstance().getRequestQueue();
         try {
