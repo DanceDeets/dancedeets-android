@@ -6,7 +6,6 @@ import android.util.LruCache;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
@@ -47,8 +46,8 @@ public class VolleySingleton {
         photoLoader = new ImageLoader(requestQueue, new ImageCache(3));
     }
 
-    private VolleySingleton(Context context, HttpStack stack) {
-        requestQueue = Volley.newRequestQueue(context, stack);
+    private VolleySingleton(RequestQueue newRequestQueue) {
+        requestQueue = newRequestQueue;
 
         // Can cache many small thumbnails
         thumbnailLoader = new ImageLoader(requestQueue, new ImageCache(100));
@@ -68,8 +67,9 @@ public class VolleySingleton {
         return instance;
     }
 
-    static VolleySingleton forceCreateInstance(Context context, HttpStack httpStack) {
-        instance = new VolleySingleton(context, httpStack);
+    // Only used for testing
+    static VolleySingleton createInstance(RequestQueue requestQueue) {
+        instance = new VolleySingleton(requestQueue);
         return instance;
     }
 
