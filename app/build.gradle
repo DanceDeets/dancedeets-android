@@ -27,9 +27,6 @@ repositories {
 }
 
 dependencies {
-    // For Parse...
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
     // You must install or update the Support Repository through the SDK manager to use this dependency.
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.android.support:support-v13:20.0.0'
@@ -39,5 +36,9 @@ dependencies {
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
     compile files('libs/Parse-1.7.0.jar')
 
+    // Even if we want the advanced features of junit, we can't import it here, or it conflicts with android's junit
+    //androidTestCompile('junit:junit:4.11+') {
+    //    exclude group: 'org.hamcrest'
+    //}
     androidTestCompile files('libs/espresso-1.1-bundled.jar')
 }
