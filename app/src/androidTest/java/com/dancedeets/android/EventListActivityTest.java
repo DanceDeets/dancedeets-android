@@ -28,20 +28,25 @@ import static org.hamcrest.text.StringContains.containsString;
  * Created by lambert on 2014/10/28.
  */
 public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
+
+    private static VolleyDiskBasedHttpStack mHttpStack;
+    private static VolleyIdlingResource mIdlingResource;
+
     public EventListActivityTest() throws NoSuchFieldException {
         super(EventListActivity.class);
-        createVolleyForEspresso();
     }
-
-    private VolleyDiskBasedHttpStack mHttpStack;
-    private VolleyIdlingResource mIdlingResource;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        createVolleyForEspresso();
     }
 
-    protected void createVolleyForEspresso() throws NoSuchFieldException {
+    protected static void createVolleyForEspresso() throws NoSuchFieldException {
+        // Until we can get an unregisterIdlingResources, we need to avoid double-registering.
+        if (mIdlingResource != null) {
+            return;
+        }
         // Construct our own queue, with a proper VolleyIdlingResource handler
         mHttpStack = new VolleyDiskBasedHttpStack();
         Network network = new BasicNetwork(mHttpStack);
