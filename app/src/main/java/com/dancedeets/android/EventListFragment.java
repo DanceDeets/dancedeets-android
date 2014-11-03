@@ -285,18 +285,28 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         return super.onOptionsItemSelected(item);
     }
 
+    public static class SearchListener implements SearchDialogFragment.OnSearchListener {
+
+        private final MyRetainedState mRetainedState;
+
+        public SearchListener(MyRetainedState retainedState) {
+            mRetainedState = retainedState;
+        }
+        @Override
+        public void onSearch(String location, String keywords) {
+            Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
+            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            listFragment.startSearchFor(location, keywords);
+        }
+    }
 
     public void showSearchDialog() {
         mSearchDialog = new SearchDialogFragment();
-        mSearchDialog.setSearchOptions(getBundledState().mSearchOptions);
+        Bundle b = new Bundle();
+        b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, getBundledState().mSearchOptions);
+        mSearchDialog.setArguments(b);
+        mSearchDialog.setOnClickHandler(new SearchListener(getRetainedState()));
         mSearchDialog.show(getFragmentManager(), "search");
-        mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
-            @Override
-            public void onSearch(String location, String keywords) {
-                Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
-                startSearchFor(location, keywords);
-            }
-        });
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

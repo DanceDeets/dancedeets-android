@@ -1,41 +1,85 @@
 package com.dancedeets.android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.dancedeets.android.uistate.BundledState;
+import com.dancedeets.android.uistate.RetainedState;
+import com.dancedeets.android.uistate.StateDialogFragment;
 import com.dancedeets.dancedeets.R;
 
 /**
  * Created by lambert on 2014/10/05.
  */
-public class SearchDialogFragment extends DialogFragment {
+public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragment.MyBundledState, SearchDialogFragment.MyRetainedState> {
 
+    static protected class MyBundledState extends BundledState {
+        SearchOptions mSearchOptions = new SearchOptions();
+    }
+
+    static public class MyRetainedState extends RetainedState {
+        OnSearchListener mOnSearchListener;
+    }
     private static final String LOG_TAG = "SearchDialogFragment";
 
-    private OnSearchListener mOnClickListener;
-    private SearchOptions mSearchOptions;
+    public static final String ARG_SEARCH_OPTIONS = "SEARCH_OPTIONS";
 
-    public void setSearchOptions(SearchOptions searchOptions) {
-        mSearchOptions = searchOptions;
+    // This is temporary for the constructor to save state. When onAttach is called, it can be copied into MyRetainedState.
+    private OnSearchListener mTempOnSearchListener;
+
+    @Override
+    public MyBundledState buildBundledState() {
+        return new MyBundledState();
+    }
+
+    @Override
+    public MyRetainedState buildRetainedState() {
+        return new MyRetainedState();
+    }
+
+    @Override
+    public String getUniqueTag() {
+        return LOG_TAG;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Don't overwrite the retainedstate's searchlistener with our empty one, if we're being recreated9
+        if (mTempOnSearchListener != null) {
+            getRetainedState().mOnSearchListener = mTempOnSearchListener;
+        }
+        Log.i(LOG_TAG, "get retained state " + getRetainedState() + ", searchlistener " + getRetainedState().mOnSearchListener);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            getBundledState().mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
+        }
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Log.i(LOG_TAG, "onCreateDialog");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View view = inflater.inflate(R.layout.event_search_options, null);
-        final EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
-        searchLocation.setText(mSearchOptions.location);
+        EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
+        EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
+        searchLocation.setText(getBundledState().mSearchOptions.location);
+        searchKeywords.setText(getBundledState().mSearchOptions.keywords);
+
         builder.getContext();
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -48,7 +92,8 @@ public class SearchDialogFragment extends DialogFragment {
                         EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
                         EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
 
-                        mOnClickListener.onSearch(
+                        Log.i(LOG_TAG, "onclick " + getRetainedState() + ", searchlistener " + getRetainedState().mOnSearchListener);
+                        getRetainedState().mOnSearchListener.onSearch(
                                 searchLocation.getText().toString(),
                                 searchKeywords.getText().toString());
                     }
@@ -57,23 +102,15 @@ public class SearchDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
-        searchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                searchLocation.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputMethodManager.showSoftInput(searchLocation, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                });
-            }
-        });
         return builder.create();
     }
 
-    public void setOnClickHandler(OnSearchListener onClickListener) {
-        mOnClickListener = onClickListener;
+    public void setOnClickHandler(OnSearchListener onSearchListener) {
+        if (getRetainedState() != null) {
+            getRetainedState().mOnSearchListener = onSearchListener;
+        } else {
+            mTempOnSearchListener = onSearchListener;
+        }
     }
 
     public static interface OnSearchListener {
