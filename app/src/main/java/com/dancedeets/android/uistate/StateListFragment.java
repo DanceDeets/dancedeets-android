@@ -11,15 +11,6 @@ public abstract class StateListFragment<Bundled extends BundledState, Retained e
     private Bundled mBundled;
     private Retained mRetained;
 
-
-    public static interface StateFragmentHolder<Bundled, Retained> extends StateHolder<Bundled, Retained> {
-        public Bundled buildBundledState();
-        public Retained buildRetainedState();
-
-        // Must be unique
-        public String getUniqueTag();
-    }
-
     protected Bundled getBundledState() {
         return mBundled;
     }
