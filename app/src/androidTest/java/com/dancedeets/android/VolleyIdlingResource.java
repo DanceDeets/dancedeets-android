@@ -36,6 +36,10 @@ public final class VolleyIdlingResource implements IdlingResource {
         setWaitForVolley(true);
     }
 
+    public void makeImpotent() {
+        mWaitForVolley = false;
+    }
+
     @Override
     public String getName() {
         return mResourceName;

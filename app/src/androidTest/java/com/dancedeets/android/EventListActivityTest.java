@@ -15,6 +15,8 @@ import com.android.volley.toolbox.NoCache;
 import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
 
+import java.util.Random;
+
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
@@ -29,8 +31,8 @@ import static org.hamcrest.text.StringContains.containsString;
  */
 public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
 
-    private static VolleyDiskBasedHttpStack mHttpStack;
-    private static VolleyIdlingResource mIdlingResource;
+    private VolleyDiskBasedHttpStack mHttpStack;
+    private VolleyIdlingResource mIdlingResource;
 
     public EventListActivityTest() throws NoSuchFieldException {
         super(EventListActivity.class);
@@ -42,15 +44,13 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         createVolleyForEspresso();
     }
 
-    protected static void createVolleyForEspresso() throws NoSuchFieldException {
-        // Until we can get an unregisterIdlingResources, we need to avoid double-registering.
-        if (mIdlingResource != null) {
-            return;
-        }
+    protected void createVolleyForEspresso() throws NoSuchFieldException {
+        Log.i("TEST", "createVolleyForEspresso");
         // Construct our own queue, with a proper VolleyIdlingResource handler
         mHttpStack = new VolleyDiskBasedHttpStack();
         Network network = new BasicNetwork(mHttpStack);
-        mIdlingResource = new VolleyIdlingResource("Volley Request Queue");
+        String randomString = Integer.toString(new Random().nextInt());
+        mIdlingResource = new VolleyIdlingResource("VolleyRequestQueue_" + randomString);
 
         Handler mHandler = new Handler(Looper.getMainLooper());
         // Wrap our normal ExecutorDelivery(Handler(MainLooper)) with one that notifies our idlingResource.
@@ -58,8 +58,19 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         RequestQueue queue = new RequestQueue(new NoCache(), network, 4, mDispatch);
 
         VolleySingleton.createInstance(queue);
+        Log.i("TEST", "registerIdlingResources: " + randomString + ": " + mIdlingResource);
         Espresso.registerIdlingResources(mIdlingResource);
         queue.start();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        Log.i("TEST", "tearDown");
+        // We need to "kill" the IdlingResource since we don't need it anymore.
+        // But Espresso does not currently have an unregisterIdlingResources() to call.
+        // So instead we make it impotent, so it doesn't affect anything going forward.
+        mIdlingResource.makeImpotent();
+        super.tearDown();
     }
 
     protected void setBlockVolleyResponses(boolean blockVolleyResponses) {
@@ -72,6 +83,7 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
 
     @SuppressWarnings("unchecked")
     public void testEventNavigation() {
+        Log.i("TEST", "mIdlingResource is "+mIdlingResource);
         getActivity();
 
         onView(withId(R.id.event_list_fragment));
@@ -84,16 +96,17 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
 
     @SuppressWarnings("unchecked")
     public void testRotationDuringLoad() {
-        Log.i("TEST", "Blocking responses, but not blocking espresso");
+        Log.i("TEST", "Setting up preconditions");
         setBlockVolleyResponses(true);
         setWaitForVolley(false);
 
-        getActivity();
+        Log.i("TEST", "getActivity");
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Log.i("TEST", "Wait for View");
         onView(withId(R.id.event_list_fragment));
         Log.i("TEST", "Rotating");
         // Guarantee deconstruction and construction of views...is there a better way to do this?
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         // If this crashes, then we are not handling the orientation change correctly
         Log.i("TEST", "Letting responses finish, and making volley wait.");
