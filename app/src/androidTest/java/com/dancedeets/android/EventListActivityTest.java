@@ -45,7 +45,6 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     }
 
     protected void createVolleyForEspresso() throws NoSuchFieldException {
-        Log.i("TEST", "createVolleyForEspresso");
         // Construct our own queue, with a proper VolleyIdlingResource handler
         mHttpStack = new VolleyDiskBasedHttpStack();
         Network network = new BasicNetwork(mHttpStack);
@@ -58,14 +57,12 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         RequestQueue queue = new RequestQueue(new NoCache(), network, 4, mDispatch);
 
         VolleySingleton.createInstance(queue);
-        Log.i("TEST", "registerIdlingResources: " + randomString + ": " + mIdlingResource);
         Espresso.registerIdlingResources(mIdlingResource);
         queue.start();
     }
 
     @Override
     public void tearDown() throws Exception {
-        Log.i("TEST", "tearDown");
         // We need to "kill" the IdlingResource since we don't need it anymore.
         // But Espresso does not currently have an unregisterIdlingResources() to call.
         // So instead we make it impotent, so it doesn't affect anything going forward.
@@ -83,7 +80,6 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
 
     @SuppressWarnings("unchecked")
     public void testEventNavigation() {
-        Log.i("TEST", "mIdlingResource is "+mIdlingResource);
         getActivity();
 
         onView(withId(R.id.event_list_fragment));
