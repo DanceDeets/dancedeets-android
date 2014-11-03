@@ -353,28 +353,38 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             builder.appendQueryParameter("distance_units", "miles");
             final Uri uri = builder.build();
 
-            JsonArrayRequest request = new JsonArrayRequest
-                    (uri.toString(), new Response.Listener<JSONArray>() {
-
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            parseJsonResponse(response);
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "Error retrieving URL " + uri + ", with error: " + error.toString());
-                            mEmptyText.setVisibility(View.GONE);
-                            mRetryButton.setVisibility(View.VISIBLE);
-                            setListAdapter(eventAdapter);
-                        }
-                    });
+            FeedResponseHandler handler = new FeedResponseHandler(uri, getRetainedState());
+            JsonArrayRequest request = new JsonArrayRequest(uri.toString(), handler, handler);
 
             Log.d(LOG_TAG, "Querying server feed: " + uri);
             request.setShouldCache(false);
             RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
             queue.add(request);
+        }
+    }
+
+    public static class FeedResponseHandler implements Response.Listener<JSONArray>, Response.ErrorListener {
+
+        private Uri mUri;
+        private RetainedState mRetainedState;
+
+        public FeedResponseHandler(Uri uri, RetainedState retainedState) {
+            mUri = uri;
+            mRetainedState = retainedState;
+        }
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            Log.e(LOG_TAG, "Error retrieving URL " + mUri + ", with error: " + error.toString());
+            listFragment.mEmptyText.setVisibility(View.GONE);
+            listFragment.mRetryButton.setVisibility(View.VISIBLE);
+            listFragment.setListAdapter(listFragment.eventAdapter);
+        }
+
+        @Override
+        public void onResponse(JSONArray response) {
+            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            listFragment.parseJsonResponse(response);
         }
     }
 
