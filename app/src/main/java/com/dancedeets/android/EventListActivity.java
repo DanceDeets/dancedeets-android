@@ -41,6 +41,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
 
         setContentView(R.layout.activity_event_list);
 
+
         if (findViewById(R.id.event_info_fragment) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
@@ -79,10 +80,7 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
-            //TODO: make a better API for this
-            fragment.mSearchOptions.location = intent.getStringExtra(SearchManager.QUERY);
-            fragment.fetchJsonData();
-
+            fragment.startSearchFor("", intent.getStringExtra(SearchManager.QUERY));
         }
     }
 

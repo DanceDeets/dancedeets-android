@@ -50,12 +50,12 @@ public class ViewFlyerFragment extends StateFragment<
     private static final String LOG_TAG = "ViewFlyerFragment";
 
     @Override
-    protected MyBundledState buildBundledState() {
+    public MyBundledState buildBundledState() {
         return new MyBundledState();
     }
 
     @Override
-    protected MyRetainedState buildRetainedState() {
+    public MyRetainedState buildRetainedState() {
         return new MyRetainedState();
     }
 

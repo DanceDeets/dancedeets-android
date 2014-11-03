@@ -47,11 +47,13 @@ public class EventInfoFragment extends StateFragment<
         EventInfoFragment.MyRetainedState> {
 
     static protected class MyBundledState extends BundledState {
-        protected FullEvent mEvent;
+        FullEvent mEvent;
     }
     static public class MyRetainedState extends RetainedState {
-        protected JsonObjectRequest mDataRequest;
+        JsonObjectRequest mDataRequest;
     }
+
+
     protected View mRootView;
     protected View mProgressContainer;
     protected View mEventInfoContainer;
@@ -78,12 +80,12 @@ public class EventInfoFragment extends StateFragment<
 
 
     @Override
-    protected MyBundledState buildBundledState() {
+    public MyBundledState buildBundledState() {
         return new MyBundledState();
     }
 
     @Override
-    protected MyRetainedState buildRetainedState() {
+    public MyRetainedState buildRetainedState() {
         return new MyRetainedState();
     }
 
@@ -92,6 +94,8 @@ public class EventInfoFragment extends StateFragment<
         IdEvent tempEvent = IdEvent.parse(getArguments());
         return LOG_TAG + tempEvent.getId();
     }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

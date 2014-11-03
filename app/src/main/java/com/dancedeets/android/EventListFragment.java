@@ -1,7 +1,6 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +28,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.Event;
+import com.dancedeets.android.uistate.BundledState;
+import com.dancedeets.android.uistate.RetainedState;
+import com.dancedeets.android.uistate.StateListFragment;
 import com.dancedeets.dancedeets.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
@@ -42,27 +44,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class EventListFragment extends ListFragment implements GoogleApiClient.ConnectionCallbacks {
+public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements GoogleApiClient.ConnectionCallbacks {
 
-    /**
-     * The serialization (saved instance state) Bundle key representing the
-     * activated item position. Only used on tablets.
-     */
-    private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-    private static final String STATE_EVENT_LIST = "event_list";
-    private static final String STATE_SEARCH_OPTIONS = "search_options";
+    static protected class MyBundledState extends BundledState {
+
+        /**
+         * The current activated item position. Only used on tablets.
+         */
+        int mActivatedPosition = ListView.INVALID_POSITION;
+
+        ArrayList<Event> mEventList = new ArrayList<Event>();
+
+        SearchOptions mSearchOptions = new SearchOptions();
+    }
+
+    static public class MyRetainedState extends RetainedState {
+        FetchCityTask mFetchCityTask;
+        Geocoder mGeocoder;
+    }
 
     /**
      * The fragment's current callback object, which is notified of list item
      * clicks.
      */
     private Callbacks mCallbacks = null;
-
-    /**
-     * The current activated item position. Only used on tablets.
-     */
-    private int mActivatedPosition = ListView.INVALID_POSITION;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -78,9 +84,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     static final String LOG_TAG = "EventListFragment";
 
-    SearchOptions mSearchOptions;
 
-    ArrayList<Event> mEventList;
     EventUIAdapter eventAdapter;
 
     View mEmptyListView;
@@ -91,10 +95,24 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     // These are exposed as member variables for the sake of testing.
     SearchDialogFragment mSearchDialog;
     FusedLocationProviderApi mLocationProviderApi = LocationServices.FusedLocationApi;
-    FetchCityTask mFetchCityTask;
-    Geocoder mGeocoder;
 
     public EventListFragment() {
+    }
+
+
+    @Override
+    public MyBundledState buildBundledState() {
+        return new MyBundledState();
+    }
+
+    @Override
+    public MyRetainedState buildRetainedState() {
+        return new MyRetainedState();
+    }
+
+    @Override
+    public String getUniqueTag() {
+        return LOG_TAG;
     }
 
     /*
@@ -137,7 +155,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSONException: " + e);
             }
-            mEventList.add(event);
+            getBundledState().mEventList.add(event);
         }
         onEventListFilled();
     }
@@ -152,9 +170,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
-        mEventList = new ArrayList<Event>();
-        mSearchOptions = new SearchOptions();
-        mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
+        // Restore the previously serialized activated item position.
+        getRetainedState().mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         setHasOptionsMenu(true);
         initializeGoogleApiClient();
     }
@@ -186,25 +203,33 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         super.onStop();
     }
 
-    class FetchCityTask extends ReverseGeocodeTask {
+    static class FetchCityTask extends ReverseGeocodeTask {
+        private RetainedState mRetainedState;
 
-        public FetchCityTask(Geocoder geocoder) {
+        public FetchCityTask(final RetainedState retainedState, Geocoder geocoder) {
             super(geocoder);
+            mRetainedState = retainedState;
         }
 
         @Override
         protected void onPostExecute(Address address) {
+            EventListFragment listFragment = (EventListFragment) mRetainedState.getTargetFragment();
             if (address != null) {
-                mSearchOptions.location = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
-                fetchJsonData();
+                String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                listFragment.startSearchFor(addressString, "");
             } else {
                 //TODO: better handle the case of address being null, which indicates no networked connectivity.
-                Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(listFragment.getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
                 Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
-                mSearchOptions.location = "";
-                fetchJsonData();
+                listFragment.startSearchFor("", "");
             }
         }
+    }
+
+    public void startSearchFor(String location, String keywords) {
+        getBundledState().mSearchOptions.location = location;
+        getBundledState().mSearchOptions.keywords = keywords;
+        fetchJsonData();
     }
 
     @Override
@@ -212,7 +237,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
         // We reconnect every time the app wakes up, but we only need
         // to fetch on start if we have no location data (ie, app startup).
-        if (mSearchOptions.location.isEmpty()) {
+        if (getBundledState().mSearchOptions.location.isEmpty()) {
             Location location = mLocationProviderApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Reverse geocoding: " + location);
             SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
@@ -227,8 +252,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
                 location.setLongitude(pref.getFloat("longitude", -1));
             }
             if (location != null) {
-                mFetchCityTask = new FetchCityTask(mGeocoder);
-                mFetchCityTask.execute(location);
+                getRetainedState().mFetchCityTask = new FetchCityTask(getRetainedState(), getRetainedState().mGeocoder);
+                getRetainedState().mFetchCityTask.execute(location);
             } else {
                 showSearchDialog();
             }
@@ -263,15 +288,13 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     public void showSearchDialog() {
         mSearchDialog = new SearchDialogFragment();
-        mSearchDialog.setSearchOptions(mSearchOptions);
+        mSearchDialog.setSearchOptions(getBundledState().mSearchOptions);
         mSearchDialog.show(getFragmentManager(), "search");
         mSearchDialog.setOnClickHandler(new SearchDialogFragment.OnSearchListener() {
             @Override
             public void onSearch(String location, String keywords) {
                 Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
-                mSearchOptions.location = location;
-                mSearchOptions.keywords = keywords;
-                fetchJsonData();
+                startSearchFor(location, keywords);
             }
         });
     }
@@ -291,7 +314,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
         });
 
-        eventAdapter = new EventUIAdapter(inflater.getContext(), mEventList, R.layout.event_row);
+        eventAdapter = new EventUIAdapter(inflater.getContext(), getBundledState().mEventList, R.layout.event_row);
+
+        if (savedInstanceState != null) {
+            onEventListFilled();
+        }
 
         return rootView;
     }
@@ -305,7 +332,7 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
          * https://code.google.com/p/android/issues/detail?id=76779
          */
         setListShown(false);
-        mEventList.clear();
+        getBundledState().mEventList.clear();
         Log.i(LOG_TAG, "fetchJsonData");
 
         boolean SANS_INTERNET = false;
@@ -320,8 +347,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
             }
         } else {
             Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
-            builder.appendQueryParameter("location", mSearchOptions.location);
-            builder.appendQueryParameter("keywords", mSearchOptions.keywords);
+            builder.appendQueryParameter("location", getBundledState().mSearchOptions.location);
+            builder.appendQueryParameter("keywords", getBundledState().mSearchOptions.keywords);
             builder.appendQueryParameter("distance", "10");
             builder.appendQueryParameter("distance_units", "miles");
             final Uri uri = builder.build();
@@ -351,29 +378,9 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         }
     }
 
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.i(LOG_TAG, "onViewCreated");
-
-        // Restore the previously serialized activated item position.
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-                setActivatedPosition(savedInstanceState
-                        .getInt(STATE_ACTIVATED_POSITION));
-            }
-            if (savedInstanceState.containsKey(STATE_EVENT_LIST)) {
-                ArrayList<Event> eventList = (ArrayList<Event>)savedInstanceState.getSerializable(STATE_EVENT_LIST);
-                mEventList.addAll(eventList);
-                onEventListFilled();
-            }
-            // If we saved the json, use it, otherwise fetch it from the server
-            if (savedInstanceState.containsKey(STATE_SEARCH_OPTIONS)) {
-                mSearchOptions = (SearchOptions)savedInstanceState.getParcelable(STATE_SEARCH_OPTIONS);
-                Log.i(LOG_TAG, "Loading bundle-saved search options: " + mSearchOptions);
-            }
-        }
-
         /* We need to add the emptyListView as a sibling to the List,
          * as suggested by ListFragment.onCreateView documentation.
          * Then setting/unsetting the ListFragment's Adapter triggers
@@ -407,16 +414,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onListItemClick(ListView listView, View view, int position,
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Event event = mEventList.get(position);
+        Event event = getBundledState().mEventList.get(position);
         Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();
@@ -436,25 +438,8 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
-            mCallbacks.onEventSelected(mEventList, position);
+            mCallbacks.onEventSelected(getBundledState().mEventList, position);
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(LOG_TAG, "onSaveInstanceState");
-        if (mActivatedPosition != ListView.INVALID_POSITION) {
-            // Serialize and persist the activated item position.
-            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-        }
-        if (mEventList != null) {
-            outState.putSerializable(STATE_EVENT_LIST, mEventList);
-        }
-        if (mSearchOptions != null) {
-            outState.putParcelable(STATE_SEARCH_OPTIONS, mSearchOptions);
-        }
-        Log.d(LOG_TAG, "Bundle saved is " + outState);
     }
 
     /**
@@ -469,11 +454,11 @@ public class EventListFragment extends ListFragment implements GoogleApiClient.C
 
     private void setActivatedPosition(int position) {
         if (position == ListView.INVALID_POSITION) {
-            getListView().setItemChecked(mActivatedPosition, false);
+            getListView().setItemChecked(getBundledState().mActivatedPosition, false);
         } else {
             getListView().setItemChecked(position, true);
         }
 
-        mActivatedPosition = position;
+        getBundledState().mActivatedPosition = position;
     }
 }
