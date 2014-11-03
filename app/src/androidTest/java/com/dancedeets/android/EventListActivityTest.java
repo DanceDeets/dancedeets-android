@@ -18,12 +18,19 @@ import com.google.android.apps.common.testing.ui.espresso.Espresso;
 import java.util.Random;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.closeSoftKeyboard;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.hasSibling;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withClassName;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.StringContains.containsString;
 
 /**
@@ -31,8 +38,12 @@ import static org.hamcrest.text.StringContains.containsString;
  */
 public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
 
+    private final static String LOG_TAG = "EventListActivityTest";
+    
     private VolleyDiskBasedHttpStack mHttpStack;
     private VolleyIdlingResource mIdlingResource;
+
+    private final static String mEventTitle = "Mike's Popping Class @ Brooklyn Ballet";
 
     public EventListActivityTest() throws NoSuchFieldException {
         super(EventListActivity.class);
@@ -83,35 +94,82 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         getActivity();
 
         onView(withId(R.id.event_list_fragment));
-        String eventTitle = "Mike's Popping Class @ Brooklyn Ballet";
         // Click on an event
-        onView(withText(eventTitle)).perform(click());
+        onView(withText(mEventTitle)).perform(click());
         // Verify the description loaded
-        onView(allOf(hasSibling(withText(eventTitle)),withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(allOf(hasSibling(withText(mEventTitle)),withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
     }
 
     @SuppressWarnings("unchecked")
-    public void testRotationDuringLoad() {
-        Log.i("TEST", "Setting up preconditions");
+    public void testScreenRotations() {
+        Log.i(LOG_TAG, "Setting up preconditions");
         setBlockVolleyResponses(true);
         setWaitForVolley(false);
 
-        Log.i("TEST", "getActivity");
+        Log.i(LOG_TAG, "getActivity");
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        Log.i("TEST", "Wait for View");
+        Log.i(LOG_TAG, "Wait for View");
         onView(withId(R.id.event_list_fragment));
-        Log.i("TEST", "Rotating");
+        onView(withClassName(endsWith("ProgressBar"))).check(matches(isDisplayed()));
+
+        Log.i(LOG_TAG, "Rotating");
         // Guarantee deconstruction and construction of views...is there a better way to do this?
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         // If this crashes, then we are not handling the orientation change correctly
-        Log.i("TEST", "Letting responses finish, and making volley wait.");
+        Log.i(LOG_TAG, "Letting responses finish, and making volley wait.");
         setWaitForVolley(true);
         setBlockVolleyResponses(false);
-        Log.i("TEST", "Verify data loaded.");
-        // We should verify that the event is displayed and shown, not try to click on it
-        String eventTitle = "Mike's Popping Class @ Brooklyn Ballet";
-        onView(withText(eventTitle)).perform(click());
+        Log.i(LOG_TAG, "Verify data loaded.");
+
+        onView(withClassName(endsWith("ProgressBar"))).check(matches(not(isDisplayed())));
+
+        Log.i(LOG_TAG, "Clicking search button");
+        onView(withId(R.id.action_search)).perform(click());
+
+        onView(withId(R.id.search_location)).perform(clearText(), typeText("location"), closeSoftKeyboard());
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.search_keywords)).perform(clearText(), typeText("keywords"), closeSoftKeyboard());
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        onView(withId(R.id.search_location)).check(matches(withText("location")));
+        onView(withId(R.id.search_keywords)).check(matches(withText("keywords")));
+        onView(withId(android.R.id.button1)).perform(click());
+
+        // Wait for events to load
+        onView(withText(mEventTitle)).check(matches(withText(mEventTitle)));
+
+        // Now turn off Volley responses, before we click the event
+        setBlockVolleyResponses(true);
+        setWaitForVolley(false);
+
+        // Now click it
+        onView(withText(mEventTitle)).perform(click());
+
+        /* Disable while we try to figure out the best way to fetch stuff inside the ViewPager
+        onView(withId(R.id.progress_container)).check(matches(isDisplayed()));
+
+        onView(withClassName(endsWith("ProgressBar"))).check(matches(not(isDisplayed())));
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        setWaitForVolley(true);
+        setBlockVolleyResponses(false);
+
+        // Wait for event load
+        onData()
+        onView(allOf(hasSibling(withText(mEventTitle)), withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        */
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
