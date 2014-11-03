@@ -292,6 +292,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         public SearchListener(MyRetainedState retainedState) {
             mRetainedState = retainedState;
         }
+
         @Override
         public void onSearch(String location, String keywords) {
             Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
@@ -308,6 +309,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         mSearchDialog.setOnClickHandler(new SearchListener(getRetainedState()));
         mSearchDialog.show(getFragmentManager(), "search");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
