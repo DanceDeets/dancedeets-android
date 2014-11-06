@@ -2,23 +2,9 @@ package com.dancedeets.android;
 
 
 import android.content.pm.ActivityInfo;
-import android.os.Handler;
-import android.os.Looper;
-import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.View;
 
-import com.android.volley.ExecutorDelivery;
-import com.android.volley.Network;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.NoCache;
 import com.dancedeets.dancedeets.R;
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-
-import org.hamcrest.Matcher;
-
-import java.util.Random;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
@@ -27,7 +13,6 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.hasSibling;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withClassName;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
@@ -40,14 +25,11 @@ import static org.hamcrest.text.StringContains.containsString;
 /**
  * Created by lambert on 2014/10/28.
  */
-public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
+public class EventListActivityTest extends CommonActivityTest<EventListActivity> {
 
     private final static String LOG_TAG = "EventListActivityTest";
 
-    private VolleyDiskBasedHttpStack mHttpStack;
-    private VolleyIdlingResource mIdlingResource;
-
-    private final static String mEventTitle = "Mike's Popping Class @ Brooklyn Ballet";
+    private final static String mEventTitle = "Event 1";
 
     public EventListActivityTest() throws NoSuchFieldException {
         super(EventListActivity.class);
@@ -57,39 +39,6 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     public void setUp() throws Exception {
         super.setUp();
         getActivity();
-
-        createVolleyForEspresso();
-    }
-
-    protected void createVolleyForEspresso() throws NoSuchFieldException {
-        // Construct our own queue, with a proper VolleyIdlingResource handler
-        mHttpStack = new VolleyDiskBasedHttpStack();
-        Network network = new BasicNetwork(mHttpStack);
-        String randomString = Integer.toString(new Random().nextInt());
-        mIdlingResource = new VolleyIdlingResource("VolleyRequestQueue_" + randomString);
-
-        Handler mHandler = new Handler(Looper.getMainLooper());
-        // Wrap our normal ExecutorDelivery(Handler(MainLooper)) with one that notifies our idlingResource.
-        ExecutorDelivery mDispatch = mIdlingResource.getExecutorDeliveryWrapper(mHandler);
-        RequestQueue queue = new RequestQueue(new NoCache(), network, 4, mDispatch);
-
-        VolleySingleton.createInstance(queue);
-        Espresso.registerIdlingResources(mIdlingResource);
-        queue.start();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        // We need to "kill" the IdlingResource since we don't need it anymore.
-        // But Espresso does not currently have an unregisterIdlingResources() to call.
-        // So instead we make it impotent, so it doesn't affect anything going forward.
-        mIdlingResource.makeImpotent();
-        super.tearDown();
-    }
-
-    protected void waitForVolley(boolean runVolley) {
-        mHttpStack.setBlockResponses(!runVolley);
-        mIdlingResource.setWaitForVolley(runVolley);
     }
 
     @SuppressWarnings("unchecked")
@@ -100,11 +49,6 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         onView(withText(mEventTitle)).perform(click());
         // Verify the description loaded
         onView(allOf(hasSibling(withText(mEventTitle)),withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Matcher<View> withinActivePager(Matcher<View> matcher) {
-        return allOf(matcher, isDescendantOfA(allOf(withId(R.id.event_info_fragment), isDisplayed())));
     }
 
     @SuppressWarnings("unchecked")
