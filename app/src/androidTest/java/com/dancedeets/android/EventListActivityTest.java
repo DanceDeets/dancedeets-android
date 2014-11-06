@@ -56,6 +56,7 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        getActivity();
 
         createVolleyForEspresso();
     }
