@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+import android.view.View;
 
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
@@ -14,6 +15,8 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
 import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
+
+import org.hamcrest.Matcher;
 
 import java.util.Random;
 
@@ -24,6 +27,7 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.hasSibling;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withClassName;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
@@ -39,7 +43,7 @@ import static org.hamcrest.text.StringContains.containsString;
 public class EventListActivityTest extends ActivityInstrumentationTestCase2<EventListActivity> {
 
     private final static String LOG_TAG = "EventListActivityTest";
-    
+
     private VolleyDiskBasedHttpStack mHttpStack;
     private VolleyIdlingResource mIdlingResource;
 
@@ -52,6 +56,7 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
         createVolleyForEspresso();
     }
 
@@ -81,19 +86,15 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         super.tearDown();
     }
 
-    protected void setBlockVolleyResponses(boolean blockVolleyResponses) {
-        mHttpStack.setBlockResponses(blockVolleyResponses);
-    }
-
-    protected void setWaitForVolley(boolean waitForVolley) {
-        mIdlingResource.setWaitForVolley(waitForVolley);
+    protected void waitForVolley(boolean runVolley) {
+        mHttpStack.setBlockResponses(!runVolley);
+        mIdlingResource.setWaitForVolley(runVolley);
     }
 
     @SuppressWarnings("unchecked")
     public void testEventNavigation() {
-        getActivity();
-
         onView(withId(R.id.event_list_fragment));
+        waitForVolley(true);
         // Click on an event
         onView(withText(mEventTitle)).perform(click());
         // Verify the description loaded
@@ -101,10 +102,15 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
     }
 
     @SuppressWarnings("unchecked")
+    public static Matcher<View> withinActivePager(Matcher<View> matcher) {
+        return allOf(matcher, isDescendantOfA(allOf(withId(R.id.event_info_fragment), isDisplayed())));
+    }
+
+    @SuppressWarnings("unchecked")
     public void testScreenRotations() {
+
         Log.i(LOG_TAG, "Setting up preconditions");
-        setBlockVolleyResponses(true);
-        setWaitForVolley(false);
+        waitForVolley(false);
 
         Log.i(LOG_TAG, "getActivity");
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -118,8 +124,7 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         // If this crashes, then we are not handling the orientation change correctly
         Log.i(LOG_TAG, "Letting responses finish, and making volley wait.");
-        setWaitForVolley(true);
-        setBlockVolleyResponses(false);
+        waitForVolley(true);
         Log.i(LOG_TAG, "Verify data loaded.");
 
         onView(withClassName(endsWith("ProgressBar"))).check(matches(not(isDisplayed())));
@@ -150,29 +155,31 @@ public class EventListActivityTest extends ActivityInstrumentationTestCase2<Even
         onView(withText(mEventTitle)).check(matches(withText(mEventTitle)));
 
         // Now turn off Volley responses, before we click the event
-        setBlockVolleyResponses(true);
-        setWaitForVolley(false);
+        waitForVolley(false);
 
         // Now click it
         onView(withText(mEventTitle)).perform(click());
 
-        /* Disable while we try to figure out the best way to fetch stuff inside the ViewPager
-        onView(withId(R.id.progress_container)).check(matches(isDisplayed()));
+        //TODO: move all this to an EventInfoActivityTest!
 
-        onView(withClassName(endsWith("ProgressBar"))).check(matches(not(isDisplayed())));
+        onView(withinActivePager(withId(R.id.progress_container))).check(matches(isDisplayed()));
 
+        waitForVolley(true);
+
+        onView(withinActivePager(withId(R.id.progress_container))).check(matches(not(isDisplayed())));
+
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+
+        //This use of getActivity does not work, as it points at the wrong (old!) activity!
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        setWaitForVolley(true);
-        setBlockVolleyResponses(false);
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
 
-        // Wait for event load
-        onData()
-        onView(allOf(hasSibling(withText(mEventTitle)), withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
-        */
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
-
 
 }
