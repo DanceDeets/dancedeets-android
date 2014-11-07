@@ -14,13 +14,18 @@ import com.google.common.io.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import static android.test.TouchUtils.dragQuarterScreenDown;
+import static android.test.TouchUtils.dragQuarterScreenUp;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.registerIdlingResources;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.doubleClick;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withClassName;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -96,9 +101,15 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Flyer for Event 3")));
 
+        onView(withClassName(containsString("ImageViewTouch"))).perform(doubleClick());
+        dragQuarterScreenDown(this, getCurrentActivity());
+
         getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Flyer for Event 3")));
+
+        onView(withClassName(containsString("ImageViewTouch"))).perform(doubleClick());
+        dragQuarterScreenUp(this, getCurrentActivity());
 
         /** If we remove this, we sometimes get errors like:
          * Injection of up event failed (corresponding down event: MotionEvent { .. })
