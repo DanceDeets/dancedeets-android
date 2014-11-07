@@ -19,6 +19,7 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.StringContains.containsString;
 
@@ -113,16 +114,16 @@ public class EventListActivityTest extends CommonActivityTest<EventListActivity>
 
         onView(withinActivePager(withId(R.id.progress_container))).check(matches(not(isDisplayed())));
 
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
 
         //This use of getActivity does not work, as it points at the wrong (old!) activity!
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }

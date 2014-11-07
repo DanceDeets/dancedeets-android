@@ -21,8 +21,8 @@ import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewA
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.text.StringContains.containsString;
 
 /**
  * Created by lambert on 2014/11/06.
@@ -72,12 +72,12 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
         onView(withinActivePager(withId(R.id.progress_container))).check(matches(not(isDisplayed())));
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Event 1")));
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Event 1")));
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(containsString("Come learn something new"))));
+        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
 
         Log.i("TEST", "swipe left");
 
@@ -94,6 +94,20 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
 
         getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Flyer for Event 3")));
+
+        getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Flyer for Event 3")));
+
+        /** If we remove this, we sometimes get errors like:
+         * Injection of up event failed (corresponding down event: MotionEvent { .. })
+         * Injection of up event as part of the click failed. Send cancel event.
+         * Error performing 'inject cancel event (corresponding down event: MotionEvent {  .. }
+         * No idea why (the title is already set, why wouldn't home be clickable?), though the sleep here seems to help
+         */
+
+        Log.i("TEST", "click on home");
         onView(withId(android.R.id.home)).perform(click());
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Event 3")));
