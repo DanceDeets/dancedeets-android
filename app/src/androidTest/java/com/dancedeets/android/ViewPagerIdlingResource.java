@@ -49,11 +49,13 @@ public class ViewPagerIdlingResource implements IdlingResource, ActivityLifecycl
 
     @Override
     public boolean isIdleNow() {
+        Log.d(LOG_TAG, "isIdleNow? mViewPager is " + mViewPager);
         if (mViewPager == null) {
             return true;
         }
         try {
             Scroller scroller = (Scroller)mScroller.get(mViewPager);
+            Log.d(LOG_TAG, "isIdleNow? scroller is " + scroller + ", isFinished is " + scroller.isFinished());
             return scroller.isFinished();
         } catch (IllegalAccessException e) {
             Log.e(LOG_TAG, "Failed to find mViewPager.mScroller");
@@ -75,7 +77,7 @@ public class ViewPagerIdlingResource implements IdlingResource, ActivityLifecycl
         Log.i(LOG_TAG, "Activity: " + activity + ", Stage: " + stage);
 
         switch (stage) {
-            case CREATED:
+            case RESUMED:
                 mViewPager = (ViewPager) activity.findViewById(mViewPagerId);
 
                 // We attempt this privacy hack to find the current OnPageChangeListener,
@@ -110,16 +112,16 @@ public class ViewPagerIdlingResource implements IdlingResource, ActivityLifecycl
                             finalPageChangeListener.onPageScrollStateChanged(state);
                         }
                         if (state == ViewPager.SCROLL_STATE_IDLE) {
+                            Log.d(LOG_TAG, "onPageScrollStateChanged to state " + state + ", calling onTransitionToIdle");
                             mCallback.onTransitionToIdle();
                         }
                     }
                 });
                 break;
-            case STOPPED:
+            case PAUSED:
                 // Clean up reference
-                if (activity.isFinishing()) {
-                    mViewPager = null;
-                }
+                mViewPager = null;
+                mCallback.onTransitionToIdle();
                 break;
         }
     }
