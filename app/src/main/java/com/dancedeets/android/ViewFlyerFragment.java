@@ -1,12 +1,12 @@
 package com.dancedeets.android;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +25,11 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
 import com.dancedeets.dancedeets.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
@@ -90,7 +93,7 @@ public class ViewFlyerFragment extends StateFragment<
         photoLoader.get(imageUrl, new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                ViewFlyerFragment viewFlyerFragment = (ViewFlyerFragment)retainedState.getTargetFragment();
+                ViewFlyerFragment viewFlyerFragment = (ViewFlyerFragment) retainedState.getTargetFragment();
                 viewFlyerFragment.mBitmap = response.getBitmap();
                 viewFlyerFragment.mImageViewTouch.setImageBitmap(viewFlyerFragment.mBitmap);
                 if (viewFlyerFragment.mShareActionProvider != null) {
@@ -121,27 +124,35 @@ public class ViewFlyerFragment extends StateFragment<
     }
 
     public void setupShareIntent() {
-        ContentValues image = new ContentValues();
-        image.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
-        Uri localImageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, image);
+        // Save off flyers to the Pictures/DanceDeets/ directory (they'll show up in Gallery too)
+        File localImageUriDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DanceDeets");
+        localImageUriDir.mkdirs();
+        // Name the files using the sortable event title and date
+        String dateString = new SimpleDateFormat("yyyyMMdd").format(getBundledState().mEvent.getStartTimeLong());
+        File localImageUri = new File(localImageUriDir, dateString + " - " + getBundledState().mEvent.getTitle() + ".jpg");
+        Log.i(LOG_TAG, "Saving flyer to " + localImageUri);
         try {
-            OutputStream out = getActivity().getContentResolver().openOutputStream(localImageUri);
+            OutputStream out = new FileOutputStream(localImageUri);
             boolean success = mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
+            // Update metadata so file shows up in other directory listings correctly
+            MediaScannerConnection.scanFile(getActivity(), new String[]{localImageUri.getAbsolutePath()}, null, null);
+
             if (!success) {
                 Log.e(LOG_TAG, "Failed to write flyer to disk for sharing: " + localImageUri);
             } else {
                 // Create the share Intent
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("image/jpg");
-                intent.putExtra(Intent.EXTRA_STREAM, localImageUri);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
                 // Share the title
                 intent.putExtra(Intent.EXTRA_TEXT, getBundledState().mEvent.getTitle());
                 mShareActionProvider.setShareIntent(intent);
             }
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to write flyer to disk for sharing: " + localImageUri + ": " + e);
+            Log.e(LOG_TAG, "Failed to write flyer to disk for sharing: " + e);
+            e.printStackTrace();
         }
     }
 
