@@ -31,7 +31,6 @@ public class ViewFlyerActivity extends Activity {
         if (b != null) {
             Event event = Event.parse(b);
             if (event != null) {
-                setTitle(event.getTitle());
                 setTitle("Flyer for " + event.getTitle());
             }
         }
