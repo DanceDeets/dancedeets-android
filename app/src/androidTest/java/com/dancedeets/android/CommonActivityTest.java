@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 import android.view.View;
 
 import com.android.volley.ExecutorDelivery;
@@ -46,7 +45,6 @@ public class CommonActivityTest<T extends Activity> extends ActivityInstrumentat
 
         @Override
         public void onActivityLifecycleChanged(Activity activity, Stage stage) {
-            Log.i("TEST", "A " + activity + ", stage " + stage);
             if (stage == Stage.RESUMED) {
                 mCurrentActivity = activity;
             } else if (stage == Stage.PAUSED && mCurrentActivity == activity) {
@@ -61,7 +59,6 @@ public class CommonActivityTest<T extends Activity> extends ActivityInstrumentat
 
         createVolleyForEspresso();
 
-        Log.i("TEST", "Hi");
         mCurrentActivityTracker = new CurrentActivityTracker();
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(mCurrentActivityTracker);
     }
