@@ -102,7 +102,6 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
     }
 
     public void handleIntent(Intent intent) {
-        boolean loaded = false;
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             Uri url = intent.getData();
             Log.i(LOG_TAG, "Viewing URL: " + url);
@@ -112,7 +111,6 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
                 getBundledState().mEventIdList = new String[]{eventId};
                 getBundledState().mEventIndex = 0;
             }
-            loaded = true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
             getBundledState().mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
@@ -121,19 +119,14 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
             Event event = (Event)b.getSerializable(ARG_EVENT);
             // Since onPageSelected is not called until the first swipe, initialize the title here.
             setTitle(event.getTitle());
-            loaded = true;
-        } else {
-            // This is a singleTop activity, so everything should be loaded/preserved already.
-            return;
+         } else {
         }
         mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, getBundledState().mEventIdList);
         mViewPager.setAdapter(mEventInfoPagerAdapter);
 
         // Disable all callbacks, as we may not have set up any fragments for these pages yet.
         mViewPager.setOnPageChangeListener(null);
-        if (loaded) {
-            mViewPager.setCurrentItem(getBundledState().mEventIndex);
-        }
+        mViewPager.setCurrentItem(getBundledState().mEventIndex);
         /**
          * Ensures that the title is set for the relevant Fragment correctly when we change pages.
          * In the case of switching to a loaded fragment, set the title directly, below.
@@ -143,6 +136,7 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                getBundledState().mEventIndex = position;
                 EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
                 // This may return null, if the event API fetch hasn't returned yet
                 if (fragment.getEvent() != null) {
