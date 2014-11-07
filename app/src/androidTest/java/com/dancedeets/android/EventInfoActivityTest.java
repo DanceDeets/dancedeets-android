@@ -1,5 +1,6 @@
 package com.dancedeets.android;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.util.Log;
 import com.dancedeets.android.models.Event;
 import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
+import com.google.android.apps.common.testing.testrunner.Stage;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -14,8 +16,11 @@ import com.google.common.io.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collection;
+
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.registerIdlingResources;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
@@ -80,6 +85,23 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
 
         Log.i("TEST", "swipe left");
         onView(withinActivePager(withId(R.id.event_info_fragment))).perform(ViewActions.swipeLeft());
+
+        onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Event 3")));
+
+        onView(withinActivePager(withId(R.id.event_info_fragment))).perform(click());
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+
+                Collection<Activity> activitiesInStage = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+                for (Activity activity : activitiesInStage) {
+                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+            }
+        });
+
+        onView(withId(android.R.id.home)).perform(click());
 
         onView(MyMatchers.withResourceName("android:id/action_bar_title")).check(matches(withText("Event 3")));
 
