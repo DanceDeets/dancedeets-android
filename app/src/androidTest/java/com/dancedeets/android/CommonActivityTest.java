@@ -11,16 +11,13 @@ import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
-import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
 
 import org.hamcrest.Matcher;
 
 import java.util.Random;
 
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.dancedeets.android.MyMatchers.isScrolledTo;
 import static org.hamcrest.Matchers.allOf;
 
 /**
@@ -36,7 +33,7 @@ public class CommonActivityTest<T extends Activity> extends ActivityInstrumentat
 
     @SuppressWarnings("unchecked")
     public static Matcher<View> withinActivePager(Matcher<View> matcher) {
-        return allOf(matcher, isDescendantOfA(allOf(withId(R.id.event_info_fragment), isDisplayed())));
+        return allOf(matcher, isScrolledTo());
     }
 
     @Override
