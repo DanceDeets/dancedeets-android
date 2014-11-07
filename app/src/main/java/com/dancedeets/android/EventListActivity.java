@@ -112,21 +112,16 @@ public class EventListActivity extends Activity implements EventListFragment.Cal
             }
 
         } else {
-            Bundle bundle = new Bundle();
             String[] eventIdList = new String[allEvents.size()];
             int i = 0;
             for (Event otherEvent : allEvents) {
                 eventIdList[i++] = otherEvent.getId();
             }
-            bundle.putStringArray(EventInfoActivity.ARG_EVENT_ID_LIST, eventIdList);
-            bundle.putInt(EventInfoActivity.ARG_EVENT_INDEX, positionSelected);
-            bundle.putSerializable(EventInfoActivity.ARG_EVENT, event);
+            Intent intent = EventInfoActivity.buildIntentFor(this, eventIdList, positionSelected, event);
 
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
-            Intent detailIntent = new Intent(this, EventInfoActivity.class);
-            detailIntent.putExtras(bundle);
-            startActivity(detailIntent);
+            startActivity(intent);
         }
     }
 

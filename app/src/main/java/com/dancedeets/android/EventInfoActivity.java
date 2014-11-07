@@ -2,6 +2,7 @@ package com.dancedeets.android;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,17 @@ public class EventInfoActivity extends Activity implements EventInfoFragment.OnE
 
     protected ViewPager mViewPager;
     protected EventInfoPagerAdapter mEventInfoPagerAdapter;
+
+    public static Intent buildIntentFor(Context context, String[] eventIdList, int positionSelected, Event event) {
+        Bundle bundle = new Bundle();
+        bundle.putStringArray(ARG_EVENT_ID_LIST, eventIdList);
+        bundle.putInt(ARG_EVENT_INDEX, positionSelected);
+        bundle.putSerializable(ARG_EVENT, event);
+        Intent intent = new Intent(context, EventInfoActivity.class);
+        intent.putExtras(bundle);
+        return intent;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
