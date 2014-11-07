@@ -35,7 +35,10 @@
                 android:layout_alignWithParentIfMissing="true"
                 android:layout_below="@id/cover"
                 android:text=""
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:autoLink="all"
+                android:textIsSelectable="true"
+                />
 
             <TextView
                 android:id="@+id/location"
@@ -45,7 +48,10 @@
                 android:ellipsize="marquee"
                 android:singleLine="true"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:autoLink="all"
+                android:textIsSelectable="true"
+                />
 
             <TextView
                 android:id="@+id/start_time"
@@ -55,7 +61,8 @@
                 android:ellipsize="marquee"
                 android:singleLine="true"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                />
 
             <TextView
                 android:id="@+id/description"
@@ -63,7 +70,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/start_time"
                 android:text=""
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:autoLink="all"
+                android:textIsSelectable="true"
+                />
 
         </RelativeLayout>
     </ScrollView>
