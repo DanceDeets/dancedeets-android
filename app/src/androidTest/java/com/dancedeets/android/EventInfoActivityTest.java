@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
@@ -8,15 +7,12 @@ import android.util.Log;
 import com.dancedeets.android.models.Event;
 import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
-import com.google.android.apps.common.testing.testrunner.Stage;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Collection;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.registerIdlingResources;
@@ -45,6 +41,12 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
         mViewPagerIdlingResource = new ViewPagerIdlingResource("Waiting for Pager Adapter", EventInfoActivity.class, R.id.event_pager);
         registerIdlingResources(mViewPagerIdlingResource);
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(mViewPagerIdlingResource);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        ActivityLifecycleMonitorRegistry.getInstance().removeLifecycleCallback(mViewPagerIdlingResource);
+        super.tearDown();
     }
 
     public Intent getStartIntent() throws Exception {
@@ -90,16 +92,7 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
 
         onView(withinActivePager(withId(R.id.event_info_fragment))).perform(click());
 
-        getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-
-                Collection<Activity> activitiesInStage = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                for (Activity activity : activitiesInStage) {
-                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                }
-            }
-        });
+        getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         onView(withId(android.R.id.home)).perform(click());
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.View;
 
 import com.android.volley.ExecutorDelivery;
@@ -11,6 +12,9 @@ import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
+import com.google.android.apps.common.testing.testrunner.ActivityLifecycleCallback;
+import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
+import com.google.android.apps.common.testing.testrunner.Stage;
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
 
 import org.hamcrest.Matcher;
@@ -26,6 +30,7 @@ import static org.hamcrest.Matchers.allOf;
 public class CommonActivityTest<T extends Activity> extends ActivityInstrumentationTestCase2<T> {
     private VolleyDiskBasedHttpStack mHttpStack;
     private VolleyIdlingResource mIdlingResource;
+    private CurrentActivityTracker mCurrentActivityTracker;
 
     public CommonActivityTest(Class<T> activityClass) {
         super(activityClass);
@@ -36,11 +41,44 @@ public class CommonActivityTest<T extends Activity> extends ActivityInstrumentat
         return allOf(matcher, isScrolledTo());
     }
 
+    private static class CurrentActivityTracker implements ActivityLifecycleCallback {
+        Activity mCurrentActivity;
+
+        @Override
+        public void onActivityLifecycleChanged(Activity activity, Stage stage) {
+            Log.i("TEST", "A " + activity + ", stage " + stage);
+            if (stage == Stage.RESUMED) {
+                mCurrentActivity = activity;
+            } else if (stage == Stage.PAUSED && mCurrentActivity == activity) {
+                mCurrentActivity = null;
+            }
+        }
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
         createVolleyForEspresso();
+
+        Log.i("TEST", "Hi");
+        mCurrentActivityTracker = new CurrentActivityTracker();
+        ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(mCurrentActivityTracker);
+    }
+
+
+    @Override
+    public void tearDown() throws Exception {
+        // We need to "kill" the IdlingResource since we don't need it anymore.
+        // But Espresso does not currently have an unregisterIdlingResources() to call.
+        // So instead we make it impotent, so it doesn't affect anything going forward.
+        mIdlingResource.makeImpotent();
+        super.tearDown();
+    }
+
+
+    public Activity getCurrentActivity() {
+        return mCurrentActivityTracker.mCurrentActivity;
     }
 
     protected void createVolleyForEspresso() throws NoSuchFieldException {
@@ -58,15 +96,6 @@ public class CommonActivityTest<T extends Activity> extends ActivityInstrumentat
         VolleySingleton.createInstance(queue);
         Espresso.registerIdlingResources(mIdlingResource);
         queue.start();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        // We need to "kill" the IdlingResource since we don't need it anymore.
-        // But Espresso does not currently have an unregisterIdlingResources() to call.
-        // So instead we make it impotent, so it doesn't affect anything going forward.
-        mIdlingResource.makeImpotent();
-        super.tearDown();
     }
 
     protected void waitForVolley(boolean runVolley) {
