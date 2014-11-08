@@ -3,7 +3,7 @@
     package="com.dancedeets.dancedeets">
 
     <!-- Not used by Gradle, but used by Android Studio lint warnings -->
-    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="18"/>
+    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="20"/>
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -20,7 +20,7 @@
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:resource="@string/facebook_app_id"
+            android:value="@string/facebook_app_id"
             />
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
