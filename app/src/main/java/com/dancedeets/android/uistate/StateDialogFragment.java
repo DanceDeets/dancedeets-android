@@ -9,15 +9,8 @@ import android.util.Log;
  * Created by lambert on 2014/10/23.
  */
 public abstract class StateDialogFragment<Bundled extends BundledState, Retained extends RetainedState> extends DialogFragment implements StateHolder<Bundled, Retained> {
-    private Bundled mBundled;
-    private Retained mRetained;
-
-    protected Bundled getBundledState() {
-        return mBundled;
-    }
-    protected Retained getRetainedState() {
-        return mRetained;
-    }
+    protected Bundled mBundled;
+    protected Retained mRetained;
 
 
     @Override

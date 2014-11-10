@@ -8,13 +8,10 @@ import android.os.Bundle;
  * Created by lambert on 2014/10/23.
  */
 public abstract class StateListFragment<Bundled extends BundledState, Retained extends RetainedState> extends ListFragment implements StateHolder<Bundled, Retained> {
-    private Bundled mBundled;
-    private Retained mRetained;
+    protected Bundled mBundled;
+    protected Retained mRetained;
 
-    protected Bundled getBundledState() {
-        return mBundled;
-    }
-    protected Retained getRetainedState() {
+    protected Retained mRetained {
         return mRetained;
     }
 

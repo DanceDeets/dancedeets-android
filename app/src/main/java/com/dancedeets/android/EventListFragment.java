@@ -155,7 +155,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSONException: " + e);
             }
-            getBundledState().mEventList.add(event);
+            mBundled.mEventList.add(event);
         }
         onEventListFilled();
     }
@@ -171,7 +171,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
         // Restore the previously serialized activated item position.
-        getRetainedState().mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
+        mRetained.mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         setHasOptionsMenu(true);
         initializeGoogleApiClient();
     }
@@ -204,16 +204,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     static class FetchCityTask extends ReverseGeocodeTask {
-        private RetainedState mRetainedState;
+        private RetainedState mRetained;
 
         public FetchCityTask(final RetainedState retainedState, Geocoder geocoder) {
             super(geocoder);
-            mRetainedState = retainedState;
+            mRetained = retainedState;
         }
 
         @Override
         protected void onPostExecute(Address address) {
-            EventListFragment listFragment = (EventListFragment) mRetainedState.getTargetFragment();
+            EventListFragment listFragment = (EventListFragment) mRetained.getTargetFragment();
             if (address != null) {
                 String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
                 listFragment.startSearchFor(addressString, "");
@@ -227,8 +227,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     public void startSearchFor(String location, String keywords) {
-        getBundledState().mSearchOptions.location = location;
-        getBundledState().mSearchOptions.keywords = keywords;
+        mBundled.mSearchOptions.location = location;
+        mBundled.mSearchOptions.keywords = keywords;
         fetchJsonData();
     }
 
@@ -237,7 +237,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
         // We reconnect every time the app wakes up, but we only need
         // to fetch on start if we have no location data (ie, app startup).
-        if (getBundledState().mSearchOptions.location.isEmpty()) {
+        if (mBundled.mSearchOptions.location.isEmpty()) {
             Location location = mLocationProviderApi.getLastLocation(mGoogleApiClient);
             Log.i(LOG_TAG, "Reverse geocoding: " + location);
             SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
@@ -252,8 +252,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 location.setLongitude(pref.getFloat("longitude", -1));
             }
             if (location != null) {
-                getRetainedState().mFetchCityTask = new FetchCityTask(getRetainedState(), getRetainedState().mGeocoder);
-                getRetainedState().mFetchCityTask.execute(location);
+                mRetained.mFetchCityTask = new FetchCityTask(mRetained, mRetained.mGeocoder);
+                mRetained.mFetchCityTask.execute(location);
             } else {
                 showSearchDialog();
             }
@@ -287,16 +287,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     public static class SearchListener implements SearchDialogFragment.OnSearchListener {
 
-        private final MyRetainedState mRetainedState;
+        private final MyRetainedState mRetained;
 
         public SearchListener(MyRetainedState retainedState) {
-            mRetainedState = retainedState;
+            mRetained = retainedState;
         }
 
         @Override
         public void onSearch(String location, String keywords) {
             Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
-            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             listFragment.startSearchFor(location, keywords);
         }
     }
@@ -304,9 +304,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public void showSearchDialog() {
         mSearchDialog = new SearchDialogFragment();
         Bundle b = new Bundle();
-        b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, getBundledState().mSearchOptions);
+        b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, mBundled.mSearchOptions);
         mSearchDialog.setArguments(b);
-        mSearchDialog.setOnClickHandler(new SearchListener(getRetainedState()));
+        mSearchDialog.setOnClickHandler(new SearchListener(mRetained));
         mSearchDialog.show(getFragmentManager(), "search");
     }
 
@@ -326,7 +326,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             }
         });
 
-        eventAdapter = new EventUIAdapter(inflater.getContext(), getBundledState().mEventList, R.layout.event_row);
+        eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
 
         if (savedInstanceState != null) {
             onEventListFilled();
@@ -344,7 +344,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          * https://code.google.com/p/android/issues/detail?id=76779
          */
         setListShown(false);
-        getBundledState().mEventList.clear();
+        mBundled.mEventList.clear();
         Log.i(LOG_TAG, "fetchJsonData");
 
         boolean SANS_INTERNET = false;
@@ -359,13 +359,13 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             }
         } else {
             Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
-            builder.appendQueryParameter("location", getBundledState().mSearchOptions.location);
-            builder.appendQueryParameter("keywords", getBundledState().mSearchOptions.keywords);
+            builder.appendQueryParameter("location", mBundled.mSearchOptions.location);
+            builder.appendQueryParameter("keywords", mBundled.mSearchOptions.keywords);
             builder.appendQueryParameter("distance", "10");
             builder.appendQueryParameter("distance_units", "miles");
             final Uri uri = builder.build();
 
-            FeedResponseHandler handler = new FeedResponseHandler(uri, getRetainedState());
+            FeedResponseHandler handler = new FeedResponseHandler(uri, mRetained);
             JsonArrayRequest request = new JsonArrayRequest(uri.toString(), handler, handler);
 
             Log.d(LOG_TAG, "Querying server feed: " + uri);
@@ -378,15 +378,15 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public static class FeedResponseHandler implements Response.Listener<JSONArray>, Response.ErrorListener {
 
         private Uri mUri;
-        private RetainedState mRetainedState;
+        private RetainedState mRetained;
 
         public FeedResponseHandler(Uri uri, RetainedState retainedState) {
             mUri = uri;
-            mRetainedState = retainedState;
+            mRetained = retainedState;
         }
         @Override
         public void onErrorResponse(VolleyError error) {
-            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             Log.e(LOG_TAG, "Error retrieving URL " + mUri + ", with error: " + error.toString());
             listFragment.mEmptyText.setVisibility(View.GONE);
             listFragment.mRetryButton.setVisibility(View.VISIBLE);
@@ -395,7 +395,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         @Override
         public void onResponse(JSONArray response) {
-            EventListFragment listFragment = (EventListFragment)mRetainedState.getTargetFragment();
+            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             listFragment.parseJsonResponse(response);
         }
     }
@@ -440,7 +440,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Event event = getBundledState().mEventList.get(position);
+        Event event = mBundled.mEventList.get(position);
         Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();
@@ -460,7 +460,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
-            mCallbacks.onEventSelected(getBundledState().mEventList, position);
+            mCallbacks.onEventSelected(mBundled.mEventList, position);
         }
     }
 
@@ -476,11 +476,11 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     private void setActivatedPosition(int position) {
         if (position == ListView.INVALID_POSITION) {
-            getListView().setItemChecked(getBundledState().mActivatedPosition, false);
+            getListView().setItemChecked(mBundled.mActivatedPosition, false);
         } else {
             getListView().setItemChecked(position, true);
         }
 
-        getBundledState().mActivatedPosition = position;
+        mBundled.mActivatedPosition = position;
     }
 }

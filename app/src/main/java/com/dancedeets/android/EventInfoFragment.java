@@ -71,7 +71,7 @@ public class EventInfoFragment extends StateFragment<
     }
 
     public FullEvent getEvent() {
-        return getBundledState().mEvent;
+        return mBundled.mEvent;
     }
 
     public void setOnEventReceivedListener(OnEventReceivedListener onEventReceivedListener) {
@@ -284,12 +284,12 @@ public class EventInfoFragment extends StateFragment<
         IdEvent tempEvent = IdEvent.parse(getArguments());
 
         Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-        getRetainedState().mDataRequest = constructEventRequest(tempEvent.getApiDataUrl(), getRetainedState());
-        VolleySingleton.getInstance().getRequestQueue().add(getRetainedState().mDataRequest);
+        mRetained.mDataRequest = constructEventRequest(tempEvent.getApiDataUrl(), mRetained);
+        VolleySingleton.getInstance().getRequestQueue().add(mRetained.mDataRequest);
     }
 
     public void onEventReceived(FullEvent event, boolean animate) {
-        getBundledState().mEvent = event;
+        mBundled.mEvent = event;
         if (mOnEventReceivedListener != null) {
             mOnEventReceivedListener.onEventReceived(event);
         }

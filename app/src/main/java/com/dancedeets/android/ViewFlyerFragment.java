@@ -112,14 +112,14 @@ public class ViewFlyerFragment extends StateFragment<
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getBundledState().mEvent = FullEvent.parse(getArguments());
+        mBundled.mEvent = FullEvent.parse(getArguments());
         Log.i(LOG_TAG, "Received Bundle: " + getArguments());
         mImageViewTouch = new ImageViewTouch(getActivity(), null);
         mImageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
         mImageViewTouch.setBackgroundColor(Color.BLACK);
 
-        loadPhoto(getBundledState().mEvent.getCoverUrl(), getRetainedState());
+        loadPhoto(mBundled.mEvent.getCoverUrl(), mRetained);
         return mImageViewTouch;
     }
 
@@ -128,8 +128,8 @@ public class ViewFlyerFragment extends StateFragment<
         File localImageUriDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DanceDeets");
         localImageUriDir.mkdirs();
         // Name the files using the sortable event title and date
-        String dateString = new SimpleDateFormat("yyyyMMdd").format(getBundledState().mEvent.getStartTimeLong());
-        File localImageUri = new File(localImageUriDir, dateString + " - " + getBundledState().mEvent.getTitle() + ".jpg");
+        String dateString = new SimpleDateFormat("yyyyMMdd").format(mBundled.mEvent.getStartTimeLong());
+        File localImageUri = new File(localImageUriDir, dateString + " - " + mBundled.mEvent.getTitle() + ".jpg");
         Log.i(LOG_TAG, "Saving flyer to " + localImageUri);
         try {
             OutputStream out = new FileOutputStream(localImageUri);
@@ -146,7 +146,7 @@ public class ViewFlyerFragment extends StateFragment<
                 intent.setType("image/jpg");
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
                 // Share the title
-                intent.putExtra(Intent.EXTRA_TEXT, getBundledState().mEvent.getTitle());
+                intent.putExtra(Intent.EXTRA_TEXT, mBundled.mEvent.getTitle());
                 mShareActionProvider.setShareIntent(intent);
             }
 

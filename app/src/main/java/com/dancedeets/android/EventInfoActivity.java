@@ -76,7 +76,7 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                getBundledState().mEventIndex = position;
+                mBundled.mEventIndex = position;
                 EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
                 // This may return null, if the event API fetch hasn't returned yet
                 if (fragment.getEvent() != null) {
@@ -99,13 +99,13 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
      * and can be re-called after calling onNewIntent later in the activity lifecycle flow.
      */
     public void initializeViewPagerWithBundledState() {
-        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, getBundledState().mEventIdList);
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mBundled.mEventIdList);
         Log.i(LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
         mViewPager.setAdapter(mEventInfoPagerAdapter);
         // The ViewPager retains its own CurrentItem state, so this is not strictly necessary here.
         // However, we must call setCurrentItem on all the intent-derived initializations,
         // and the flow just makes it easier to store/restore our own EventIndex for everyone here.
-        mViewPager.setCurrentItem(getBundledState().mEventIndex);
+        mViewPager.setCurrentItem(mBundled.mEventIndex);
     }
 
     static class MyBundledState extends BundledState {
@@ -113,7 +113,7 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
         public int mEventIndex;
     }
 
-    MyBundledState mBundled;
+    protected MyBundledState mBundled;
 
     public String getUniqueTag() {
         return LOG_TAG;
@@ -121,9 +121,6 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
 
     private MyBundledState buildBundledState() {
         return new MyBundledState();
-    }
-    protected MyBundledState getBundledState() {
-        return mBundled;
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -138,14 +135,14 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
             List<String> pathSegments = url.getPathSegments();
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
-                getBundledState().mEventIdList = new String[]{eventId};
-                getBundledState().mEventIndex = 0;
+                mBundled.mEventIdList = new String[]{eventId};
+                mBundled.mEventIndex = 0;
             }
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            getBundledState().mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
-            getBundledState().mEventIndex = b.getInt(ARG_EVENT_INDEX);
+            mBundled.mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
+            mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
 
             Event event = (Event)b.getSerializable(ARG_EVENT);
             // Since onPageSelected is not called until the first swipe, initialize the title here.
@@ -172,7 +169,7 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
 
     @Override
     public void onEventReceived(FullEvent event) {
-        if (getBundledState().mEventIdList[mViewPager.getCurrentItem()].equals(event.getId())) {
+        if (mBundled.mEventIdList[mViewPager.getCurrentItem()].equals(event.getId())) {
             setTitle(event.getTitle());
         }
     }

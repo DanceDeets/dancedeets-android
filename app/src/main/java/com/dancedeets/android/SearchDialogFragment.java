@@ -54,16 +54,16 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         super.onAttach(activity);
         // Don't overwrite the retainedstate's searchlistener with our empty one, if we're being recreated9
         if (mTempOnSearchListener != null) {
-            getRetainedState().mOnSearchListener = mTempOnSearchListener;
+            mRetained.mOnSearchListener = mTempOnSearchListener;
         }
-        Log.i(LOG_TAG, "get retained state " + getRetainedState() + ", searchlistener " + getRetainedState().mOnSearchListener);
+        Log.i(LOG_TAG, "get retained state " + mRetained + ", searchlistener " + mRetained.mOnSearchListener);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            getBundledState().mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
+            mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
         }
     }
 
@@ -77,8 +77,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         View view = inflater.inflate(R.layout.event_search_options, null);
         EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
         EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
-        searchLocation.setText(getBundledState().mSearchOptions.location);
-        searchKeywords.setText(getBundledState().mSearchOptions.keywords);
+        searchLocation.setText(mBundled.mSearchOptions.location);
+        searchKeywords.setText(mBundled.mSearchOptions.keywords);
 
         builder.getContext();
         // Inflate and set the layout for the dialog
@@ -92,8 +92,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
                         EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
                         EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
 
-                        Log.i(LOG_TAG, "onclick " + getRetainedState() + ", searchlistener " + getRetainedState().mOnSearchListener);
-                        getRetainedState().mOnSearchListener.onSearch(
+                        Log.i(LOG_TAG, "onclick " + mRetained + ", searchlistener " + mRetained.mOnSearchListener);
+                        mRetained.mOnSearchListener.onSearch(
                                 searchLocation.getText().toString(),
                                 searchKeywords.getText().toString());
                     }
@@ -106,8 +106,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
     }
 
     public void setOnClickHandler(OnSearchListener onSearchListener) {
-        if (getRetainedState() != null) {
-            getRetainedState().mOnSearchListener = onSearchListener;
+        if (mRetained != null) {
+            mRetained.mOnSearchListener = onSearchListener;
         } else {
             mTempOnSearchListener = onSearchListener;
         }
