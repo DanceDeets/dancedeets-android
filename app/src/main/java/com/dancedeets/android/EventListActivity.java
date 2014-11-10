@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class EventListActivity extends Activity implements EventListFragment.Callbacks {
+public class EventListActivity extends FacebookActivity implements EventListFragment.Callbacks {
 
     private static final String LOG_TAG = "EventListActivity";
 

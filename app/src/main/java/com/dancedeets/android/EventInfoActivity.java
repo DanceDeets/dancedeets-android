@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,7 @@ import com.dancedeets.dancedeets.R;
 import java.util.List;
 
 
-public class EventInfoActivity extends Activity implements EventInfoFragment.OnEventReceivedListener {
+public class EventInfoActivity extends FacebookActivity implements EventInfoFragment.OnEventReceivedListener {
 
     private static final String LOG_TAG = "EventInfoActivity";
 

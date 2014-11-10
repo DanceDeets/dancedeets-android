@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +13,7 @@ import com.dancedeets.android.models.Event;
 /**
  * Shows zoomable/pannable event flyers, when clicked on from the event info page.
  */
-public class ViewFlyerActivity extends Activity {
+public class ViewFlyerActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "ViewFlyerActivity";
 
