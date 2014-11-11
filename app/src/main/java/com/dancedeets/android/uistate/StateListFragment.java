@@ -11,11 +11,6 @@ public abstract class StateListFragment<Bundled extends BundledState, Retained e
     protected Bundled mBundled;
     protected Retained mRetained;
 
-    protected Retained mRetained {
-        return mRetained;
-    }
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
