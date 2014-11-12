@@ -17,11 +17,11 @@ public class FacebookActivity extends Activity {
 
     private static final String LOG_TAG = "FacebookActivity";
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+    protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
-            Log.i(LOG_TAG, "Logged in...");
+            Log.i(LOG_TAG, "Activity " + this + " is logged in...");
         } else if (state.isClosed()) {
-            Log.i(LOG_TAG, "Logged out...");
+            Log.i(LOG_TAG, "Activity " + this + " is logged out...");
         }
     }
 

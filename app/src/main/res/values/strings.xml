@@ -19,5 +19,9 @@
     <string name="filter_title_viewevent">DanceDeets Event</string>
     <string name="loading">Loading...</string>
     <string name="facebook_app_id">2347064084</string>
+    <string name="login_bubble">Looking to dance? We got the \'deets!\n\nClick Login below, and let\'s check out the world of dance events, both near and far!\n\nAnd of course, we promise not to spam or hack your Facebook account, just help you find and share dance events.</string>
+    <string name="login_explain_why_login">Curious what we use login for?</string>
+    <string name="login_use_without_fblogin">Use DanceDeets without logging in</string>
+    <string name="penguin_name">The DanceDeets Penguin</string>
 
 </resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/login_bubble"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bubble_white_bottom"
+        android:text="@string/login_bubble"/>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/penguin"
+        android:layout_below="@id/login_bubble"
+        android:layout_above="@id/authButton"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/penguin_name"/>
+
+    <com.facebook.widget.LoginButton
+        android:id="@+id/authButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/login_explain_why_login"
+        />
+
+    <TextView
+        android:id="@id/login_explain_why_login"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/login_explain_why_login"
+        android:layout_above="@+id/login_use_without_fblogin"/>
+
+    <TextView
+        android:id="@id/login_use_without_fblogin"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/login_use_without_fblogin"
+        android:layout_alignParentBottom="true"/>
+
+
+</RelativeLayout>
