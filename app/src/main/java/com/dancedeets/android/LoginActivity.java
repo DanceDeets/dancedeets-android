@@ -42,8 +42,10 @@ public class LoginActivity extends FacebookActivity {
         }
     }
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        super.onSessionStateChange(session, state, exception);
+        // Don't call the super, since we don't want it sending us back to the LoginActivity when logged out
+        // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
+            Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
 
             Request request = Request.newMeRequest(session, new MeCallback(session));
             Request.executeBatchAsync(request);
@@ -52,6 +54,7 @@ public class LoginActivity extends FacebookActivity {
             intent.setAction(Intent.ACTION_DEFAULT);
             startActivity(intent);
         } else if (state.isClosed()) {
+            Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
         }
     }
 

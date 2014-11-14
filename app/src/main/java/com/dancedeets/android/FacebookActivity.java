@@ -19,9 +19,9 @@ public class FacebookActivity extends Activity {
 
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
-            Log.i(LOG_TAG, "Activity " + this + " is logged in...");
+            Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
         } else if (state.isClosed()) {
-            Log.i(LOG_TAG, "Activity " + this + " is logged out...");
+            Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
 
             // On logout, send them back to the login screen.
             Intent intent = new Intent(this, LoginActivity.class);
@@ -45,16 +45,6 @@ public class FacebookActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // For scenarios where the main activity is launched and user
-        // session is not null, the session state change notification
-        // may not be triggered. Trigger it if it's open/closed.
-        Session session = Session.getActiveSession();
-        if (session != null &&
-                (session.isOpened() || session.isClosed()) ) {
-            onSessionStateChange(session, session.getState(), null);
-        }
-
         uiHelper.onResume();
     }
 
