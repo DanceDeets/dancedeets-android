@@ -22,6 +22,11 @@ public class FacebookActivity extends Activity {
             Log.i(LOG_TAG, "Activity " + this + " is logged in...");
         } else if (state.isClosed()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged out...");
+
+            // On logout, send them back to the login screen.
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setAction(Intent.ACTION_MAIN);
+            startActivity(intent);
         }
     }
 
