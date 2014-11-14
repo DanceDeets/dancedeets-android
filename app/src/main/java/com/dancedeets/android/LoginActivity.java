@@ -2,10 +2,15 @@ package com.dancedeets.android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.dancedeets.dancedeets.R;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.facebook.model.GraphUser;
+import com.facebook.widget.LoginButton;
 
 /**
  * Created by lambert on 2014/11/11.
@@ -14,12 +19,36 @@ public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
 
+    public class MeCallback implements Request.GraphUserCallback {
+
+        Session mSession;
+
+        MeCallback(Session session) {
+            mSession = session;
+        }
+        @Override
+        public void onCompleted(GraphUser user, Response response) {
+            // If the response is successful
+            if (mSession == Session.getActiveSession()) {
+                if (user != null) {
+                    // TODO: send this ID and Session to the server.
+                    //session.getAccessToken();
+                    //session.getPermissions();
+                    //session.getAuthorizationBundle();
+                    Log.i(LOG_TAG, "ID: " + user.getId());
+                    Log.i(LOG_TAG, "Name: " + user.getName());
+                }
+            }
+        }
+    }
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
-            Bundle bundle = new Bundle();
+
+            Request request = Request.newMeRequest(session, new MeCallback(session));
+            Request.executeBatchAsync(request);
+
             Intent intent = new Intent(this, EventListActivity.class);
-            intent.putExtras(bundle);
             intent.setAction(Intent.ACTION_DEFAULT);
             startActivity(intent);
         } else if (state.isClosed()) {
@@ -30,6 +59,10 @@ public class LoginActivity extends FacebookActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+
+        LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
+        // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
+        authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
     }
 
 }
