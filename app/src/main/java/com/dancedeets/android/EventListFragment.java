@@ -218,7 +218,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
                 listFragment.startSearchFor(addressString, "");
             } else {
-                //TODO: better handle the case of address being null, which indicates no networked connectivity.
+                // TODO: Location: better handle the case of address being null, which indicates no networked connectivity.
                 Toast.makeText(listFragment.getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
                 Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
                 listFragment.startSearchFor("", "");
@@ -252,9 +252,14 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 location.setLongitude(pref.getFloat("longitude", -1));
             }
             if (location != null) {
+                // TODO: Location: Sometimes this times out too, just randomly.
+                // Should we store prefs for the final geocoded location too?
                 mRetained.mFetchCityTask = new FetchCityTask(mRetained, mRetained.mGeocoder);
                 mRetained.mFetchCityTask.execute(location);
             } else {
+                // TODO: Location: Handle geocoder returning Null, perhaps with a better prompt/message/warning?
+                // No GPS, but perhaps there still is network connectivity...
+                // Perhaps we can return a list of selected cities/locations?
                 showSearchDialog();
             }
         }
