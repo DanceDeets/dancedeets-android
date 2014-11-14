@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -30,6 +31,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
     private static final String LOG_TAG = "SearchDialogFragment";
 
     public static final String ARG_SEARCH_OPTIONS = "SEARCH_OPTIONS";
+
+    public static final String ARG_MESSAGE = "MESSAGE";
 
     // This is temporary for the constructor to save state. When onAttach is called, it can be copied into MyRetainedState.
     private OnSearchListener mTempOnSearchListener;
@@ -64,6 +67,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
+            TextView messageView = (TextView) getActivity().findViewById(R.id.search_message);
+            messageView.setText(getArguments().getString(ARG_MESSAGE));
         }
     }
 

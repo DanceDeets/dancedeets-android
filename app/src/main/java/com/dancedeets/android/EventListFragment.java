@@ -227,9 +227,14 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     public void startSearchFor(String location, String keywords) {
-        mBundled.mSearchOptions.location = location;
-        mBundled.mSearchOptions.keywords = keywords;
-        fetchJsonData();
+        SearchOptions searchOptions = mBundled.mSearchOptions;
+        searchOptions.location = location;
+        searchOptions.keywords = keywords;
+        if (searchOptions.location.isEmpty() && searchOptions.keywords.isEmpty()) {
+            showSearchDialog("Could not detect your location. Enter your location here.");
+        } else {
+            fetchJsonData();
+        }
     }
 
     @Override
@@ -260,7 +265,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 // TODO: Location: Handle geocoder returning Null, perhaps with a better prompt/message/warning?
                 // No GPS, but perhaps there still is network connectivity...
                 // Perhaps we can return a list of selected cities/locations?
-                showSearchDialog();
+                startSearchFor("", "");
             }
         }
     }
@@ -285,7 +290,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             return true;
         }
         if (id == R.id.action_search) {
-            showSearchDialog();
+            showSearchDialog("");
         }
         return super.onOptionsItemSelected(item);
     }
@@ -306,10 +311,11 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
     }
 
-    public void showSearchDialog() {
+    public void showSearchDialog(String message) {
         mSearchDialog = new SearchDialogFragment();
         Bundle b = new Bundle();
         b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, mBundled.mSearchOptions);
+        b.putString(SearchDialogFragment.ARG_MESSAGE, message);
         mSearchDialog.setArguments(b);
         mSearchDialog.setOnClickHandler(new SearchListener(mRetained));
         mSearchDialog.show(getFragmentManager(), "search");
