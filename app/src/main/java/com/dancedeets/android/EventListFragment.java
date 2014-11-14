@@ -256,6 +256,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 location.setLatitude(pref.getFloat("latitude", -1));
                 location.setLongitude(pref.getFloat("longitude", -1));
             }
+            Log.i(LOG_TAG, "Final location is " + location);
             if (location != null) {
                 // TODO: Location: Sometimes this times out too, just randomly.
                 // Should we store prefs for the final geocoded location too?
