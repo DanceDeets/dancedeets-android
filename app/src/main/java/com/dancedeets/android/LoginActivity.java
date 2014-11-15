@@ -19,7 +19,7 @@ public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
 
-    public class MeCallback implements Request.GraphUserCallback {
+    public static class MeCallback implements Request.GraphUserCallback {
 
         Session mSession;
 
