@@ -106,26 +106,16 @@ public class EventListActivityTest extends CommonActivityTest<EventListActivity>
         // Now click it
         onView(withText(mEventTitle)).perform(click());
 
-        //TODO: move all this to an EventInfoActivityTest!
 
+        // Verify loading the info page is waiting on volley
         onView(withinActivePager(withId(R.id.progress_container))).check(matches(isDisplayed()));
 
         waitForVolley(true);
 
+        // And that it now completes successfully
         onView(withinActivePager(withId(R.id.progress_container))).check(matches(not(isDisplayed())));
 
         onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
-
-        //This use of getActivity does not work, as it points at the wrong (old!) activity!
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        onView(withinActivePager(withId(R.id.description))).check(matches(withText(is("Event 1 description."))));
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
 }

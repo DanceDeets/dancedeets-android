@@ -340,8 +340,6 @@ public class EventInfoFragment extends StateFragment<
         TextView startTime  = (TextView) mRootView.findViewById(R.id.start_time);
         startTime.setText(getEvent().getStartTimeString());
         TextView description = (TextView) mRootView.findViewById(R.id.description);
-        // TODO: Somehow linkify the links in description?
-        // http://developer.android.com/reference/android/text/util/Linkify.html
         description.setText(getEvent().getDescription());
     }
 

@@ -45,7 +45,15 @@ public class EventUIAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position; // TODO: do we want to return the FB ID of the item itself? If we do, override hasStableIds()
+        // The facebook ID is not guaranteed to fit into a 'long',
+        // so we use the hashcode of the string, which should be good enough for uniqueness.
+        return mEventList.get(position).getId().hashCode();
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        // Dependent on the getItemId implementation above being stable.
+        return true;
     }
 
     protected void bindView(int position, View view) {
