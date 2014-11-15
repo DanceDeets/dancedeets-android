@@ -46,7 +46,6 @@ import java.util.Locale;
 
 public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements GoogleApiClient.ConnectionCallbacks {
 
-
     static protected class MyBundledState extends BundledState {
 
         /**
@@ -90,6 +89,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     View mEmptyListView;
     TextView mEmptyText;
     Button mRetryButton;
+    TextView mListDescription;
+
     GoogleApiClient mGoogleApiClient;
 
     // These are exposed as member variables for the sake of testing.
@@ -230,6 +231,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         SearchOptions searchOptions = mBundled.mSearchOptions;
         searchOptions.location = location;
         searchOptions.keywords = keywords;
+        // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
+        if (searchOptions.keywords.isEmpty()) {
+            mListDescription.setText("Events near " + searchOptions.location);
+        } else {
+            mListDescription.setText("Events near " + searchOptions.location + " with keywords '" + searchOptions.keywords + "'");
+        }
         if (searchOptions.location.isEmpty() && searchOptions.keywords.isEmpty()) {
             showSearchDialog("Could not detect your location. Enter your location here.");
         } else {
@@ -326,7 +333,15 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
-        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.event_list_layout, container, false);
+
+        View listRootView = super.onCreateView(inflater, rootView, savedInstanceState);
+        View eventListMagicView = rootView.findViewById(R.id.event_list_magic);
+        int eventListMagicIndex = rootView.indexOfChild(eventListMagicView);
+        ViewGroup.LayoutParams eventListMagicParams = eventListMagicView.getLayoutParams();
+        rootView.removeView(eventListMagicView);
+        rootView.addView(listRootView, eventListMagicIndex, eventListMagicParams);
+
         mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
                 container, false);
         mEmptyText = (TextView) mEmptyListView.findViewById(R.id.empty_events_list_text);
@@ -337,6 +352,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 fetchJsonData();
             }
         });
+
+        mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
         eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
 

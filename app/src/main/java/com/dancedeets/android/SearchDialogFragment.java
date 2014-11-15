@@ -22,7 +22,7 @@ import com.dancedeets.dancedeets.R;
 public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragment.MyBundledState, SearchDialogFragment.MyRetainedState> {
 
     static protected class MyBundledState extends BundledState {
-        SearchOptions mSearchOptions = new SearchOptions();
+        SearchOptions mSearchOptions;
     }
 
     static public class MyRetainedState extends RetainedState {
@@ -63,16 +63,6 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
-            TextView messageView = (TextView) getActivity().findViewById(R.id.search_message);
-            messageView.setText(getArguments().getString(ARG_MESSAGE));
-        }
-    }
-
-    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.i(LOG_TAG, "onCreateDialog");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -82,8 +72,12 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         View view = inflater.inflate(R.layout.event_search_options, null);
         EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
         EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
+
+        mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
         searchLocation.setText(mBundled.mSearchOptions.location);
         searchKeywords.setText(mBundled.mSearchOptions.keywords);
+        TextView messageView = (TextView) getActivity().findViewById(R.id.search_message);
+        messageView.setText(getArguments().getString(ARG_MESSAGE));
 
         builder.getContext();
         // Inflate and set the layout for the dialog

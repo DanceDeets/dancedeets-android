@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
@@ -13,11 +11,20 @@
         android:layout_gravity="center_horizontal"
         />
 
-    <fragment
-        android:id="@+id/event_list_fragment"
-        android:name="com.dancedeets.android.EventListFragment"
+    <TextView
+        android:id="@+id/event_list_description"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".EventList"
-        tools:layout="@layout/event_row" />
+        android:layout_height="wrap_content"
+        android:text="Loading Events..."
+        android:freezesText="true"
+        android:background="@color/grey"
+        android:padding="5dp"
+        />
+
+    <!-- The ListView stuff gets added dynamically inside EventListFragment, replacing this magic token below. -->
+        <View
+            android:id="@+id/event_list_magic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 </LinearLayout>
