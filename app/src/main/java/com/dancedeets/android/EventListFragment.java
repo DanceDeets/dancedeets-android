@@ -481,9 +481,13 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
      * given the 'activated' state when touched.
      */
     public void setActivateOnItemClick(boolean activateOnItemClick) {
-        // When setting CHOICE_MODE_SINGLE, ListView will automatically
-        // give items the 'activated' state when touched.
-        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        if (activateOnItemClick) {
+            // When setting CHOICE_MODE_SINGLE, ListView will automatically
+            // give items the 'activated' state when touched.
+            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        } else {
+            getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
+        }
     }
 
     private void setActivatedPosition(int position) {
