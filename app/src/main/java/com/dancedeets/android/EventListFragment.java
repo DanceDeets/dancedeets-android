@@ -408,6 +408,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         @Override
         public void onResponse(JSONArray response) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
+            if (response.length() == 0) {
+                Log.w(LOG_TAG, "Found no events from search. URL was " + mUri);
+                Log.w(LOG_TAG, "Response was " + response);
+            }
             listFragment.parseJsonResponse(response);
         }
     }
