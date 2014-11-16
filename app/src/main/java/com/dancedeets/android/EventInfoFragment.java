@@ -276,6 +276,7 @@ public class EventInfoFragment extends StateFragment<
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(LOG_TAG, "Error retrieving data: " + error);
+                        //TODO(lambert): implement a better error handling display to the user
                     }
                 });
     }
