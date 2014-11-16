@@ -20,6 +20,7 @@ import java.util.List;
 public class EventUIAdapter extends BaseAdapter {
     static class ViewBinder {
         NetworkImageView icon;
+        NetworkImageView cover;
         TextView title;
         TextView location;
         TextView startTime;
@@ -61,7 +62,12 @@ public class EventUIAdapter extends BaseAdapter {
         ImageLoader thumbnailLoader = VolleySingleton.getInstance().getThumbnailLoader();
 
         ViewBinder viewBinder = (ViewBinder)view.getTag();
-        viewBinder.icon.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
+        if (viewBinder.icon != null) {
+            viewBinder.icon.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
+        }
+        if (viewBinder.cover != null) {
+            viewBinder.cover.setImageUrl(event.getCoverUrl(), thumbnailLoader);
+        }
         viewBinder.title.setText(event.getTitle());
         viewBinder.location.setText(event.getLocation());
         viewBinder.startTime.setText(event.getStartTimeString());
@@ -78,10 +84,11 @@ public class EventUIAdapter extends BaseAdapter {
         if (convertView == null) {
             view = mInflater.inflate(resource, parent, false);
             ViewBinder viewBinder = new ViewBinder();
-            viewBinder.icon = (NetworkImageView )view.findViewById(R.id.icon);
-            viewBinder.title = (TextView)view.findViewById(R.id.title);
-            viewBinder.location = (TextView)view.findViewById(R.id.location);
-            viewBinder.startTime = (TextView)view.findViewById(R.id.start_time);
+            viewBinder.icon = (NetworkImageView )view.findViewById(R.id.event_list_icon);
+            viewBinder.cover = (NetworkImageView )view.findViewById(R.id.event_list_cover);
+            viewBinder.title = (TextView)view.findViewById(R.id.event_list_title);
+            viewBinder.location = (TextView)view.findViewById(R.id.event_list_location);
+            viewBinder.startTime = (TextView)view.findViewById(R.id.event_list_start_time);
             view.setTag(viewBinder);
         } else {
             view = convertView;
