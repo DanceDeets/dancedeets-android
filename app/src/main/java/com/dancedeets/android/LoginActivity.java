@@ -53,6 +53,10 @@ public class LoginActivity extends FacebookActivity {
             Intent intent = new Intent(this, EventListActivity.class);
             intent.setAction(Intent.ACTION_DEFAULT);
             startActivity(intent);
+            // Finish this activity, so it is no longer on the back stack.
+            // We can't use the noHistory option, as Facebook login does navigate off this activity,
+            // and so we do need this activity back state retained for that navigation.
+            finish();
         } else if (state.isClosed()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
         }
