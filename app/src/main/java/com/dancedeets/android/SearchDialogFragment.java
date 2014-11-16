@@ -76,7 +76,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
         searchLocation.setText(mBundled.mSearchOptions.location);
         searchKeywords.setText(mBundled.mSearchOptions.keywords);
-        TextView messageView = (TextView) getActivity().findViewById(R.id.search_message);
+        TextView messageView = (TextView) view.findViewById(R.id.search_message);
         messageView.setText(getArguments().getString(ARG_MESSAGE));
 
         builder.getContext();
