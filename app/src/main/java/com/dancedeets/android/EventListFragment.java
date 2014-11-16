@@ -162,8 +162,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     protected void onEventListFilled() {
-        mEmptyText.setVisibility(View.GONE);
-        mRetryButton.setVisibility(View.VISIBLE);
+        if (mBundled.mEventList.isEmpty()) {
+            mEmptyText.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyText.setVisibility(View.GONE);
+        }
+        mRetryButton.setVisibility(View.GONE);
         setListAdapter(eventAdapter);
     }
 
@@ -335,6 +339,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         Log.d(LOG_TAG, "onCreateView");
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.event_list_layout, container, false);
 
+        // Construct the ListFragment's UI objects in super, and stick them inside our rootView in the appropriate place.
         View listRootView = super.onCreateView(inflater, rootView, savedInstanceState);
         View eventListMagicView = rootView.findViewById(R.id.event_list_magic);
         int eventListMagicIndex = rootView.indexOfChild(eventListMagicView);
@@ -353,6 +358,15 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             }
         });
 
+        /* We need to add the emptyListView as a sibling to the List,
+         * as suggested by ListFragment.onCreateView documentation.
+         * Then setting/unsetting the ListFragment's Adapter triggers
+         * the ProgressBar and ListContainer(List+EmptyView) to alternate.
+         * And within the List, it will then alternate with the EmptyView.
+         */
+        ViewParent listContainerView = listRootView.findViewById(android.R.id.list).getParent();
+        ((ViewGroup) listContainerView).addView(mEmptyListView);
+
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
         eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
@@ -362,6 +376,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
 
         return rootView;
+    }
+
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.i(LOG_TAG, "onViewCreated");
+        getListView().setEmptyView(mEmptyListView);
     }
 
     public void fetchJsonData() {
@@ -431,20 +451,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             }
             listFragment.parseJsonResponse(response);
         }
-    }
-
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i(LOG_TAG, "onViewCreated");
-        /* We need to add the emptyListView as a sibling to the List,
-         * as suggested by ListFragment.onCreateView documentation.
-         * Then setting/unsetting the ListFragment's Adapter triggers
-         * the ProgressBar and ListContainer(List+EmptyView) to alternate.
-         * And within the List, it will then alternate with the EmptyView.
-         */
-        ViewParent listContainerView = view.findViewById(android.R.id.list).getParent();
-        ((ViewGroup) listContainerView).addView(mEmptyListView);
-        getListView().setEmptyView(mEmptyListView);
     }
 
     @Override
