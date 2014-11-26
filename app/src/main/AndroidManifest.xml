@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dancedeets.dancedeets">
+    package="com.dancedeets.android">
 
     <!-- Not used by Gradle, but used by Android Studio lint warnings -->
     <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="20"/>
