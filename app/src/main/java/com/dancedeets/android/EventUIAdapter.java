@@ -85,7 +85,7 @@ public class EventUIAdapter extends BaseAdapter {
             view = mInflater.inflate(resource, parent, false);
             ViewBinder viewBinder = new ViewBinder();
             viewBinder.icon = (NetworkImageView )view.findViewById(R.id.event_list_icon);
-            viewBinder.cover = (NetworkImageView )view.findViewById(R.id.event_list_cover);
+            //viewBinder.cover = (NetworkImageView )view.findViewById(R.id.event_list_cover);
             viewBinder.title = (TextView)view.findViewById(R.id.event_list_title);
             viewBinder.location = (TextView)view.findViewById(R.id.event_list_location);
             viewBinder.startTime = (TextView)view.findViewById(R.id.event_list_start_time);
