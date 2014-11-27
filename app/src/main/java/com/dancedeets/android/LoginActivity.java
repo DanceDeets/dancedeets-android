@@ -7,7 +7,6 @@ import android.util.Log;
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.dancedeets.dancedeets.R;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.widget.LoginButton;

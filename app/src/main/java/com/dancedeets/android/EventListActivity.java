@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.dancedeets.android.models.Event;
-import com.dancedeets.dancedeets.R;
 
 import java.util.HashMap;
 import java.util.List;

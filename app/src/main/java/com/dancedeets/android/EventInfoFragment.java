@@ -33,7 +33,6 @@ import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
-import com.dancedeets.dancedeets.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

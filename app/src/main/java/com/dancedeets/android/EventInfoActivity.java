@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import com.dancedeets.android.models.Event;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
-import com.dancedeets.dancedeets.R;
 
 import java.util.List;
 

@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateDialogFragment;
-import com.dancedeets.dancedeets.R;
 
 /**
  * Created by lambert on 2014/10/05.

@@ -2,7 +2,6 @@ package com.dancedeets.android;
 
 import android.app.Application;
 
-import com.dancedeets.dancedeets.R;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
