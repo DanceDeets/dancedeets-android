@@ -1,6 +1,8 @@
 package com.dancedeets.android;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -25,6 +27,7 @@ public class LoginActivity extends FacebookActivity {
     private static final String LOG_TAG = "LoginActivity";
 
     static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private FetchLocation mFetchLocation;
 
     void updateServerSessionAndLocation(Session session, String location) {
         JSONObject jsonPayload = new JSONObject();
@@ -56,6 +59,8 @@ public class LoginActivity extends FacebookActivity {
     }
 
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
+        //TODO: for some reason, this doesn't appear to be called (correctly) when the activity loads and the device screen is off.
+
         // Don't call the super, since we don't want it sending us back to the LoginActivity when logged out
         // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
@@ -78,12 +83,36 @@ public class LoginActivity extends FacebookActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
         LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
         authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
+        mFetchLocation = new FetchLocation();
     }
 
+    @Override
+    public void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        mFetchLocation.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    public void onStart() {
+        super.onStart();
+        mFetchLocation.onStart(this, new FetchLocation.AddressListener() {
+            @Override
+            public void onAddressFound(Location location, Address address) {
+                //TODO: Use location, and fb code, and send that to /auth on the server
+                Log.i(LOG_TAG, "Address found: " + address);
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mFetchLocation.onStop();
+    }
 }

@@ -71,11 +71,7 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
 
     private void handleIntent(Intent intent) {
         Log.i(LOG_TAG, "handleIntent: " + intent);
-        if (Intent.ACTION_DEFAULT.equals(intent.getAction())) {
-            EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
-                    R.id.event_list_fragment);
-            fragment.initializeGoogleApiClient();
-        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
                     R.id.event_list_fragment);
             fragment.startSearchFor("", intent.getStringExtra(SearchManager.QUERY));

@@ -1,11 +1,8 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,9 +38,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements GoogleApiClient.ConnectionCallbacks {
+public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
 
     static protected class MyBundledState extends BundledState {
 
@@ -58,8 +54,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     static public class MyRetainedState extends RetainedState {
-        FetchCityTask mFetchCityTask;
-        Geocoder mGeocoder;
+        private FetchLocation mFetchLocation;
+
     }
 
     /**
@@ -115,29 +111,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         return LOG_TAG;
     }
 
-    /*
-     * Handle results returned to the FragmentActivity
-     * by Google Play services
-     */
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-            case GooglePlayUtil.CONNECTION_FAILURE_RESOLUTION_REQUEST:
-            /*
-             * If the result code is Activity.RESULT_OK, try
-             * to connect again
-             */
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                    /*
-                     * Try the request again
-                     */
-                        initializeGoogleApiClient();
-                        break;
-                }
-        }
+        mRetained.mFetchLocation.onActivityResult(getActivity(), requestCode, resultCode, data);
     }
 
     protected void parseJsonResponse(JSONArray response) {
@@ -175,60 +152,45 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "onCreate");
         // Restore the previously serialized activated item position.
-        mRetained.mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         setHasOptionsMenu(true);
-        initializeGoogleApiClient();
     }
 
-    protected void initializeGoogleApiClient() {
-        if (GooglePlayUtil.servicesConnected(getActivity())) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getBaseContext())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .build();
-        } else {
-            Log.i(LOG_TAG, "Unable to connect to Google Play Services");
-        }
-    }
 
-    @Override
     public void onStart() {
         super.onStart();
-        Log.i(LOG_TAG, "onStart");
-        // Connect the client.
-        mGoogleApiClient.connect();
+        if (mBundled.mSearchOptions.location.isEmpty()) {
+            mRetained.mFetchLocation = new FetchLocation();
+            mRetained.mFetchLocation.onStart(getActivity(), this);
+        }
+    }
+    @Override
+    public void onAddressFound(Location location, Address address) {
+        Log.i(LOG_TAG, "Address found: " + address);
+        if (address != null) {
+            String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            startSearchFor(addressString, "");
+        } else {
+            if (location == null) {
+                // TODO: Location: Handle geocoder returning Null, perhaps with a better prompt/message/warning?
+                // No GPS, but perhaps there still is network connectivity...
+                // Perhaps we can return a list of selected cities/locations?
+                startSearchFor("", "");
+            } else {
+                // TODO: Location: better handle the case of getting a location but no address, which indicates no networked connectivity.
+                // Alternately, sometimes the reverse geocoding just fails due to network hiccups.
+                Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
+                Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
+                startSearchFor("", "");
+            }
+        }
     }
 
     @Override
     public void onStop() {
-        Log.i(LOG_TAG, "onStop");
-        // Disconnecting the client invalidates it.
-        mGoogleApiClient.disconnect();
         super.onStop();
+        mRetained.mFetchLocation.onStop();
     }
 
-    static class FetchCityTask extends ReverseGeocodeTask {
-        private RetainedState mRetained;
-
-        public FetchCityTask(final RetainedState retainedState, Geocoder geocoder) {
-            super(geocoder);
-            mRetained = retainedState;
-        }
-
-        @Override
-        protected void onPostExecute(Address address) {
-            EventListFragment listFragment = (EventListFragment) mRetained.getTargetFragment();
-            if (address != null) {
-                String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
-                listFragment.startSearchFor(addressString, "");
-            } else {
-                // TODO: Location: better handle the case of address being null, which indicates no networked connectivity.
-                Toast.makeText(listFragment.getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
-                Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
-                listFragment.startSearchFor("", "");
-            }
-        }
-    }
 
     public void startSearchFor(String location, String keywords) {
         SearchOptions searchOptions = mBundled.mSearchOptions;
@@ -247,43 +209,25 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(LOG_TAG, "GoogleApiClient.onConnected: " + bundle);
-        // We reconnect every time the app wakes up, but we only need
-        // to fetch on start if we have no location data (ie, app startup).
-        if (mBundled.mSearchOptions.location.isEmpty()) {
-            Location location = mLocationProviderApi.getLastLocation(mGoogleApiClient);
-            Log.i(LOG_TAG, "Reverse geocoding: " + location);
-            SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
-            if (location != null) {
-                pref.edit()
-                        .putFloat("latitude", (float)location.getLatitude())
-                        .putFloat("longitude", (float)location.getLongitude())
-                        .apply();
-            } else if (pref.getFloat("latitude", -1) != -1) {
-                location = new Location("Saved Preference File");
-                location.setLatitude(pref.getFloat("latitude", -1));
-                location.setLongitude(pref.getFloat("longitude", -1));
-            }
-            Log.i(LOG_TAG, "Final location is " + location);
-            if (location != null) {
-                // TODO: Location: Sometimes this times out too, just randomly.
-                // Should we store prefs for the final geocoded location too?
-                mRetained.mFetchCityTask = new FetchCityTask(mRetained, mRetained.mGeocoder);
-                mRetained.mFetchCityTask.execute(location);
-            } else {
-                // TODO: Location: Handle geocoder returning Null, perhaps with a better prompt/message/warning?
-                // No GPS, but perhaps there still is network connectivity...
-                // Perhaps we can return a list of selected cities/locations?
-                startSearchFor("", "");
-            }
-        }
+    //TODO: Add caching to the new code:
+    /*
+    SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
+    if (location != null) {
+        pref.edit()
+                .putFloat("latitude", (float)location.getLatitude())
+                .putFloat("longitude", (float)location.getLongitude())
+                .apply();
+    } else if (pref.getFloat("latitude", -1) != -1) {
+        location = new Location("Saved Preference File");
+        location.setLatitude(pref.getFloat("latitude", -1));
+        location.setLongitude(pref.getFloat("longitude", -1));
     }
-
-    public void onConnectionSuspended(int cause) {
-        Log.i(LOG_TAG, "GoogleApiClient.onConnectionSuspended: " + cause);
+    Log.i(LOG_TAG, "Final location is " + location);
+    if (location != null) {
+        // TODO: Location: Sometimes this times out too, just randomly.
+        // Should we store prefs for the final geocoded location too?
     }
+    */
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
