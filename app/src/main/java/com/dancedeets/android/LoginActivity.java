@@ -59,8 +59,6 @@ public class LoginActivity extends FacebookActivity {
     }
 
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        //TODO: for some reason, this doesn't appear to be called (correctly) when the activity loads and the device screen is off.
-
         // Don't call the super, since we don't want it sending us back to the LoginActivity when logged out
         // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
