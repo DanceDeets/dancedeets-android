@@ -16,6 +16,7 @@ public class FacebookActivity extends Activity {
     private UiLifecycleHelper uiHelper;
 
     private static final String LOG_TAG = "FacebookActivity";
+    private Session mLastSession;
 
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
@@ -36,7 +37,10 @@ public class FacebookActivity extends Activity {
         uiHelper = new UiLifecycleHelper(this, new Session.StatusCallback() {
             @Override
             public void call(Session session, SessionState state, Exception exception) {
-                onSessionStateChange(session, state, exception);
+                if (isSessionChanged(session)) {
+                    mLastSession = session;
+                    onSessionStateChange(session, state, exception);
+                }
             }
         });
         uiHelper.onCreate(savedInstanceState);
@@ -45,7 +49,41 @@ public class FacebookActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Facebook tells us to call onSessionStateChange, but this can result in double-calling,
+        // so instead we check if it's different from the last session, and call it conditionally.
+        Session session = Session.getActiveSession();
+        if (session != null &&
+                (session.isOpened() || session.isClosed()) ) {
+            if (isSessionChanged(session)) {
+                mLastSession = session;
+                onSessionStateChange(session, session.getState(), null);
+            }
+        }
         uiHelper.onResume();
+    }
+
+
+    private boolean isSessionChanged(Session session) {
+        if (mLastSession == null) {
+            return true;
+        }
+
+        if (mLastSession.getState() != session.getState()) {
+            return true;
+        }
+
+        if (mLastSession.getAccessToken() != null &&
+                !mLastSession.getAccessToken().equals(session.getAccessToken())) {
+            return true;
+        }
+
+        if (mLastSession.getAccessToken() == null &&
+                session.getAccessToken() != null) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
