@@ -3,6 +3,7 @@ package com.dancedeets.android;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -10,10 +11,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 /**
- * For managing the Google Play error dialogs and resolution requests.
+ * Created by lambert on 2014/12/13.
  */
-public class GooglePlayUtil {
-    // Global constants
+public class FetchLocationWithDialog extends FetchLocation {
+
     /*
      * Define a request code to send to Google Play services
      * This code is returned in Activity.onActivityResult
@@ -41,7 +42,30 @@ public class GooglePlayUtil {
         }
     }
 
-    public static boolean servicesConnected(Activity activity) {
+    public void onActivityResult(Activity activity,
+                                 int requestCode, int resultCode, Intent data) {
+        // Decide what to do based on the original request code
+        switch (requestCode) {
+            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
+            /*
+             * If the result code is Activity.RESULT_OK, try
+             * to connect again
+             */
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                    /*
+                     * Try the request again
+                     */
+                        initializeGoogleApiClient(activity);
+                        break;
+                }
+        }
+    }
+
+    // This method, called from onStart, actually stores the Activity beyond onStart
+    // (for use in the retry dialog).
+    // Therefore, this class needs onStop to be called when the Activity is destroyed.
+    protected boolean areGooglePlayServicesConnected(Activity activity) {
         // Check that Google Play services is available
         int resultCode =
                 GooglePlayServicesUtil.
@@ -76,4 +100,5 @@ public class GooglePlayUtil {
             return false;
         }
     }
+
 }

@@ -54,7 +54,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     static public class MyRetainedState extends RetainedState {
-        private FetchLocation mFetchLocation;
+        private FetchLocationWithDialog mFetchLocationWithDialog;
 
     }
 
@@ -114,7 +114,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-        mRetained.mFetchLocation.onActivityResult(getActivity(), requestCode, resultCode, data);
+        mRetained.mFetchLocationWithDialog.onActivityResult(getActivity(), requestCode, resultCode, data);
     }
 
     protected void parseJsonResponse(JSONArray response) {
@@ -159,8 +159,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public void onStart() {
         super.onStart();
         if (mBundled.mSearchOptions.location.isEmpty()) {
-            mRetained.mFetchLocation = new FetchLocation();
-            mRetained.mFetchLocation.onStart(getActivity(), this);
+            mRetained.mFetchLocationWithDialog = new FetchLocationWithDialog();
+            mRetained.mFetchLocationWithDialog.onStart(getActivity(), this);
         }
     }
     @Override
@@ -188,7 +188,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onStop() {
         super.onStop();
-        mRetained.mFetchLocation.onStop();
+        mRetained.mFetchLocationWithDialog.onStop();
     }
 
 

@@ -1,13 +1,14 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
@@ -42,6 +43,10 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         }
     }
 
+    // FetchLocation should not store this Activity beyond the lifetime of the Activity.
+    // So we can safely use it to initialize variables here, but that's it.
+    // If we do want to store it (like in FetchLocationWithDialog),
+    // then we need to make sure the local reference gets cleaned up appropriately.
     public void onStart(Activity activity, AddressListener addressListener) {
         Log.i(LOG_TAG, "onStart, called from " + activity);
         mAddressListener = addressListener;
@@ -53,8 +58,15 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         }
     }
 
+    protected boolean areGooglePlayServicesConnected(Activity activity) {
+        int resultCode =
+                GooglePlayServicesUtil.
+                        isGooglePlayServicesAvailable(activity);
+        return (ConnectionResult.SUCCESS == resultCode);
+    }
+
     protected void initializeGoogleApiClient(Activity activity) {
-        if (GooglePlayUtil.servicesConnected(activity)) {
+        if (areGooglePlayServicesConnected(activity)) {
             mGoogleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
@@ -82,6 +94,9 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         mLocation = mLocationProviderApi.getLastLocation(mGoogleApiClient);
         Log.i(LOG_TAG, "Reverse geocoding: " + mLocation);
         if (mLocation != null) {
+            // It's okay that this has an implicit reference to this parent class.
+            // This class will be around as long as the underlying geocode task is running,
+            // and when this class is destroyed via onStop, we cancel this task.
             mReverseGeocodeTask = new ReverseGeocodeTask(mGeocoder) {
                 protected void onPostExecute(Address address) {
                     onAddressFound(address);
@@ -90,26 +105,6 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
             mReverseGeocodeTask.execute(mLocation);
         } else {
             onAddressFound(null);
-        }
-    }
-
-    public void onActivityResult(Activity activity,
-            int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-            case GooglePlayUtil.CONNECTION_FAILURE_RESOLUTION_REQUEST:
-            /*
-             * If the result code is Activity.RESULT_OK, try
-             * to connect again
-             */
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                    /*
-                     * Try the request again
-                     */
-                        initializeGoogleApiClient(activity);
-                        break;
-                }
         }
     }
 
