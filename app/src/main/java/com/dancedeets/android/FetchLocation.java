@@ -69,7 +69,9 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         // Disconnecting the client invalidates it.
         mGoogleApiClient.disconnect();
         mAddressListener = null;
-        mReverseGeocodeTask.cancel(true);
+        if (mReverseGeocodeTask != null) {
+            mReverseGeocodeTask.cancel(true);
+        }
     }
 
     @Override
