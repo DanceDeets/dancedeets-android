@@ -64,17 +64,17 @@ public class LoginActivity extends FacebookActivity {
             }
             JsonObjectRequest request = new JsonObjectRequest(
                     Method.POST,
-                    "http://www.dancedeets.com/auth",
+                    "http://www.dancedeets.com/api/auth",
                     jsonPayload,
                     new com.android.volley.Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.i(LOG_TAG, "Successfully called /auth: " + response);
+                            Log.i(LOG_TAG, "Successfully called /api/auth: " + response);
                         }
                     }, new com.android.volley.Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e(LOG_TAG, "Error calling /auth: " + error);
+                    Log.e(LOG_TAG, "Error calling /api/auth: " + error);
                 }
             });
             VolleySingleton.getInstance().getRequestQueue().add(request);
