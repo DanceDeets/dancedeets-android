@@ -115,7 +115,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-        mRetained.mFetchLocationWithDialog.onActivityResult(getActivity(), requestCode, resultCode, data);
+        if (mRetained.mFetchLocationWithDialog != null) {
+            mRetained.mFetchLocationWithDialog.onActivityResult(getActivity(), requestCode, resultCode, data);
+        }
     }
 
     protected void parseJsonResponse(JSONArray response) {
@@ -168,7 +170,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onStop() {
         super.onStop();
-        mRetained.mFetchLocationWithDialog.onStop();
+        if (mRetained.mFetchLocationWithDialog != null) {
+            mRetained.mFetchLocationWithDialog.onStop();
+        }
     }
 
     @Override
