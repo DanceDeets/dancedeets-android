@@ -72,11 +72,11 @@ public class LoginActivity extends FacebookActivity {
                             Log.i(LOG_TAG, "Successfully called /api/auth: " + response);
                         }
                     }, new com.android.volley.Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(LOG_TAG, "Error calling /api/auth: " + error);
-                }
-            });
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e(LOG_TAG, "Error calling /api/auth: " + error);
+                        }
+                    });
             VolleySingleton.getInstance().getRequestQueue().add(request);
         }
     }
