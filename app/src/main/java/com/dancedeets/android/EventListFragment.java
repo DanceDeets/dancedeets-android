@@ -163,6 +163,13 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             mRetained.mFetchLocationWithDialog.onStart(getActivity(), this);
         }
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mRetained.mFetchLocationWithDialog.onStop();
+    }
+
     @Override
     public void onAddressFound(Location location, Address address) {
         Log.i(LOG_TAG, "Address found: " + address);
@@ -171,26 +178,19 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             startSearchFor(addressString, "");
         } else {
             if (location == null) {
-                // TODO: Location: Handle geocoder returning Null, perhaps with a better prompt/message/warning?
-                // No GPS, but perhaps there still is network connectivity...
+                // Both are null. No GPS, but perhaps there still is network connectivity...
                 // Perhaps we can return a list of selected cities/locations?
                 startSearchFor("", "");
             } else {
-                // TODO: Location: better handle the case of getting a location but no address, which indicates no networked connectivity.
-                // Alternately, sometimes the reverse geocoding just fails due to network hiccups.
+                // We have GPS, but our reverse geocode from the GMaps API failed.
+                // Could be without network connectivity, or just a transient failure.
+                // Is their cached data we can use? Or just use the lat/long directly?
                 Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
                 Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
                 startSearchFor("", "");
             }
         }
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mRetained.mFetchLocationWithDialog.onStop();
-    }
-
 
     public void startSearchFor(String location, String keywords) {
         SearchOptions searchOptions = mBundled.mSearchOptions;
