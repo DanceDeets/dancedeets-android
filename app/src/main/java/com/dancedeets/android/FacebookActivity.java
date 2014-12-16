@@ -16,7 +16,8 @@ public class FacebookActivity extends Activity {
     private UiLifecycleHelper uiHelper;
 
     private static final String LOG_TAG = "FacebookActivity";
-    private Session mLastSession;
+    private SessionState mLastSessionState;
+    private String mLastSessionToken;
 
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
@@ -38,7 +39,8 @@ public class FacebookActivity extends Activity {
             @Override
             public void call(Session session, SessionState state, Exception exception) {
                 if (isSessionChanged(session)) {
-                    mLastSession = session;
+                    mLastSessionState = session.getState();
+                    mLastSessionToken = session.getAccessToken();
                     onSessionStateChange(session, state, exception);
                 }
             }
@@ -56,7 +58,8 @@ public class FacebookActivity extends Activity {
         if (session != null &&
                 (session.isOpened() || session.isClosed()) ) {
             if (isSessionChanged(session)) {
-                mLastSession = session;
+                mLastSessionState = session.getState();
+                mLastSessionToken = session.getAccessToken();
                 onSessionStateChange(session, session.getState(), null);
             }
         }
@@ -65,21 +68,15 @@ public class FacebookActivity extends Activity {
 
 
     private boolean isSessionChanged(Session session) {
-        if (mLastSession == null) {
+        if (mLastSessionState == null && mLastSessionToken == null) {
             return true;
         }
 
-        if (mLastSession.getState() != session.getState()) {
+        if (mLastSessionState != session.getState()) {
             return true;
         }
 
-        if (mLastSession.getAccessToken() != null &&
-                !mLastSession.getAccessToken().equals(session.getAccessToken())) {
-            return true;
-        }
-
-        if (mLastSession.getAccessToken() == null &&
-                session.getAccessToken() != null) {
+        if (!mLastSessionToken.equals(session.getAccessToken())) {
             return true;
         }
 
