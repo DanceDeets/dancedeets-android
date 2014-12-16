@@ -23,5 +23,6 @@
     <string name="login_explain_why_login">Curious what we use login for?</string>
     <string name="login_use_without_fblogin">Use DanceDeets without logging in</string>
     <string name="penguin_name">The DanceDeets Penguin</string>
+    <string name="action_logout">Log out</string>
 
 </resources>

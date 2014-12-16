@@ -28,6 +28,7 @@ import com.dancedeets.android.models.Event;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateListFragment;
+import com.facebook.Session;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
@@ -241,13 +242,19 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_search:
+                showSearchDialog("");
+                return true;
+            case R.id.action_logout:
+                Session.getActiveSession().closeAndClearTokenInformation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        if (id == R.id.action_search) {
-            showSearchDialog("");
-        }
-        return super.onOptionsItemSelected(item);
+
     }
 
     public static class SearchListener implements SearchDialogFragment.OnSearchListener {
