@@ -248,6 +248,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             case R.id.action_search:
                 showSearchDialog("");
                 return true;
+            case R.id.action_refresh:
+                startSearchFor(mBundled.mSearchOptions.location, mBundled.mSearchOptions.keywords);
+                return true;
             case R.id.action_logout:
                 Session.getActiveSession().closeAndClearTokenInformation();
                 return true;
