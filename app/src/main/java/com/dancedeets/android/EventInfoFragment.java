@@ -185,7 +185,16 @@ public class EventInfoFragment extends StateFragment<
     }
 
     public void translatePage() {
-        Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t?client=at&v=1.0").buildUpon()
+        Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t").buildUpon()
+                // I believe this stands for Translate Android
+                .appendQueryParameter("client", "ta")
+                // version 1.0 returns simple json output, while 2.0 returns more complex data used by the Translate app
+                .appendQueryParameter("v", "1.0")
+                // This is necessary, or Google Translate will mistakenly interpret utf8-encoded text as Shift_JIS, and return garbage.
+                .appendQueryParameter("ie", "UTF-8")
+                // And really, there's no reason to return data as Shift_JIS either, just creates more room for error.
+                .appendQueryParameter("oe", "UTF-8")
+                // Source language unknown, and target language is always the locale's language
                 .appendQueryParameter("sl", "auto")
                 .appendQueryParameter("tl", Locale.getDefault().getLanguage())
                 .build();// android language
