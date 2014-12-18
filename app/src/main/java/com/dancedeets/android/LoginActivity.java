@@ -44,7 +44,12 @@ public class LoginActivity extends FacebookActivity {
         public void onAddressFound(Location location, Address address) {
             Log.i(LOG_TAG, "onAddressFound with location: " + location + ", address: " + address);
 
-            String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            String addressString = null;
+            if (address != null) {
+                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            } else {
+                Log.e(LOG_TAG, "Failed to get address from server, sending update with empty location.");
+            }
             updateServerSessionAndLocation(mSession, addressString);
 
             mFetchLocation.onStop();
