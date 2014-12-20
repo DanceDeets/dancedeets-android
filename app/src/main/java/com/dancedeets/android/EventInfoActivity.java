@@ -10,11 +10,14 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.dancedeets.android.models.Event;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
+import com.facebook.Session;
 
 import java.util.List;
 
@@ -90,6 +93,13 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
             // dimensions.put("Fragment", "Event Info");
             // ParseAnalytics.trackEvent("Fragment", dimensions);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.general_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -188,6 +198,12 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_feedback:
+                SendFeedback.sendFeedback(this, null);
+                return true;
+            case R.id.action_logout:
+                Session.getActiveSession().closeAndClearTokenInformation();
+                return true;
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 // Basic intent for Parent Activity

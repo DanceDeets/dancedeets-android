@@ -37,12 +37,4 @@
         android:title="@string/menu_translate"
         >
     </item>
-<!--
-    <item
-        android:id="@+id/action_view_map"
-        android:icon="@icon/view_map"
-        android:title="@string/menu_view_map"
-        android:showAsAction="always">
-    </item>
--->
 </menu>

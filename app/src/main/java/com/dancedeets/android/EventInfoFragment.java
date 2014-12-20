@@ -136,8 +136,6 @@ public class EventInfoFragment extends StateFragment<
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
             case R.id.action_view_map:
                 // "geo:0,0?q=lat,lng(label)"
                 // "geo:0,0?q=my+street+address"

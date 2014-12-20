@@ -4,10 +4,14 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.dancedeets.android.models.Event;
+import com.facebook.Session;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +62,26 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
             //TODO: PARSE
             // ParseAnalytics.trackAppOpened(getIntent());
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.general_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_feedback:
+                SendFeedback.sendFeedback(this, null);
+                return true;
+            case R.id.action_logout:
+                Session.getActiveSession().closeAndClearTokenInformation();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
