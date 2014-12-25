@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DanceDeets.iml" filepath="$PROJECT_DIR$/DanceDeets.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dancedeets-newdroid.iml" filepath="$PROJECT_DIR$/dancedeets-newdroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
       <module fileurl="file://$PROJECT_DIR$/robolectric-tests/robolectric-tests.iml" filepath="$PROJECT_DIR$/robolectric-tests/robolectric-tests.iml" />
     </modules>
