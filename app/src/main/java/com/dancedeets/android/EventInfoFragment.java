@@ -24,7 +24,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.IdEvent;
@@ -36,7 +35,6 @@ import com.dancedeets.android.uistate.StateFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +47,6 @@ public class EventInfoFragment extends StateFragment<
         FullEvent mEvent;
     }
     static public class MyRetainedState extends RetainedState {
-        JsonObjectRequest mDataRequest;
     }
 
 
@@ -255,44 +252,38 @@ public class EventInfoFragment extends StateFragment<
         }
     }
 
-    // This is done in a static method, so there are no references to this Fragment leaked
-    private static JsonObjectRequest constructEventRequest(String url, final RetainedState retainedState) {
-        return new JsonObjectRequest(
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        FullEvent event;
-                        try {
-                            event = FullEvent.parse(response);
-                        } catch (JSONException e) {
-                            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
-                            return;
-                        }
-                        // Sometimes the retainedState keeps a targetFragment even after it's detached,
-                        // since I can't hook into the lifecycle at the right point in time.
-                        // So double-check it's safe here first...
-                        if (retainedState.getTargetFragment().getActivity() != null) {
-                            ((EventInfoFragment) retainedState.getTargetFragment()).onEventReceived(event, true);
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Error retrieving data: " + error);
-                        //TODO(lambert): implement a better error handling display to the user
-                    }
-                });
+    // This is done in a static class, so there are no references to this Fragment leaked
+    static class EventHandler implements DanceDeetsApi.OnEventReceivedListener {
+        private final MyRetainedState mRetainedState;
+
+        public EventHandler(MyRetainedState retainedState) {
+            mRetainedState = retainedState;
+        }
+        @Override
+        public void onEventReceived(FullEvent event) {
+            // Sometimes the retainedState keeps a targetFragment even after it's detached,
+            // since I can't hook into the lifecycle at the right point in time.
+            // So double-check it's safe here first...
+            if (mRetainedState.getTargetFragment().getActivity() != null) {
+                ((EventInfoFragment) mRetainedState.getTargetFragment()).onEventReceived(event, true);
+            }
+        }
+
+        @Override
+        public void onError(Exception e) {
+            if (e instanceof JSONException) {
+                Log.e(LOG_TAG, "Error reading from event api: " + e);
+            } else {
+                Log.e(LOG_TAG, "Error retrieving data: " + e);
+            }
+            //TODO(lambert): implement a better error handling display to the user
+        }
     }
 
     public void loadEventFromArguments() {
         IdEvent tempEvent = IdEvent.parse(getArguments());
-
-        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getApiDataUrl());
-        mRetained.mDataRequest = constructEventRequest(tempEvent.getApiDataUrl(), mRetained);
-        VolleySingleton.getInstance().getRequestQueue().add(mRetained.mDataRequest);
+        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getId());
+        DanceDeetsApi.getEvent(tempEvent.getId(), new EventHandler(mRetained));
     }
 
     public void onEventReceived(FullEvent event, boolean animate) {

@@ -40,10 +40,6 @@ public class IdEvent implements Serializable {
         return "http://www.facebook.com/events/" + getId() + "/";
     }
 
-    public String getApiDataUrl() {
-        return "http://www.dancedeets.com/api/events/" + getId();
-    }
-
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
