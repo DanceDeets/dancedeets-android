@@ -23,7 +23,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.Event;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -396,10 +395,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         @Override
         public void onResponse(JSONArray response) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            if (response.length() == 0) {
-                Log.w(LOG_TAG, "Found no events from search. URL was " + mUri);
-                Log.w(LOG_TAG, "Response was " + response);
-            }
             listFragment.parseJsonResponse(response);
         }
     }
@@ -439,13 +434,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             volley.prefetchPhoto(event.getCoverUrl());
         }
         // Prefetch API data too
-        JsonObjectRequest r = new JsonObjectRequest(event.getApiDataUrl(), null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-            }
-        }, null);
-        volley.getRequestQueue().add(r);
-
+        DanceDeetsApi.getEvent(event.getId(), null);
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
