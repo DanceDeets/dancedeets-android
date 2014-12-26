@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.dancedeets.android.models.Event;
+import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateListFragment;
@@ -118,23 +119,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
     }
 
-    protected void parseJsonResponse(JSONArray response) {
-        Log.i(LOG_TAG, "Parsing JSON Response");
-
-        VolleySingleton volley = VolleySingleton.getInstance();
-
-        for (int i = 0; i < response.length(); i++) {
-            Event event = null;
-            try {
-                JSONObject jsonEvent = response.getJSONObject(i);
-                event = Event.parse(jsonEvent);
-                // Prefetch images so scrolling "just works"
-                volley.prefetchThumbnail(event.getThumbnailUrl());
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSONException: " + e);
-            }
-            mBundled.mEventList.add(event);
-        }
+    protected void handleEventList(List<FullEvent> eventList) {
+        mBundled.mEventList.clear();
+        mBundled.mEventList.addAll(eventList);
         onEventListFilled();
     }
 
@@ -345,57 +332,29 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         setListShown(false);
         mBundled.mEventList.clear();
         Log.i(LOG_TAG, "fetchJsonData");
-
-        boolean SANS_INTERNET = false;
-        if (SANS_INTERNET) {
-
-            final String jsonString = "[{\"city\": \"EXPG New York, New York, NY, US\", \"end_time\": \"2014-09-29T20:30:00Z\", \"image_url\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/c0.0.200.200/p200x200/10635707_10152646002551066_7530276650584086219_n.jpg?oh=33a51a2e0ad11b5ea42ee1f083d39233&oe=548B9F4D\", \"description\": \"Weekly House Dance class in New York City at EXPG-NYC studio, every Monday night (7-8:30PM).\\n\\nIt's a beginner, open class. We talk about the club culture, the history of House dance and music, learn foundation steps, how to get creative with them & be able to freestyle. Emphasis is made on how to connect the movement with the music. \\n\\n\\nEvery Monday\\nFrom 7:00PM to 8:30PM\\n@EXPG New York 27 2nd avenue, NY, NY 10003.\\n\\nFor more info, please visit www.expg-ny.com.\", \"title\": \"House Dance class with Mai L\\u00ea\", \"keywords\": \"class, club, house dance\", \"start_time\": \"2014-09-29T19:00:00Z\", \"id\": \"781192871949041\", \"cover_url\": {\"source\": \"https://scontent-a.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10635707_10152646002551066_7530276650584086219_n.jpg?oh=26b884cb2af327e81336b27e9981f08c&oe=5485D972\", \"height\": 756, \"width\": 945}, \"location\": \"New York, NY, US\"}]";
-            try {
-                JSONArray response = new JSONArray(jsonString);
-                parseJsonResponse(response);
-            } catch (JSONException exception) {
-                Log.e(LOG_TAG, "Error faking json response: " + exception);
-            }
-        } else {
-            Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events/feed").buildUpon();
-            builder.appendQueryParameter("location", mBundled.mSearchOptions.location);
-            builder.appendQueryParameter("keywords", mBundled.mSearchOptions.keywords);
-            builder.appendQueryParameter("distance", "10");
-            builder.appendQueryParameter("distance_units", "miles");
-            final Uri uri = builder.build();
-
-            FeedResponseHandler handler = new FeedResponseHandler(uri, mRetained);
-            JsonArrayRequest request = new JsonArrayRequest(uri.toString(), handler, handler);
-
-            Log.d(LOG_TAG, "Querying server feed: " + uri);
-            request.setShouldCache(false);
-            RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
-            queue.add(request);
-        }
+        DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
     }
 
-    public static class FeedResponseHandler implements Response.Listener<JSONArray>, Response.ErrorListener {
-
-        private Uri mUri;
+    public static class ResultsReceivedHandler implements DanceDeetsApi.OnResultsReceivedListener {
         private RetainedState mRetained;
 
-        public FeedResponseHandler(Uri uri, RetainedState retainedState) {
-            mUri = uri;
+        public ResultsReceivedHandler(RetainedState retainedState) {
             mRetained = retainedState;
         }
+
         @Override
-        public void onErrorResponse(VolleyError error) {
+        public void onResultsReceived(List<FullEvent> eventList) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            Log.e(LOG_TAG, "Error retrieving URL " + mUri + ", with error: " + error.toString());
+            listFragment.handleEventList(eventList);
+        }
+
+        @Override
+        public void onError(Exception exception) {
+            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
+            Log.e(LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
             listFragment.mEmptyText.setVisibility(View.GONE);
             listFragment.mRetryButton.setVisibility(View.VISIBLE);
             listFragment.setListAdapter(listFragment.eventAdapter);
-        }
-
-        @Override
-        public void onResponse(JSONArray response) {
-            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            listFragment.parseJsonResponse(response);
         }
     }
 
