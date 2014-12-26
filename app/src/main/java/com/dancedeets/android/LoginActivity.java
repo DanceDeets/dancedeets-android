@@ -81,11 +81,11 @@ public class LoginActivity extends FacebookActivity {
 
             Intent intent = new Intent(this, EventListActivity.class);
             intent.setAction(Intent.ACTION_DEFAULT);
+            // We can't use the noHistory option on this activity as we need state retained:
+            // Facebook login navigate to a sub-activity expecting a response back to this one.
+            // So any navigation away must manually ensure there is no history stack retained.
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            // Finish this activity, so it is no longer on the back stack.
-            // We can't use the noHistory option, as Facebook login does navigate off this activity,
-            // and so we do need this activity back state retained for that navigation.
-            finish();
         } else if (state.isClosed()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
         }
@@ -112,7 +112,7 @@ public class LoginActivity extends FacebookActivity {
         }
         TextView link2 = (TextView)findViewById(R.id.login_explain_why_login);
         if (link2 != null) {
-            link2.setTextColor(link1.getLinkTextColors());
+            link2.setTextColor(link2.getLinkTextColors());
         }
 
         LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
