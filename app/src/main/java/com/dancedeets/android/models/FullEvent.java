@@ -68,12 +68,11 @@ public class FullEvent extends Event {
             event.mCoverData = CoverData.parse(jsonCover);
             event.mCoverUrl = event.mCoverData.getLargestCover().getSourceUrl();
         }
+        event.mImageUrl = jsonEvent.getString("picture");
+
         JSONObject jsonVenue = jsonEvent.getJSONObject("venue");
         event.mVenue = Venue.parse(jsonVenue);
         event.mLocation = event.mVenue.getName();
-
-        //TODO: Do we even return an imageurl anymore? Isn't this deprecated and what we want to move away from?
-        // event.mImageUrl = jsonEvent.getString("image_url");
 
         if (jsonEvent.isNull("admins")) {
             event.mAdminList = new ArrayList<NamedPerson>();
