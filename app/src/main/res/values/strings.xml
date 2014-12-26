@@ -19,10 +19,14 @@
     <string name="loading">Loading...</string>
     <string name="facebook_app_id">2347064084</string>
     <string name="login_bubble">Looking to dance? We got the \'deets!\n\nClick Login below, and let\'s check out the world of dance events, both near and far!\n\nAnd of course, we promise not to spam or hack your Facebook account, just help you find and share dance events.</string>
-    <string name="login_explain_why_login">Curious what we use login for?</string>
-    <string name="login_use_without_fblogin">Use DanceDeets without logging in</string>
+    <string name="login_explain_why_login">Curious why we ask you to login with Facebook?</string>
+    <string name="login_use_without_fblogin">Want to use DanceDeets without Facebook login?</string>
     <string name="penguin_name">The DanceDeets Penguin</string>
     <string name="action_logout">Log out</string>
     <string name="action_feedback">Send Feedback</string>
+    <string name="explain_why_login">Why does DanceDeets require Facebook login?\n\nDanceDeets is built on the Facebook platform, and all the DanceDeets events are pulled from Facebook. To find and collect the good dance events, DanceDeets depends on dancers signing up with their Facebook accounts and sharing their dance events with DanceDeets. For this reason, the DanceDeets mobile apps use Facebook login.</string>
+    <string name="login_use_website">Use www.dancedeets.com</string>
+    <string name="use_without_fblogin">Want to use DanceDeets without Facebook login?\n\nThe mobile apps currently require Facebook login to use. However, if you wish to search and view events without logging in, you can use the mobile website available at www.dancedeets.com .</string>
+    <string name="login_or">or</string>
 
 </resources>

@@ -3,8 +3,12 @@ package com.dancedeets.android;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -16,6 +20,27 @@ import com.facebook.widget.LoginButton;
 public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
+
+    public void clickedExplainWhyLogin(View view) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("ResourceID", R.layout.login_explain_why);
+        intent.setAction(Intent.ACTION_DEFAULT);
+        startActivity(intent);
+    }
+
+    public void clickedUseWithoutFacebookLogin(View view) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("ResourceID", R.layout.login_use_without_facebook_login);
+        intent.setAction(Intent.ACTION_DEFAULT);
+        startActivity(intent);
+    }
+
+    public void clickedUseWebsite(View view) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.dancedeets.com/"));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 
     private static class SendAuthRequest implements FetchLocation.AddressListener {
         private static final String LOG_TAG = "SendAuthRequest";
@@ -70,10 +95,38 @@ public class LoginActivity extends FacebookActivity {
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+
+        Intent intent = getIntent();
+        int layoutId = R.layout.login;
+        if (intent != null) {
+            if (intent.hasExtra("ResourceID")) {
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            layoutId = intent.getIntExtra("ResourceID", R.layout.login);
+        }
+        setContentView(layoutId);
+
+        TextView link1 = (TextView)findViewById(R.id.login_use_without_fblogin);
+        if (link1 != null) {
+            link1.setTextColor(link1.getLinkTextColors());
+        }
+        TextView link2 = (TextView)findViewById(R.id.login_explain_why_login);
+        if (link2 != null) {
+            link2.setTextColor(link1.getLinkTextColors());
+        }
 
         LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
         authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
