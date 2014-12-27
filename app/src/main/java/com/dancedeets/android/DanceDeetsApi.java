@@ -7,8 +7,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.*;
-import com.dancedeets.android.models.Event;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.FullEvent;
 import com.facebook.Session;
 
@@ -139,7 +138,6 @@ public class DanceDeetsApi {
                     JSONObject jsonEvent = jsonEventList.getJSONObject(i);
                     event = FullEvent.parse(jsonEvent);
                     // Prefetch images so scrolling "just works"
-                    Log.e(LOG_TAG, event.getId() + ": " + event.getThumbnailUrl());
                     VolleySingleton volley = VolleySingleton.getInstance();
                     volley.prefetchThumbnail(event.getThumbnailUrl());
                 } catch (JSONException e) {
