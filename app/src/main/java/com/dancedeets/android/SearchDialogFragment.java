@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -69,7 +70,8 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View view = inflater.inflate(R.layout.event_search_options, null);
-        EditText searchLocation = (EditText) view.findViewById(R.id.search_location);
+        AutoCompleteTextView searchLocation = (AutoCompleteTextView) view.findViewById(R.id.search_location);
+        searchLocation.setAdapter(new PlacesAdapter(getActivity(), android.R.layout.simple_list_item_1));
         EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
 
         mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
@@ -90,7 +92,6 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
                         EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
                         EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
 
-                        Log.i(LOG_TAG, "onclick " + mRetained + ", searchlistener " + mRetained.mOnSearchListener);
                         mRetained.mOnSearchListener.onSearch(
                                 searchLocation.getText().toString(),
                                 searchKeywords.getText().toString());
