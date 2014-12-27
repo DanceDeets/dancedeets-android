@@ -3,9 +3,13 @@ package com.dancedeets.android;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,16 +21,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 // Based on https://developers.google.com/places/training/autocomplete-android
-public class PlacesAdapter extends ArrayAdapter implements Filterable {
-    private ArrayList<String> mResultList;
+public class PlacesAdapter extends BaseAdapter implements Filterable {
+    private final LayoutInflater mInflater;
+    private final int mResource;
+    private List<String> mResultList;
 
     private static String LOG_TAG = "PlacesAdapter";
 
-    public PlacesAdapter(Context context, int textViewResourceId) {
-        super(context, textViewResourceId);
+    public PlacesAdapter(Context context, int resource) {
+        super();
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mResource = resource;
     }
 
     @Override
@@ -37,6 +46,31 @@ public class PlacesAdapter extends ArrayAdapter implements Filterable {
     @Override
     public String getItem(int index) {
         return mResultList.get(index);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return createViewFromResource(position, convertView, parent, mResource);
+    }
+
+    private View createViewFromResource(int position, View convertView, ViewGroup parent,
+                                        int resource) {
+        View view;
+
+        if (convertView == null) {
+            view = mInflater.inflate(resource, parent, false);
+        } else {
+            view = convertView;
+        }
+
+        String item = getItem(position);
+        ((TextView) view).setText(item);
+        return view;
     }
 
 
@@ -102,31 +136,37 @@ public class PlacesAdapter extends ArrayAdapter implements Filterable {
 
     @Override
     public Filter getFilter() {
+        // This Filter runs in another thread, which allows us to do long-running operations
+        // to fetch the filtered results. (In this case, by loading from Google Places API).
+        // But this background thread cannot touch mResultList, but must instead communicate
+        // via returning from performFiltering to pass to publishResults.
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
-                    // Retrieve the google places results.
-                    // TODO(lambert): We shouldn't be modifying mResultList from inside this thread,
-                    // and should only do that from publishResults.
-                    mResultList = lookupSuggestions(constraint.toString());
+                    // Retrieve the Places suggestions.
+                    // Don't modify mResultList, let publishResults do that in the UI thread.
+                    List<String> resultList = lookupSuggestions(constraint.toString());
 
                     // Assign the data to the FilterResults
-                    filterResults.values = mResultList;
-                    filterResults.count = mResultList.size();
+                    filterResults.values = resultList;
+                    filterResults.count = resultList.size();
                 }
                 return filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                if (results != null && results.count > 0) {
+                //noinspection unchecked
+                mResultList = (List<String>) results.values;
+                if (results.count > 0) {
                     notifyDataSetChanged();
                 }
                 else {
                     notifyDataSetInvalidated();
                 }
-            }};
+            }
+        };
     }
 }
