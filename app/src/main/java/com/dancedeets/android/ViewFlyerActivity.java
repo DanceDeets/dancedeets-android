@@ -8,7 +8,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.dancedeets.android.models.Event;
+import com.dancedeets.android.models.FullEvent;
 
 /**
  * Shows zoomable/pannable event flyers, when clicked on from the event info page.
@@ -28,7 +28,7 @@ public class ViewFlyerActivity extends FacebookActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            Event event = Event.parse(b);
+            FullEvent event = FullEvent.parse(b);
             if (event != null) {
                 setTitle("Flyer for " + event.getTitle());
             }
