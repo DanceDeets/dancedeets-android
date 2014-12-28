@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.util.Log;
 
 import com.dancedeets.android.models.Event;
-import com.dancedeets.dancedeets.R;
 import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.common.base.Charsets;
