@@ -140,7 +140,7 @@ public class ViewFlyerFragment extends StateFragment<
             } else {
                 // Create the share Intent
                 Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("image/jpg");
+                intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
                 // Share the title
                 intent.putExtra(Intent.EXTRA_TEXT, mBundled.mEvent.getTitle());
