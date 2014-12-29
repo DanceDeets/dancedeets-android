@@ -28,5 +28,5 @@
     <string name="login_use_website">Use www.dancedeets.com</string>
     <string name="use_without_fblogin">Want to use DanceDeets without Facebook login?\n\nThe mobile apps currently require Facebook login to use. However, if you wish to search and view events without logging in, you can use the mobile website available at www.dancedeets.com .</string>
     <string name="login_or">or</string>
-
+    <string name="enter_feedback_here">Enter feedback here:</string>
 </resources>

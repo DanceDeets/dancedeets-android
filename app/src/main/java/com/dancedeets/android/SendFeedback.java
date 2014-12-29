@@ -34,7 +34,8 @@ public class SendFeedback {
                         //"\nUser Info:" +
                         //getUserInformation(user) +
                         "\n____________________" +
-                        "\nEnter your feedback here:";
+                        "\n" + activity.getResources().getString(R.string.enter_feedback_here) +
+                        "\n";
         String uriText = "mailto:" + Uri.encode("feedback@dancedeets.com") +
                 "?subject=" + Uri.encode(subject) +
                 "&body=" + Uri.encode(body);
@@ -64,15 +65,15 @@ public class SendFeedback {
     private static String getDeviceInformation(Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         StringBuilder handsetInfoBuilder = new StringBuilder();
-        handsetInfoBuilder.append("\nBrand: " + Build.BRAND);
-        handsetInfoBuilder.append("\nManufacturer: " + Build.MANUFACTURER);
-        handsetInfoBuilder.append("\nModel: " + Build.MODEL);
-        handsetInfoBuilder.append("\nDevice: " + Build.DEVICE);
-        handsetInfoBuilder.append("\nScreen Density: " + metrics.density);
-        handsetInfoBuilder.append("\nScreen Size: " + metrics.widthPixels + "x" + metrics.heightPixels);
-        handsetInfoBuilder.append("\nVersion SDK: " + Build.VERSION.SDK_INT);
-        handsetInfoBuilder.append("\nVersion Codename: " + Build.VERSION.CODENAME);
-        handsetInfoBuilder.append("\nVersion Incremental: " + Build.VERSION.INCREMENTAL);
+        handsetInfoBuilder.append("\nBrand: ").append(Build.BRAND);
+        handsetInfoBuilder.append("\nManufacturer: ").append(Build.MANUFACTURER);
+        handsetInfoBuilder.append("\nModel: ").append(Build.MODEL);
+        handsetInfoBuilder.append("\nDevice: ").append(Build.DEVICE);
+        handsetInfoBuilder.append("\nScreen Density: ").append(metrics.density);
+        handsetInfoBuilder.append("\nScreen Size: ").append(metrics.widthPixels).append("x").append(metrics.heightPixels);
+        handsetInfoBuilder.append("\nVersion SDK: ").append(Build.VERSION.SDK_INT);
+        handsetInfoBuilder.append("\nVersion Codename: ").append(Build.VERSION.CODENAME);
+        handsetInfoBuilder.append("\nVersion Incremental: ").append(Build.VERSION.INCREMENTAL);
         handsetInfoBuilder.append("\n");
         return handsetInfoBuilder.toString();
     }
