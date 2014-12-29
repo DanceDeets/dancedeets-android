@@ -38,12 +38,10 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
  */
 public class ViewFlyerFragment extends StateFragment<
         ViewFlyerFragment.MyBundledState,
-        ViewFlyerFragment.MyRetainedState> {
+        RetainedState> {
 
     static protected class MyBundledState extends BundledState {
         protected FullEvent mEvent;
-    }
-    static public class MyRetainedState extends RetainedState {
     }
     protected ShareActionProvider mShareActionProvider;
     protected ImageViewTouch mImageViewTouch;
@@ -57,8 +55,8 @@ public class ViewFlyerFragment extends StateFragment<
     }
 
     @Override
-    public MyRetainedState buildRetainedState() {
-        return new MyRetainedState();
+    public RetainedState buildRetainedState() {
+        return new RetainedState();
     }
 
     @Override
@@ -87,7 +85,7 @@ public class ViewFlyerFragment extends StateFragment<
         }
     }
 
-    static private void loadPhoto(String imageUrl, final MyRetainedState retainedState) {
+    static private void loadPhoto(String imageUrl, final RetainedState retainedState) {
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         photoLoader.get(imageUrl, new ImageLoader.ImageListener() {
             @Override

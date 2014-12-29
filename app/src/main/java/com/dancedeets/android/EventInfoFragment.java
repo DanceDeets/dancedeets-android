@@ -26,7 +26,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dancedeets.android.models.FullEvent;
-import com.dancedeets.android.models.IdEvent;
 import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
@@ -41,12 +40,10 @@ import java.util.Locale;
 
 public class EventInfoFragment extends StateFragment<
         EventInfoFragment.MyBundledState,
-        EventInfoFragment.MyRetainedState> {
+        RetainedState> {
 
     static protected class MyBundledState extends BundledState {
         FullEvent mEvent;
-    }
-    static public class MyRetainedState extends RetainedState {
     }
 
 
@@ -81,17 +78,15 @@ public class EventInfoFragment extends StateFragment<
     }
 
     @Override
-    public MyRetainedState buildRetainedState() {
-        return new MyRetainedState();
+    public RetainedState buildRetainedState() {
+        return new RetainedState();
     }
 
     @Override
     public String getUniqueTag() {
-        IdEvent tempEvent = IdEvent.parse(getArguments());
+        FullEvent tempEvent = FullEvent.parse(getArguments());
         return LOG_TAG + tempEvent.getId();
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -248,42 +243,10 @@ public class EventInfoFragment extends StateFragment<
         if (getEvent() != null) {
             onEventReceived(getEvent(), false);
         } else {
-            loadEventFromArguments();
+            FullEvent tempEvent = FullEvent.parse(getArguments());
+            Log.i(LOG_TAG, "Retrieving: " + tempEvent.getId());
+            onEventReceived(tempEvent, true);
         }
-    }
-
-    // This is done in a static class, so there are no references to this Fragment leaked
-    static class EventHandler implements DanceDeetsApi.OnEventReceivedListener {
-        private final MyRetainedState mRetainedState;
-
-        public EventHandler(MyRetainedState retainedState) {
-            mRetainedState = retainedState;
-        }
-        @Override
-        public void onEventReceived(FullEvent event) {
-            // Sometimes the retainedState keeps a targetFragment even after it's detached,
-            // since I can't hook into the lifecycle at the right point in time.
-            // So double-check it's safe here first...
-            if (mRetainedState.getTargetFragment().getActivity() != null) {
-                ((EventInfoFragment) mRetainedState.getTargetFragment()).onEventReceived(event, true);
-            }
-        }
-
-        @Override
-        public void onError(Exception e) {
-            if (e instanceof JSONException) {
-                Log.e(LOG_TAG, "Error reading from event api: " + e);
-            } else {
-                Log.e(LOG_TAG, "Error retrieving data: " + e);
-            }
-            //TODO(lambert): implement a better error handling display to the user
-        }
-    }
-
-    public void loadEventFromArguments() {
-        IdEvent tempEvent = IdEvent.parse(getArguments());
-        Log.i(LOG_TAG, "Retrieving: " + tempEvent.getId());
-        DanceDeetsApi.getEvent(tempEvent.getId(), new EventHandler(mRetained));
     }
 
     public void onEventReceived(FullEvent event, boolean animate) {

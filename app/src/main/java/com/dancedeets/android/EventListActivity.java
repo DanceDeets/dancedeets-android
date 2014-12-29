@@ -10,11 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.dancedeets.android.models.Event;
+import com.dancedeets.android.models.FullEvent;
 import com.facebook.Session;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -107,8 +107,8 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
      * the item with the given ID was selected.
      */
     @Override
-    public void onEventSelected(List<Event> allEvents, int positionSelected) {
-        Event event = allEvents.get(positionSelected);
+    public void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected) {
+        FullEvent event = allEvents.get(positionSelected);
         Log.i(LOG_TAG, "Sending Event: " + event);
         if (mTwoPane) {
             Bundle bundle = event.getBundle();
@@ -130,12 +130,7 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
             }
 
         } else {
-            String[] eventIdList = new String[allEvents.size()];
-            int i = 0;
-            for (Event otherEvent : allEvents) {
-                eventIdList[i++] = otherEvent.getId();
-            }
-            Intent intent = EventInfoActivity.buildIntentFor(this, eventIdList, positionSelected, event);
+            Intent intent = EventInfoActivity.buildIntentFor(this, allEvents, positionSelected);
 
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.

@@ -9,9 +9,10 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.dancedeets.android.models.IdEvent;
+import com.dancedeets.android.models.FullEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lambert on 2014/10/16.
@@ -20,7 +21,7 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
 
     private static final String LOG_TAG = "EventInfoPagerAdapter";
 
-    protected String[] mEventList;
+    protected List<FullEvent> mEventList;
     protected EventInfoFragment.OnEventReceivedListener mOnEventReceivedListener;
 
     // We have no way to grab the fragment for a given position, which makes it near-impossible to implement getItem().
@@ -28,12 +29,12 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
     protected ArrayList<EventInfoFragment> mFragments;
     protected FragmentManager mFragmentManager;
 
-    public EventInfoPagerAdapter(FragmentManager fm, EventInfoFragment.OnEventReceivedListener listener, String[] eventList) {
+    public EventInfoPagerAdapter(FragmentManager fm, EventInfoFragment.OnEventReceivedListener listener, List<FullEvent> eventList) {
         super(fm);
         mOnEventReceivedListener = listener;
         mFragmentManager = fm;
         mEventList = eventList;
-        mFragments = new ArrayList<EventInfoFragment>();
+        mFragments = new ArrayList<>();
     }
 
     @Override
@@ -65,7 +66,7 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        IdEvent event = new IdEvent(mEventList[i]);
+        FullEvent event = mEventList.get(i);
         EventInfoFragment eventInfoFragment = new EventInfoFragment();
         eventInfoFragment.setArguments(event.getBundle());
         return eventInfoFragment;
@@ -73,7 +74,7 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return mEventList.length;
+        return (mEventList != null) ? mEventList.size() : 0;
     }
 
     private static String STATE_SUPERCLASS = "STATE_SUPERCLASS";

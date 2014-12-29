@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.dancedeets.android.models.Event;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -31,10 +25,6 @@ import com.dancedeets.android.uistate.StateListFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +38,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          */
         int mActivatedPosition = ListView.INVALID_POSITION;
 
-        ArrayList<Event> mEventList = new ArrayList<Event>();
+        ArrayList<FullEvent> mEventList = new ArrayList<>();
 
         SearchOptions mSearchOptions = new SearchOptions();
     }
@@ -73,7 +63,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         /**
          * Callback for when an item has been selected.
          */
-        public void onEventSelected(List<Event> allEvents, int positionSelected);
+        public void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected);
     }
 
     static final String LOG_TAG = "EventListFragment";
@@ -164,7 +154,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public void onAddressFound(Location location, Address address) {
         Log.i(LOG_TAG, "Address found: " + address);
         if (address != null) {
-            String addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            String addressString;
+            if (address.getLocale() != null) {
+                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+            } else {
+                addressString = address.getAdminArea() + ", " + address.getCountryCode();
+            }
             startSearchFor(addressString, "");
         } else {
             if (location == null) {
@@ -384,7 +379,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        Event event = mBundled.mEventList.get(position);
+        FullEvent event = mBundled.mEventList.get(position);
         Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();

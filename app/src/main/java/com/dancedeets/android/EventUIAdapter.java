@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.dancedeets.android.models.Event;
+import com.dancedeets.android.models.FullEvent;
 
 import java.util.List;
 
@@ -25,10 +25,10 @@ public class EventUIAdapter extends BaseAdapter {
         TextView startTime;
     }
     private LayoutInflater mInflater;
-    private List<Event> mEventList;
+    private List<FullEvent> mEventList;
     private int mResource;
 
-    public EventUIAdapter(Context context, List<Event> eventBundleList, int resource) {
+    public EventUIAdapter(Context context, List<FullEvent> eventBundleList, int resource) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mEventList = eventBundleList;
         mResource = resource;
@@ -57,7 +57,7 @@ public class EventUIAdapter extends BaseAdapter {
     }
 
     protected void bindView(int position, View view) {
-        Event event = (Event)getItem(position);
+        FullEvent event = (FullEvent)getItem(position);
         ImageLoader thumbnailLoader = VolleySingleton.getInstance().getThumbnailLoader();
 
         ViewBinder viewBinder = (ViewBinder)view.getTag();
