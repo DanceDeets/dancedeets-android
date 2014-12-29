@@ -22,16 +22,14 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
     private static final String LOG_TAG = "EventInfoPagerAdapter";
 
     protected List<FullEvent> mEventList;
-    protected EventInfoFragment.OnEventReceivedListener mOnEventReceivedListener;
 
     // We have no way to grab the fragment for a given position, which makes it near-impossible to implement getItem().
     // So we need to override instantiateItem/destroyItem to keep track of fragments, so we can find a title.
     protected ArrayList<EventInfoFragment> mFragments;
     protected FragmentManager mFragmentManager;
 
-    public EventInfoPagerAdapter(FragmentManager fm, EventInfoFragment.OnEventReceivedListener listener, List<FullEvent> eventList) {
+    public EventInfoPagerAdapter(FragmentManager fm, List<FullEvent> eventList) {
         super(fm);
-        mOnEventReceivedListener = listener;
         mFragmentManager = fm;
         mEventList = eventList;
         mFragments = new ArrayList<>();
@@ -47,7 +45,6 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         EventInfoFragment fragment = (EventInfoFragment)super.instantiateItem(container, position);
-        fragment.setOnEventReceivedListener(mOnEventReceivedListener);
         // Grow the array as necessary, like super.instantiateItem does
         while (mFragments.size() <= position) {
             mFragments.add(null);

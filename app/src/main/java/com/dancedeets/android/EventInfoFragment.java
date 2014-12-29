@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,19 +45,7 @@ public class EventInfoFragment extends StateFragment<
         FullEvent mEvent;
     }
 
-
-    protected View mRootView;
-    protected View mProgressContainer;
-    protected View mEventInfoContainer;
-    protected ShareActionProvider mShareActionProvider;
-
-    private OnEventReceivedListener mOnEventReceivedListener;
-
     private static final String LOG_TAG = "EventInfoFragment";
-
-    public interface OnEventReceivedListener {
-        public void onEventReceived(FullEvent event);
-    }
 
     public EventInfoFragment() {
     }
@@ -66,11 +53,6 @@ public class EventInfoFragment extends StateFragment<
     public FullEvent getEvent() {
         return mBundled.mEvent;
     }
-
-    public void setOnEventReceivedListener(OnEventReceivedListener onEventReceivedListener) {
-        mOnEventReceivedListener = onEventReceivedListener;
-    }
-
 
     @Override
     public MyBundledState buildBundledState() {
@@ -101,22 +83,14 @@ public class EventInfoFragment extends StateFragment<
         inflater.inflate(R.menu.event_info_menu, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
-        // Sometimes the event gets loaded before the share menu is set up,
-        // so this check handles that possibility and ensures the share intent is set.
-        if (getEvent() != null) {
-            setUpShareIntent();
-        }
-    }
 
-    protected void setUpShareIntent() {
+        // Set up ShareActionProvider shareIntent
+        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         String url = formatShareText();
         intent.putExtra(Intent.EXTRA_TEXT, url);
-        // Sometimes we receive an event so quickly, it happens before the menu can be shown...
-        // so we cannot rely on mShareActionProvider here. Maybe we should get rid of the
-        mShareActionProvider.setShareIntent(intent);
+        shareActionProvider.setShareIntent(intent);
     }
 
     protected String formatShareText() {
@@ -227,63 +201,20 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_event_info,
+        View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
-        mProgressContainer = mRootView.findViewById(R.id.progress_container);
-        mEventInfoContainer = mRootView.findViewById(R.id.event_info);
-        // Show the progress bar until we receive data
-        mProgressContainer.setVisibility(View.VISIBLE);
-        mEventInfoContainer.setVisibility(View.GONE);
-
-        return mRootView;
-    }
-
-    public void onActivityCreated (Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (getEvent() != null) {
-            onEventReceived(getEvent(), false);
-        } else {
-            FullEvent tempEvent = FullEvent.parse(getArguments());
-            Log.i(LOG_TAG, "Retrieving: " + tempEvent.getId());
-            onEventReceived(tempEvent, true);
-        }
-    }
-
-    public void onEventReceived(FullEvent event, boolean animate) {
+        FullEvent event = FullEvent.parse(getArguments());
         mBundled.mEvent = event;
-        if (mOnEventReceivedListener != null) {
-            mOnEventReceivedListener.onEventReceived(event);
-        }
-
-        setUpView();
-        // Only call this if we've set up the menu already..
-        // otherwise, we set it up later, at the same time as the menu
-        if (mShareActionProvider != null) {
-            setUpShareIntent();
-        }
-        if (animate) {
-            mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-                    getActivity(), android.R.anim.fade_out));
-            mEventInfoContainer.startAnimation(AnimationUtils.loadAnimation(
-                    getActivity(), android.R.anim.fade_in));
-        }
-        mProgressContainer.setVisibility(View.GONE);
-        mEventInfoContainer.setVisibility(View.VISIBLE);
+        fillOutView(rootView, event);
+        return rootView;
     }
 
-    public String getTitle() {
-        if (getEvent() != null) {
-            return getEvent().getTitle();
-        }
-        return null;
-    }
-
-    public void setUpView() {
-        List<NamedPerson> adminList = getEvent().getAdmins();
+    public void fillOutView(View rootView, FullEvent event) {
+        List<NamedPerson> adminList = event.getAdmins();
         Log.i(LOG_TAG, "admin list: "+adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
-        NetworkImageView cover = (NetworkImageView) mRootView.findViewById(R.id.cover);
-        cover.setImageUrl(getEvent().getCoverUrl(), photoLoader);
+        NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
+        cover.setImageUrl(event.getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -294,14 +225,14 @@ public class EventInfoFragment extends StateFragment<
             }
         });
 
-        TextView title = (TextView) mRootView.findViewById(R.id.title);
-        title.setText(getEvent().getTitle());
-        TextView location = (TextView) mRootView.findViewById(R.id.location);
-        location.setText(getEvent().getLocation());
-        TextView startTime  = (TextView) mRootView.findViewById(R.id.start_time);
-        startTime.setText(getEvent().getStartTimeString());
-        TextView description = (TextView) mRootView.findViewById(R.id.description);
-        description.setText(getEvent().getDescription());
+        TextView title = (TextView) rootView.findViewById(R.id.title);
+        title.setText(event.getTitle());
+        TextView location = (TextView) rootView.findViewById(R.id.location);
+        location.setText(event.getLocation());
+        TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
+        startTime.setText(event.getStartTimeString());
+        TextView description = (TextView) rootView.findViewById(R.id.description);
+        description.setText(event.getDescription());
     }
 
     /* check if intent is available */

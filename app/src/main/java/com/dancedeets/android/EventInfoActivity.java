@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState>, EventInfoFragment.OnEventReceivedListener {
+public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState> {
 
     private static final String LOG_TAG = "EventInfoActivity";
 
@@ -91,27 +91,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             // and only be overridden by any onNewIntent down the line.
             String tag = getUniqueTag();
             mBundled = (MyBundledState) savedInstanceState.getSerializable(tag);
+            initializeViewPagerWithBundledState();
         }
-
-        initializeViewPagerWithBundledState();
-
-        /**
-         * Ensures that the title is set for the relevant Fragment correctly when we change pages.
-         * In the case of switching to a loaded fragment, set the title directly, below.
-         * In the case of switching to an unloaded fragment, we do nothing. The fragment
-         * will call us when the event is loaded, so that we can set the event title.
-         */
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                mBundled.mEventIndex = position;
-                EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(position);
-                // This may return null, if the event API fetch hasn't returned yet
-                if (fragment.getEvent() != null) {
-                    setTitle(fragment.getEvent().getTitle());
-                }
-            }
-        });
 
         if (savedInstanceState == null) {
             // TODO: PARSE
@@ -134,13 +115,26 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
      * and can be re-called after calling onNewIntent later in the activity lifecycle flow.
      */
     public void initializeViewPagerWithBundledState() {
-        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mBundled.mEventList);
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mBundled.mEventList);
         Log.i(LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
         mViewPager.setAdapter(mEventInfoPagerAdapter);
         // The ViewPager retains its own CurrentItem state, so this is not strictly necessary here.
         // However, we must call setCurrentItem on all the intent-derived initializations,
         // and the flow just makes it easier to store/restore our own EventIndex for everyone here.
         mViewPager.setCurrentItem(mBundled.mEventIndex);
+
+        // Since onPageSelected is not called until the first swipe, always initialize the title here.
+        FullEvent event = mBundled.mEventList.get(mBundled.mEventIndex);
+        setTitle(event.getTitle());
+
+        // Ensures that the title is set for the relevant Fragment correctly when we change pages.
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                mBundled.mEventIndex = position;
+                setTitle(mBundled.mEventList.get(position).getTitle());
+            }
+        });
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -158,16 +152,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         @Override
         public void onEventReceived(FullEvent event) {
             EventInfoActivity eventInfoActivity = (EventInfoActivity) mRetainedState.getActivity();
-            // Sometimes the retainedState keeps a targetFragment even after it's detached,
-            // since I can't hook into the lifecycle at the right point in time.
-            // So double-check it's safe here first...
-            if (eventInfoActivity != null) {
-                eventInfoActivity.mBundled.mEventList.clear();
-                eventInfoActivity.mBundled.mEventList.add(event);
-                eventInfoActivity.mBundled.mEventIndex = 0;
-                eventInfoActivity.mEventInfoPagerAdapter.notifyDataSetChanged();
-                eventInfoActivity.onEventReceived(event);
-            }
+            eventInfoActivity.onEventReceived(event);
         }
 
         @Override
@@ -197,37 +182,19 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             mBundled.mEventList = (List<FullEvent>)b.getSerializable(ARG_EVENT_LIST);
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
 
-            FullEvent event = mBundled.mEventList.get(mBundled.mEventIndex);
-            // Since onPageSelected is not called until the first swipe, initialize the title here.
-            onEventReceived(event);
+            initializeViewPagerWithBundledState();
             return true;
         }
         return false;
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // This is used by the VIEW URL intent, on page-rotate, to re-set the Title.
-        // TODO: For some reason this is necessary for VIEW but not regular navigation.
-        EventInfoFragment fragment = mEventInfoPagerAdapter.getExistingItem(mViewPager.getCurrentItem());
-        // Fragment may return null, if we are loading the activity (but not on rotating).
-        // Event may return null, if the event API fetch hasn't returned yet
-        if (fragment != null && fragment.getEvent() != null) {
-            setTitle(fragment.getEvent().getTitle());
-        }
-
+    protected void onEventReceived(FullEvent event) {
+        mBundled.mEventList = new ArrayList<>(1);
+        mBundled.mEventList.add(event);
+        mBundled.mEventIndex = 0;
+        //eventInfoActivity.mEventInfoPagerAdapter.notifyDataSetChanged();
+        initializeViewPagerWithBundledState();
     }
-
-    @Override
-    public void onEventReceived(FullEvent event) {
-        //TODO(lambert): I think we can get rid of this, inline it, or ignore race conditions, as we have all the data we need now.
-        if (mBundled.mEventList.get(mViewPager.getCurrentItem()).getId().equals(event.getId())) {
-            setTitle(event.getTitle());
-        }
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -235,9 +202,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         // it should all be captured in BundledState by now.
         setIntent(intent);
         Log.i(LOG_TAG, "onNewIntent");
-        if (handleIntent(intent)) {
-            initializeViewPagerWithBundledState();
-        }
+        mBundled = buildBundledState();
+        handleIntent(intent);
     }
 
     @Override
