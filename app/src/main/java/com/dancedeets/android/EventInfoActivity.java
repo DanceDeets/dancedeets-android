@@ -14,30 +14,55 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.dancedeets.android.models.Event;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
+import com.dancedeets.android.uistate.RetainedState;
+import com.dancedeets.android.uistate.StateHolder;
+import com.dancedeets.android.uistate.StateUtil;
 import com.facebook.Session;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class EventInfoActivity extends FacebookActivity implements EventInfoFragment.OnEventReceivedListener {
+public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState>, EventInfoFragment.OnEventReceivedListener {
 
     private static final String LOG_TAG = "EventInfoActivity";
 
-    public static final String ARG_EVENT = "EVENT";
-    public static final String ARG_EVENT_ID_LIST = "EVENT_ID_LIST";
+    public static final String ARG_EVENT_LIST = "EVENT_ID_LIST";
     public static final String ARG_EVENT_INDEX = "EVENT_INDEX";
 
     protected ViewPager mViewPager;
     protected EventInfoPagerAdapter mEventInfoPagerAdapter;
+    protected RetainedState mRetained;
 
-    public static Intent buildIntentFor(Context context, String[] eventIdList, int positionSelected, Event event) {
+    static class MyBundledState extends BundledState {
+        public List<FullEvent> mEventList = new ArrayList<>();
+        public int mEventIndex;
+    }
+
+    protected MyBundledState mBundled;
+
+    public String getUniqueTag() {
+        return LOG_TAG;
+    }
+
+    @Override
+    public MyBundledState buildBundledState() {
+        return new MyBundledState();
+    }
+
+    @Override
+    public RetainedState buildRetainedState() {
+        return new RetainedState();
+    }
+
+    public static Intent buildIntentFor(Context context, ArrayList<FullEvent> eventList, int positionSelected) {
         Bundle bundle = new Bundle();
-        bundle.putStringArray(ARG_EVENT_ID_LIST, eventIdList);
+        bundle.putSerializable(ARG_EVENT_LIST, eventList);
         bundle.putInt(ARG_EVENT_INDEX, positionSelected);
-        bundle.putSerializable(ARG_EVENT, event);
         Intent intent = new Intent(context, EventInfoActivity.class);
         intent.putExtras(bundle);
         return intent;
@@ -48,6 +73,7 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+        mRetained = StateUtil.createRetained(this, this);
 
         setContentView(R.layout.event_info_pager);
 
@@ -108,7 +134,7 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
      * and can be re-called after calling onNewIntent later in the activity lifecycle flow.
      */
     public void initializeViewPagerWithBundledState() {
-        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mBundled.mEventIdList);
+        mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), this, mBundled.mEventList);
         Log.i(LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
         mViewPager.setAdapter(mEventInfoPagerAdapter);
         // The ViewPager retains its own CurrentItem state, so this is not strictly necessary here.
@@ -117,24 +143,42 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
         mViewPager.setCurrentItem(mBundled.mEventIndex);
     }
 
-    static class MyBundledState extends BundledState {
-        public String[] mEventIdList = {};
-        public int mEventIndex;
-    }
-
-    protected MyBundledState mBundled;
-
-    public String getUniqueTag() {
-        return LOG_TAG;
-    }
-
-    private MyBundledState buildBundledState() {
-        return new MyBundledState();
-    }
-
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(getUniqueTag(), mBundled);
+    }
+
+    // This is done in a static class, so there are no references to this Fragment leaked
+    static class EventHandler implements DanceDeetsApi.OnEventReceivedListener {
+        private final RetainedState mRetainedState;
+
+        public EventHandler(RetainedState retainedState) {
+            mRetainedState = retainedState;
+        }
+        @Override
+        public void onEventReceived(FullEvent event) {
+            EventInfoActivity eventInfoActivity = (EventInfoActivity) mRetainedState.getActivity();
+            // Sometimes the retainedState keeps a targetFragment even after it's detached,
+            // since I can't hook into the lifecycle at the right point in time.
+            // So double-check it's safe here first...
+            if (eventInfoActivity != null) {
+                eventInfoActivity.mBundled.mEventList.clear();
+                eventInfoActivity.mBundled.mEventList.add(event);
+                eventInfoActivity.mBundled.mEventIndex = 0;
+                eventInfoActivity.mEventInfoPagerAdapter.notifyDataSetChanged();
+                eventInfoActivity.onEventReceived(event);
+            }
+        }
+
+        @Override
+        public void onError(Exception e) {
+            if (e instanceof JSONException) {
+                Log.e(LOG_TAG, "Error reading from event api: " + e);
+            } else {
+                Log.e(LOG_TAG, "Error retrieving data: " + e);
+            }
+            //TODO(lambert): implement a better error handling display to the user
+        }
     }
 
     public boolean handleIntent(Intent intent) {
@@ -144,18 +188,18 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
             List<String> pathSegments = url.getPathSegments();
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
-                mBundled.mEventIdList = new String[]{eventId};
-                mBundled.mEventIndex = 0;
+                // Add Event requests
+                DanceDeetsApi.getEvent(eventId, new EventHandler(mRetained));
             }
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            mBundled.mEventIdList = b.getStringArray(ARG_EVENT_ID_LIST);
+            mBundled.mEventList = (List<FullEvent>)b.getSerializable(ARG_EVENT_LIST);
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
 
-            Event event = (Event)b.getSerializable(ARG_EVENT);
+            FullEvent event = mBundled.mEventList.get(mBundled.mEventIndex);
             // Since onPageSelected is not called until the first swipe, initialize the title here.
-            setTitle(event.getTitle());
+            onEventReceived(event);
             return true;
         }
         return false;
@@ -178,7 +222,8 @@ public class EventInfoActivity extends FacebookActivity implements EventInfoFrag
 
     @Override
     public void onEventReceived(FullEvent event) {
-        if (mBundled.mEventIdList[mViewPager.getCurrentItem()].equals(event.getId())) {
+        //TODO(lambert): I think we can get rid of this, inline it, or ignore race conditions, as we have all the data we need now.
+        if (mBundled.mEventList.get(mViewPager.getCurrentItem()).getId().equals(event.getId())) {
             setTitle(event.getTitle());
         }
     }
