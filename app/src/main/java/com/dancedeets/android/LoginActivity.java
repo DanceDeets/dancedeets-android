@@ -6,6 +6,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -14,9 +16,6 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.widget.LoginButton;
 
-/**
- * Created by lambert on 2014/11/11.
- */
 public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
@@ -99,7 +98,7 @@ public class LoginActivity extends FacebookActivity {
         Intent intent = getIntent();
         int layoutId = R.layout.login;
         if (intent != null) {
-            if (intent.hasExtra("ResourceID")) {
+            if (intent.hasExtra("ResourceID") && getActionBar() != null) {
                 getActionBar().setDisplayHomeAsUpEnabled(true);
             }
             layoutId = intent.getIntExtra("ResourceID", R.layout.login);
@@ -121,10 +120,20 @@ public class LoginActivity extends FacebookActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.login_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.action_feedback:
+                SendFeedback.sendFeedback(this, null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
