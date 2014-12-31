@@ -91,18 +91,9 @@ public class EventInfoFragment extends StateFragment<
         Intent intent = new Intent(Intent.ACTION_SEND);
         // We need to keep this as text/plain, not text/html, so we get the full set of apps to share to.
         intent.setType("text/plain");
-        setupShareIntent(intent);
+        intent.putExtra(Intent.EXTRA_SUBJECT, EventSharing.getTitle(getEvent()));
+        intent.putExtra(Intent.EXTRA_TEXT, EventSharing.getBodyText(getEvent()));
         shareActionProvider.setShareIntent(intent);
-    }
-
-    protected void setupShareIntent(Intent intent) {
-        FullEvent event = mBundled.mEvent;
-        //EXTRA_SUBJECT:
-        intent.putExtra(Intent.EXTRA_SUBJECT, EventSharing.getTitle(event));
-        //EXTRA_HTML_TEXT:
-        intent.putExtra(Intent.EXTRA_HTML_TEXT, EventSharing.getBodyHtml(event));
-        //EXTRA_TEXT:
-        intent.putExtra(Intent.EXTRA_TEXT, EventSharing.getBodyText(event));
     }
 
     @Override

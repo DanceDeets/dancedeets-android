@@ -149,7 +149,8 @@ public class ViewFlyerFragment extends StateFragment<
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
-                setupShareIntent(intent);
+                intent.putExtra(Intent.EXTRA_SUBJECT, EventSharing.getTitle(mBundled.mEvent));
+                intent.putExtra(Intent.EXTRA_TEXT, EventSharing.getBodyText(mBundled.mEvent));
                 mShareActionProvider.setShareIntent(intent);
             }
 
@@ -158,16 +159,4 @@ public class ViewFlyerFragment extends StateFragment<
             e.printStackTrace();
         }
     }
-
-    protected void setupShareIntent(Intent intent) {
-        //EXTRA_STREAM is already the flyer bitmap image, set up above.
-        FullEvent event = mBundled.mEvent;
-        //EXTRA_SUBJECT:
-        intent.putExtra(Intent.EXTRA_SUBJECT, EventSharing.getTitle(event));
-        //EXTRA_HTML_TEXT:
-        intent.putExtra(Intent.EXTRA_HTML_TEXT, EventSharing.getBodyHtml(event));
-        //EXTRA_TEXT:
-        intent.putExtra(Intent.EXTRA_TEXT, EventSharing.getBodyText(event));
-    }
-
 }
