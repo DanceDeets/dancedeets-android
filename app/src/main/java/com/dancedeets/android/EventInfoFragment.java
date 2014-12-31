@@ -43,6 +43,8 @@ public class EventInfoFragment extends StateFragment<
 
     static protected class MyBundledState extends BundledState {
         FullEvent mEvent;
+        CharSequence mTranslatedTitle;
+        CharSequence mTranslatedDescription;
     }
 
     private static final String LOG_TAG = "EventInfoFragment";
@@ -159,11 +161,10 @@ public class EventInfoFragment extends StateFragment<
         @Override
         public void onResponse(JSONArray response) {
             EventInfoFragment eventInfoFragment = (EventInfoFragment) mRetainedState.getTargetFragment();
-            TextView titleView = (TextView) eventInfoFragment.getView().findViewById(R.id.title);
-            TextView descriptionView = (TextView) eventInfoFragment.getView().findViewById(R.id.description);
             try {
-                titleView.setText(response.getJSONArray(0).getString(0));
-                descriptionView.setText(response.getJSONArray(1).getString(0));
+                eventInfoFragment.mBundled.mTranslatedTitle = response.getJSONArray(0).getString(0);
+                eventInfoFragment.mBundled.mTranslatedDescription = response.getJSONArray(1).getString(0);
+                eventInfoFragment.swapTitleAndDescription();
             } catch (JSONException error) {
                 Log.e(LOG_TAG, "Translation failed: " + error);
                 Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
@@ -177,35 +178,54 @@ public class EventInfoFragment extends StateFragment<
         }
     }
 
-    public void translatePage() {
-        Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t").buildUpon()
-                // I believe this stands for Translate Android
-                .appendQueryParameter("client", "ta")
-                // version 1.0 returns simple json output, while 2.0 returns more complex data used by the Translate app
-                .appendQueryParameter("v", "1.0")
-                // This is necessary, or Google Translate will mistakenly interpret utf8-encoded text as Shift_JIS, and return garbage.
-                .appendQueryParameter("ie", "UTF-8")
-                // And really, there's no reason to return data as Shift_JIS either, just creates more room for error.
-                .appendQueryParameter("oe", "UTF-8")
-                // Source language unknown, and target language is always the locale's language
-                .appendQueryParameter("sl", "auto")
-                .appendQueryParameter("tl", Locale.getDefault().getLanguage())
-                .build();// android language
-        RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
+    public void swapTitleAndDescription() {
         TextView titleView = (TextView) getView().findViewById(R.id.title);
         TextView descriptionView = (TextView) getView().findViewById(R.id.description);
-        String body = "q=" + Uri.encode(titleView.getText().toString())
-                + "&q=" + Uri.encode(descriptionView.getText().toString());
 
-        TranslateEvent translateEventListener = new TranslateEvent(mRetained);
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(
-                Request.Method.POST,
-                translateUrl.toString(),
-                body,
-                translateEventListener,
-                translateEventListener);
-        jsonRequest.setShouldCache(false);
-        queue.add(jsonRequest);
+        CharSequence oldTitle = titleView.getText();
+        CharSequence oldDescription = descriptionView.getText();
+
+        titleView.setText(mBundled.mTranslatedTitle);
+        descriptionView.setText(mBundled.mTranslatedDescription);
+
+        mBundled.mTranslatedTitle = oldTitle;
+        mBundled.mTranslatedDescription = oldDescription;
+    }
+
+    public void translatePage() {
+        if (mBundled.mTranslatedTitle != null) {
+            // Restore old translated content
+            swapTitleAndDescription();
+        } else {
+            Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t").buildUpon()
+                    // I believe this stands for Translate Android
+                    .appendQueryParameter("client", "ta")
+                            // version 1.0 returns simple json output, while 2.0 returns more complex data used by the Translate app
+                    .appendQueryParameter("v", "1.0")
+                            // This is necessary, or Google Translate will mistakenly interpret utf8-encoded text as Shift_JIS, and return garbage.
+                    .appendQueryParameter("ie", "UTF-8")
+                            // And really, there's no reason to return data as Shift_JIS either, just creates more room for error.
+                    .appendQueryParameter("oe", "UTF-8")
+                            // Source language unknown, and target language is always the locale's language
+                    .appendQueryParameter("sl", "auto")
+                    .appendQueryParameter("tl", Locale.getDefault().getLanguage())
+                    .build();// android language
+            RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
+            TextView titleView = (TextView) getView().findViewById(R.id.title);
+            TextView descriptionView = (TextView) getView().findViewById(R.id.description);
+            String body = "q=" + Uri.encode(titleView.getText().toString())
+                    + "&q=" + Uri.encode(descriptionView.getText().toString());
+
+            TranslateEvent translateEventListener = new TranslateEvent(mRetained);
+            JsonArrayRequest jsonRequest = new JsonArrayRequest(
+                    Request.Method.POST,
+                    translateUrl.toString(),
+                    body,
+                    translateEventListener,
+                    translateEventListener);
+            jsonRequest.setShouldCache(false);
+            queue.add(jsonRequest);
+        }
     }
 
     @Override
