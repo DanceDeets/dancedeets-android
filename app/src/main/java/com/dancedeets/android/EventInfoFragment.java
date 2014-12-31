@@ -148,6 +148,35 @@ public class EventInfoFragment extends StateFragment<
         return super.onOptionsItemSelected(item);
     }
 
+    static class TranslateEvent implements Response.Listener<JSONArray>, Response.ErrorListener {
+
+        RetainedState mRetainedState;
+
+        public TranslateEvent(RetainedState retainedState) {
+            mRetainedState = retainedState;
+        }
+
+        @Override
+        public void onResponse(JSONArray response) {
+            EventInfoFragment eventInfoFragment = (EventInfoFragment) mRetainedState.getTargetFragment();
+            TextView titleView = (TextView) eventInfoFragment.getView().findViewById(R.id.title);
+            TextView descriptionView = (TextView) eventInfoFragment.getView().findViewById(R.id.description);
+            try {
+                titleView.setText(response.getJSONArray(0).getString(0));
+                descriptionView.setText(response.getJSONArray(1).getString(0));
+            } catch (JSONException error) {
+                Log.e(LOG_TAG, "Translation failed: " + error);
+                Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e(LOG_TAG, "Translation failed: " + error);
+            Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void translatePage() {
         Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t").buildUpon()
                 // I believe this stands for Translate Android
@@ -168,32 +197,13 @@ public class EventInfoFragment extends StateFragment<
         String body = "q=" + Uri.encode(titleView.getText().toString())
                 + "&q=" + Uri.encode(descriptionView.getText().toString());
 
+        TranslateEvent translateEventListener = new TranslateEvent(mRetained);
         JsonArrayRequest jsonRequest = new JsonArrayRequest(
                 Request.Method.POST,
                 translateUrl.toString(),
                 body,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.i(LOG_TAG, "YAY" + response);
-                        TextView titleView = (TextView) getView().findViewById(R.id.title);
-                        TextView descriptionView = (TextView) getView().findViewById(R.id.description);
-                        try {
-                            titleView.setText(response.getJSONArray(0).getString(0));
-                            descriptionView.setText(response.getJSONArray(1).getString(0));
-                        } catch (JSONException error) {
-                            Log.e(LOG_TAG, "Translation failed: " + error);
-                            Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Translation failed: " + error);
-                        Toast.makeText(getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
-                    }
-                });
+                translateEventListener,
+                translateEventListener);
         jsonRequest.setShouldCache(false);
         queue.add(jsonRequest);
     }
