@@ -142,9 +142,13 @@ public class ViewFlyerFragment extends StateFragment<
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
-                // Share the title
-                intent.putExtra(Intent.EXTRA_TEXT, mBundled.mEvent.getTitle());
+                setupShareIntent(intent);
                 mShareActionProvider.setShareIntent(intent);
+                // We need to set a different history file name, as Android only stores one ShareIntent per ShareHistoryFileName.
+                // This means the EventInfoFragment ShareIntent is overwritten by the ViewFlyerFragment ShareIntent,
+                // and when the user navigates up/back, it uses the wrong ShareIntent.
+                // We could re-set the ShareIntent manually, but it seems cleaner to just use two history files.
+                mShareActionProvider.setShareHistoryFileName("flyer_" + ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
             }
 
         } catch (IOException e) {
@@ -153,5 +157,13 @@ public class ViewFlyerFragment extends StateFragment<
         }
     }
 
+    protected void setupShareIntent(Intent intent) {
+        //EXTRA_STREAM is already the flyer bitmap image, set up above.
+        FullEvent event = mBundled.mEvent;
+        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
+        //EXTRA_HTMLTEXT
+        //EXTRA_TEXT
+        intent.putExtra(Intent.EXTRA_TEXT, mBundled.mEvent.getTitle());
+    }
 
 }

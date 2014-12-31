@@ -90,14 +90,16 @@ public class EventInfoFragment extends StateFragment<
         ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        String url = formatShareText();
-        intent.putExtra(Intent.EXTRA_TEXT, url);
+        setupShareIntent(intent);
         shareActionProvider.setShareIntent(intent);
     }
 
-    protected String formatShareText() {
-        String url = getEvent().getUrl();
-        return url;
+    protected void setupShareIntent(Intent intent) {
+        FullEvent event = mBundled.mEvent;
+        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
+        //EXTRA_TEXT
+        //EXTRA_HTML_TEXT
+        intent.putExtra(Intent.EXTRA_TEXT, getEvent().getUrl());
     }
 
     @Override
