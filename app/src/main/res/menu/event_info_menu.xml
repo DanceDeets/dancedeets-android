@@ -5,36 +5,43 @@
     tools:context=".EventsList" >
 
     <item
-        android:id="@+id/action_share"
-        android:icon="@android:drawable/ic_menu_share"
-        android:title="@string/menu_share"
-        android:showAsAction="always"
-        android:actionProviderClass="android.widget.ShareActionProvider">
-    </item>
-
-    <item
-        android:id="@+id/action_add_to_calendar"
-        android:icon="@drawable/ic_menu_facebook"
-        android:title="@string/menu_add_to_calendar"
-    >
-    </item>
-
-    <item
-        android:id="@+id/action_view_facebook"
-        android:icon="@drawable/ic_menu_facebook"
-        android:title="@string/menu_view_facebook"
+        android:id="@+id/action_view_map"
+        android:title="@string/menu_view_map"
+        android:icon="@drawable/ic_menu_map"
+        android:showAsAction="ifRoom"
         >
     </item>
 
     <item
-        android:id="@+id/action_view_map"
-        android:title="@string/menu_view_map"
+        android:id="@+id/action_view_facebook"
+        android:title="@string/menu_view_facebook"
+        android:icon="@drawable/ic_menu_facebook"
+        android:showAsAction="ifRoom"
+        >
+    </item>
+
+    <item
+        android:id="@+id/action_add_to_calendar"
+        android:title="@string/menu_add_to_calendar"
+        android:icon="@drawable/ic_menu_calendar"
+        android:showAsAction="ifRoom"
         >
     </item>
 
     <item
         android:id="@+id/action_translate"
         android:title="@string/menu_translate"
+        android:icon="@drawable/ic_menu_translate"
+        android:showAsAction="ifRoom"
         >
     </item>
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share"
+        android:showAsAction="never"
+        android:actionProviderClass="android.widget.ShareActionProvider">
+    </item>
+
 </menu>
