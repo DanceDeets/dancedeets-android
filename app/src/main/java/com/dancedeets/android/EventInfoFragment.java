@@ -96,10 +96,12 @@ public class EventInfoFragment extends StateFragment<
 
     protected void setupShareIntent(Intent intent) {
         FullEvent event = mBundled.mEvent;
-        intent.putExtra(Intent.EXTRA_SUBJECT, event.getTitle());
-        //EXTRA_TEXT
-        //EXTRA_HTML_TEXT
-        intent.putExtra(Intent.EXTRA_TEXT, getEvent().getUrl());
+        //EXTRA_SUBJECT:
+        intent.putExtra(Intent.EXTRA_SUBJECT, EventSharing.getTitle(event));
+        //EXTRA_HTML_TEXT:
+        intent.putExtra(Intent.EXTRA_HTML_TEXT, EventSharing.getBodyHtml(event));
+        //EXTRA_TEXT:
+        intent.putExtra(Intent.EXTRA_TEXT, EventSharing.getBodyText(event));
     }
 
     @Override
