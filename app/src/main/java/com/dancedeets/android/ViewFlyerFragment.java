@@ -78,6 +78,13 @@ public class ViewFlyerFragment extends StateFragment<
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        // We need to set a different history file name, as Android only stores one ShareIntent per ShareHistoryFileName.
+        // This means the EventInfoFragment ShareIntent is overwritten by the ViewFlyerFragment ShareIntent,
+        // and when the user navigates up/back, it uses the wrong ShareIntent.
+        // We could re-set the ShareIntent manually, but it seems cleaner to just use two history files.
+        // We also need call setShareHistoryFilename before calling setShareIntent, so we do that immediately.
+        mShareActionProvider.setShareHistoryFileName("flyer_" + ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+
         // Sometimes the event gets loaded before the share menu is set up,
         // so this check handles that possibility and ensures the share intent is set.
         if (mBitmap != null) {
@@ -144,11 +151,6 @@ public class ViewFlyerFragment extends StateFragment<
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(localImageUri));
                 setupShareIntent(intent);
                 mShareActionProvider.setShareIntent(intent);
-                // We need to set a different history file name, as Android only stores one ShareIntent per ShareHistoryFileName.
-                // This means the EventInfoFragment ShareIntent is overwritten by the ViewFlyerFragment ShareIntent,
-                // and when the user navigates up/back, it uses the wrong ShareIntent.
-                // We could re-set the ShareIntent manually, but it seems cleaner to just use two history files.
-                mShareActionProvider.setShareHistoryFileName("flyer_" + ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
             }
 
         } catch (IOException e) {
