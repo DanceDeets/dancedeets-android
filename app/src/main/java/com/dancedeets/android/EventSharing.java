@@ -1,6 +1,10 @@
 package com.dancedeets.android;
 
+import android.net.Uri;
+import android.text.TextUtils;
+
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.Venue;
 
 /**
  * Encapsulates the common methods used by intents when sharing our events.
@@ -22,8 +26,15 @@ public class EventSharing {
     }
 
     public static String getBodyHtml(FullEvent event) {
-        //TODO: Fill this out when we have something worth HTML-ifying.
-        return null;
+        Venue venue = event.getVenue();
+        Venue.LatLong latLong = venue.getLatLong();
+        String locationUrl = "https://www.google.com/maps/place/" + Uri.encode(venue.getName()) + "/@" + latLong.getLatitude() + "," + latLong.getLongitude();
+        return (
+                "Check out this dance event!" +
+                "<br>\nEvent: <a href=\"" + TextUtils.htmlEncode(event.getUrl()) + "\">" + TextUtils.htmlEncode(event.getTitle()) + "</a>" +
+                "<br>\nWhen: " + TextUtils.htmlEncode(event.getStartTimeString()) +
+                "<br>\nWhere: <a href=\"" + TextUtils.htmlEncode(locationUrl) + "\">" + TextUtils.htmlEncode(event.getLocation()) + "</a>"
+        );
     }
 
 }

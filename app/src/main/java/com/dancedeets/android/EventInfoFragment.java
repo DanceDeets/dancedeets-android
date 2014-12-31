@@ -89,6 +89,7 @@ public class EventInfoFragment extends StateFragment<
         // Set up ShareActionProvider shareIntent
         ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
+        // We need to keep this as text/plain, not text/html, so we get the full set of apps to share to.
         intent.setType("text/plain");
         setupShareIntent(intent);
         shareActionProvider.setShareIntent(intent);
