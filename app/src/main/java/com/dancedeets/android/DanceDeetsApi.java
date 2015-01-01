@@ -113,7 +113,7 @@ public class DanceDeetsApi {
         public void onError(Exception exception);
     }
 
-    static class SearchProcessor implements Response.Listener<JSONObject> {
+    static class SearchProcessor implements Response.Listener<JSONObject>, Response.ErrorListener {
 
         private final OnResultsReceivedListener mOnResultsReceivedListener;
 
@@ -149,6 +149,13 @@ public class DanceDeetsApi {
                 mOnResultsReceivedListener.onResultsReceived(eventList);
             }
         }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            if (mOnResultsReceivedListener != null) {
+                mOnResultsReceivedListener.onError(error);
+            }
+        }
     }
 
     public static void runSearch(SearchOptions searchOptions, final OnResultsReceivedListener onResultsReceivedListener) {
@@ -159,20 +166,13 @@ public class DanceDeetsApi {
         builder.appendQueryParameter("distance_units", "miles");
         final Uri searchUri = builder.build();
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (onResultsReceivedListener != null) {
-                    onResultsReceivedListener.onError(error);
-                }
-            }
-        };
+        SearchProcessor searchProcessor = new SearchProcessor(onResultsReceivedListener);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 searchUri.toString(),
                 null,
-                new SearchProcessor(onResultsReceivedListener),
-                errorListener);
+                searchProcessor,
+                searchProcessor);
 
         Log.d(LOG_TAG, "Querying server feed: " + searchUri);
         request.setShouldCache(false);
