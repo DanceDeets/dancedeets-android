@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
@@ -162,6 +163,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             } else {
                 Log.e(LOG_TAG, "Error retrieving data: " + e);
             }
+            Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to load event info! " + e, Toast.LENGTH_LONG).show();
             //TODO(lambert): implement a better error handling display to the user
         }
     }

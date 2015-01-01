@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ShareActionProvider;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -109,6 +110,7 @@ public class ViewFlyerFragment extends StateFragment<
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOG_TAG, "Failed to load flyer image for display: " + error);
+                Toast.makeText(retainedState.getActivity().getBaseContext(), "Failed to load flyer! " + error, Toast.LENGTH_LONG).show();
             }
         });
     }

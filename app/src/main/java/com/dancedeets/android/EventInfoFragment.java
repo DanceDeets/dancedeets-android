@@ -163,14 +163,14 @@ public class EventInfoFragment extends StateFragment<
                 eventInfoFragment.swapTitleAndDescription();
             } catch (JSONException error) {
                 Log.e(LOG_TAG, "Translation failed: " + error);
-                Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+                Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
             }
         }
 
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e(LOG_TAG, "Translation failed: " + error);
-            Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
         }
     }
 
