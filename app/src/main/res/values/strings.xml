@@ -30,4 +30,5 @@
     <string name="login_or">or</string>
     <string name="enter_feedback_here">Enter feedback here:</string>
     <string name="flyer_for">Flyer for</string>
+    <string name="hint_enter_location">Enter Location</string>
 </resources>

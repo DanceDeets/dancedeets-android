@@ -17,7 +17,7 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateDialogFragment;
 
 /**
- * Created by lambert on 2014/10/05.
+ * A dialog for searching events on the list view.
  */
 public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragment.MyBundledState, SearchDialogFragment.MyRetainedState> {
 
@@ -78,7 +78,14 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         searchLocation.setText(mBundled.mSearchOptions.location);
         searchKeywords.setText(mBundled.mSearchOptions.keywords);
         TextView messageView = (TextView) view.findViewById(R.id.search_message);
-        messageView.setText(getArguments().getString(ARG_MESSAGE));
+        String message = getArguments().getString(ARG_MESSAGE);
+        if (message != null && !message.isEmpty()) {
+            messageView.setText(message);
+            int borderDp = 20;
+            float scale = getResources().getDisplayMetrics().density;
+            int dpAsPixels = (int) (borderDp*scale + 0.5f);
+            messageView.setPadding(0, 0, 0, dpAsPixels);
+        }
 
         builder.getContext();
         // Inflate and set the layout for the dialog
