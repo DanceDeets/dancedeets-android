@@ -7,6 +7,9 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -96,22 +99,25 @@ public class EventInfoFragment extends StateFragment<
         shareActionProvider.setShareIntent(intent);
     }
 
+    public void openLocationOnMap() {
+        // "geo:0,0?q=lat,lng(label)"
+        // "geo:0,0?q=my+street+address"
+        Venue venue = getEvent().getVenue();
+        Venue.LatLong latLong = venue.getLatLong();
+        String name = venue.getName();
+        Uri mapUrl = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude() + "?q=" + Uri.encode(name));
+        Intent intent = new Intent(Intent.ACTION_VIEW, mapUrl);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_view_map:
-                // "geo:0,0?q=lat,lng(label)"
-                // "geo:0,0?q=my+street+address"
-                Venue venue = getEvent().getVenue();
-                Venue.LatLong latLong = venue.getLatLong();
-                String name = venue.getName();
-                Uri mapUrl = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude() + "?q=" + Uri.encode(name));
-                Log.i(LOG_TAG, "map url is " + mapUrl);
-                intent = new Intent(Intent.ACTION_VIEW, mapUrl);
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivity(intent);
-                }
+                openLocationOnMap();
                 return true;
             case R.id.action_view_facebook:
                 Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
@@ -255,7 +261,17 @@ public class EventInfoFragment extends StateFragment<
         TextView title = (TextView) rootView.findViewById(R.id.title);
         title.setText(event.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
-        location.setText(event.getLocation());
+        // Set location View to be linkable text
+
+        SpannableString ss = new SpannableString(event.getLocation());
+        ss.setSpan(new URLSpan("#"), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        location.setText(ss, TextView.BufferType.SPANNABLE);
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openLocationOnMap();
+            }
+        });
         TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
         startTime.setText(event.getStartTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);

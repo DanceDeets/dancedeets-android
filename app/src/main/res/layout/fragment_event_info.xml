@@ -42,8 +42,8 @@
             android:singleLine="true"
             android:text=""
             android:textSize="14sp"
-            android:autoLink="all"
             android:textIsSelectable="true"
+            android:clickable="true"
             />
 
         <TextView
