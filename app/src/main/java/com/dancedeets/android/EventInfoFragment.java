@@ -46,8 +46,8 @@ public class EventInfoFragment extends StateFragment<
 
     static protected class MyBundledState extends BundledState {
         FullEvent mEvent;
-        CharSequence mTranslatedTitle;
-        CharSequence mTranslatedDescription;
+        String mTranslatedTitle;
+        String mTranslatedDescription;
     }
 
     private static final String LOG_TAG = "EventInfoFragment";
@@ -190,8 +190,8 @@ public class EventInfoFragment extends StateFragment<
         titleView.setText(mBundled.mTranslatedTitle);
         descriptionView.setText(mBundled.mTranslatedDescription);
 
-        mBundled.mTranslatedTitle = oldTitle;
-        mBundled.mTranslatedDescription = oldDescription;
+        mBundled.mTranslatedTitle = oldTitle.toString();
+        mBundled.mTranslatedDescription = oldDescription.toString();
     }
 
     public void translatePage() {
