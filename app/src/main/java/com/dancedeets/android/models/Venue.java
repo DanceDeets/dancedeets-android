@@ -1,9 +1,13 @@
 package com.dancedeets.android.models;
 
+import android.text.TextUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Created by lambert on 2014/10/14.
@@ -47,6 +51,26 @@ public class Venue implements Serializable {
     protected String mZip;
     protected String mCountry;
 
+
+    public String getAddress() {
+        List<String> addressParts = new ArrayList<>();
+        if (mStreet != null) {
+            addressParts.add(mStreet);
+        }
+        if (mCity != null) {
+            addressParts.add(mCity);
+        }
+        if (mState != null) {
+            addressParts.add(mState);
+        }
+        if (mZip != null) {
+            addressParts.add(mZip);
+        }
+        if (mCountry != null) {
+            addressParts.add(mCountry);
+        }
+        return TextUtils.join(", ", addressParts);
+    }
 
     protected Venue() {
     }
