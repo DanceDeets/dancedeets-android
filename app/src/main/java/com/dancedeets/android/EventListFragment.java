@@ -155,7 +155,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         Log.i(LOG_TAG, "Address found: " + address);
         if (address != null) {
             String addressString;
-            if (address.getLocale() != null) {
+            if (address.getLocality() != null) {
                 addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
             } else {
                 addressString = address.getAdminArea() + ", " + address.getCountryCode();
