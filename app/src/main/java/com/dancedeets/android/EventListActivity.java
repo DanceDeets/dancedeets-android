@@ -2,6 +2,8 @@ package com.dancedeets.android;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -41,8 +43,18 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_event_list);
+        // Set (DEBUG) title
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            //The .debug specified in gradle
+            if (pInfo.packageName.equals("com.dancedeets.android.debug")) {
+                setTitle(getTitle() + " (DEBUG)");
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        setContentView(R.layout.activity_event_list);
 
         if (findViewById(R.id.event_info_fragment) != null) {
             // The detail container view will be present only in the

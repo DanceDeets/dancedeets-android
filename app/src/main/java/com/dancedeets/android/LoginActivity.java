@@ -1,6 +1,8 @@
 package com.dancedeets.android;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
@@ -94,6 +96,17 @@ public class LoginActivity extends FacebookActivity {
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+
+        // Set (DEBUG) title
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            //The .debug specified in gradle
+            if (pInfo.packageName.equals("com.dancedeets.android.debug")) {
+                setTitle(getTitle() + " (DEBUG)");
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         Intent intent = getIntent();
         int layoutId = R.layout.login;
