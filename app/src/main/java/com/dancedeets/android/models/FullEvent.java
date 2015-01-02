@@ -75,10 +75,10 @@ public class FullEvent extends Event {
         event.mLocation = event.mVenue.getName();
 
         if (jsonEvent.isNull("admins")) {
-            event.mAdminList = new ArrayList<NamedPerson>();
+            event.mAdminList = new ArrayList<>();
         } else {
             JSONArray jsonAdmins = jsonEvent.getJSONArray("admins");
-            event.mAdminList = new ArrayList<NamedPerson>(jsonAdmins.length());
+            event.mAdminList = new ArrayList<>(jsonAdmins.length());
             for (int i = 0; i < jsonAdmins.length(); i++) {
                 JSONObject jsonAdmin = jsonAdmins.getJSONObject(i);
                 NamedPerson admin = NamedPerson.parse(jsonAdmin);
