@@ -216,12 +216,6 @@ public class LoginActivity extends FacebookActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        ((DanceDeetsApp)getApplication()).getMixPanel().flush();
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.login_menu, menu);

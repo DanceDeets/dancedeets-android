@@ -100,6 +100,7 @@ public class FacebookActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        ((DanceDeetsApp)getApplication()).getMixPanel().flush();
         super.onDestroy();
         uiHelper.onDestroy();
     }
