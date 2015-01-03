@@ -29,19 +29,19 @@
     </item>
 
     <item
-        android:id="@+id/action_translate"
-        android:title="@string/menu_translate"
-        android:icon="@drawable/ic_menu_translate"
+        android:id="@+id/action_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share"
         android:showAsAction="ifRoom"
         >
     </item>
 
     <item
-        android:id="@+id/action_share"
-        android:icon="@android:drawable/ic_menu_share"
-        android:title="@string/menu_share"
+        android:id="@+id/action_translate"
+        android:title="@string/menu_translate"
+        android:icon="@drawable/ic_menu_translate"
         android:showAsAction="never"
-        android:actionProviderClass="android.widget.ShareActionProvider">
+        >
     </item>
 
 </menu>
