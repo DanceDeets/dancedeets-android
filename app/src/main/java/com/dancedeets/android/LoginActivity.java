@@ -16,9 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,12 +95,37 @@ public class LoginActivity extends FacebookActivity {
         }
     }
 
+    // Static context so we don't retain a reference to the possibly-destroyed Activity
+    static class MeCompleted implements Request.GraphUserCallback {
+
+        private final Session mSession;
+        private final MixpanelAPI mMixPanel;
+
+        MeCompleted(MixpanelAPI mixPanel, Session session) {
+            mMixPanel = mixPanel;
+            mSession = session;
+        }
+        @Override
+        public void onCompleted(GraphUser user, Response response) {
+            if (mSession == Session.getActiveSession()) {
+                if (user != null) {
+                    // When we log-in (auto or manual), dentify as this uid,
+                    // so all future events (across website and ios/android)
+                    // can be correlated with each other.
+                    mMixPanel.identify(user.getId());
+                }
+            }
+        }
+    }
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         // Don't call the super, since we don't want it sending us back to the LoginActivity when logged out
         // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
-            trackLoginState(true);
+            trackLoginNav("Logged In");
+
+            MixpanelAPI mixPanel = ((DanceDeetsApp) getApplication()).getMixPanel();
+            Request.executeBatchAsync(Request.newMeRequest(session, new MeCompleted(mixPanel, session)));
 
             FetchLocation fetchLocation = new FetchLocation();
             fetchLocation.onStart(this, new SendAuthRequest(session, fetchLocation));
