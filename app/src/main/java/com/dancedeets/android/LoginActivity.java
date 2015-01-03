@@ -20,6 +20,9 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.widget.LoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -27,7 +30,17 @@ public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
 
+    public void trackLoginNav(String page) {
+        try {
+            JSONObject props = new JSONObject();
+            props.put("Link", page);
+            ((DanceDeetsApp) getApplication()).getMixPanel().track("Login Nav", props);
+        } catch (JSONException e) {
+        }
+    }
+
     public void clickedExplainWhyLogin(View view) {
+        trackLoginNav("Explain Why Login");
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("ResourceID", R.layout.login_explain_why);
         intent.setAction(Intent.ACTION_DEFAULT);
@@ -35,6 +48,7 @@ public class LoginActivity extends FacebookActivity {
     }
 
     public void clickedUseWithoutFacebookLogin(View view) {
+        trackLoginNav("Use Without Facebook");
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("ResourceID", R.layout.login_use_without_facebook_login);
         intent.setAction(Intent.ACTION_DEFAULT);
@@ -42,6 +56,7 @@ public class LoginActivity extends FacebookActivity {
     }
 
     public void clickedUseWebsite(View view) {
+        trackLoginNav("Use Website");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.dancedeets.com/"));
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
@@ -81,6 +96,7 @@ public class LoginActivity extends FacebookActivity {
         // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
+            trackLoginState(true);
 
             FetchLocation fetchLocation = new FetchLocation();
             fetchLocation.onStart(this, new SendAuthRequest(session, fetchLocation));
@@ -149,8 +165,20 @@ public class LoginActivity extends FacebookActivity {
         }
 
         LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
+        authButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                trackLoginNav("Login Pressed");
+            }
+        });
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
         authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
+    }
+
+    @Override
+    protected void onDestroy() {
+        ((DanceDeetsApp)getApplication()).getMixPanel().flush();
+        super.onDestroy();
     }
 
     @Override

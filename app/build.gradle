@@ -49,6 +49,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:5.0.89'
     compile 'com.mcxiaoke.volley:library:1.0.6'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
+    compile 'com.mixpanel.android:mixpanel-android:4.5.0@aar'
     compile files('libs/Parse-1.7.0.jar')
     compile project(':facebook')
     // Even if we want the advanced features of junit, we can't import it here, or it conflicts with android's junit

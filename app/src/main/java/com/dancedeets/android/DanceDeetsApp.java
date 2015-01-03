@@ -6,6 +6,7 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 import io.fabric.sdk.android.Fabric;
@@ -16,6 +17,9 @@ import io.fabric.sdk.android.Fabric;
 public class DanceDeetsApp extends Application {
 
     public static final String SAVED_DATA_FILENAME = "SAVED_DATA";
+    public static final String PROD_MIXPANEL_TOKEN = "f5d9d18ed1bbe3b190f9c7c7388df243";
+    public static final String DEV_MIXPANEL_TOKEN = "f5d9d18ed1bbe3b190f9c7c7388df243";
+    private MixpanelAPI mMixPanel;
 
     @Override
     public void onCreate() {
@@ -23,6 +27,19 @@ public class DanceDeetsApp extends Application {
         Fabric.with(this, new Crashlytics());
         initializeGoogle();
         initializeParse();
+        mMixPanel = MixpanelAPI.getInstance(this, getMixPanelToken());
+    }
+
+    public String getMixPanelToken() {
+        if (BuildConfig.DEBUG) {
+            return DEV_MIXPANEL_TOKEN;
+        } else {
+            return PROD_MIXPANEL_TOKEN;
+        }
+    }
+
+    public MixpanelAPI getMixPanel() {
+        return mMixPanel;
     }
 
     protected void initializeGoogle() {

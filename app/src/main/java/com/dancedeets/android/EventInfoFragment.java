@@ -89,6 +89,22 @@ public class EventInfoFragment extends StateFragment<
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
 
+        // Tell analytics if someone hits the share button
+/*
+        ShareActionProvider shareActionProvider =
+        shareActionProvider.setOnShareTargetSelectedListener(
+                new ShareActionProvider.OnShareTargetSelectedListener() {
+                    @Override
+                    public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
+                                                         Intent intent) {
+                        //AnalyticsUtil.logAction(
+                        //        MainActivity .this, "sharing", "main-activity-action-bar");
+                        //return false;
+                    }
+                });
+*/
+        shareItem.setActionProvider(new ShareActionProvider(getActivity()));
+
         // Set up ShareActionProvider shareIntent
         ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
