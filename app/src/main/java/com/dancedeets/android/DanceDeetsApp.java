@@ -3,6 +3,7 @@ package com.dancedeets.android;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.models.FullEvent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
@@ -46,14 +47,27 @@ public class DanceDeetsApp extends Application {
         return mMixPanel;
     }
 
-    public void trackUINavigation(String page, String... keyValuePairs) {
+    public void track(String eventName, String... keyValuePairs) {
         try {
             JSONObject props = new JSONObject();
-            props.put("Page", page);
             for (int i=0; i<keyValuePairs.length; i+=2) {
                 props.put(keyValuePairs[i], keyValuePairs[i+1]);
             }
-            mMixPanel.track("Navigation", props);
+            mMixPanel.track(eventName, props);
+        } catch (JSONException e) {
+        }
+    }
+
+    public void trackEvent(String eventName, FullEvent event, String... keyValuePairs) {
+        try {
+            JSONObject props = new JSONObject();
+            props.put("Event", event.getId());
+            props.put("City", event.getVenue().getCityStateCountry());
+            props.put("Country", event.getVenue().getCountry());
+            for (int i=0; i<keyValuePairs.length; i+=2) {
+                props.put(keyValuePairs[i], keyValuePairs[i+1]);
+            }
+            mMixPanel.track(eventName, props);
         } catch (JSONException e) {
         }
     }

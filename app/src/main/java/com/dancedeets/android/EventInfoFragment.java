@@ -96,7 +96,7 @@ public class EventInfoFragment extends StateFragment<
                     @Override
                     public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
                                                          Intent intent) {
-                        trackAction("Share");
+                        trackAction("Share Event");
                         return false;
                     }
                 });
@@ -138,12 +138,7 @@ public class EventInfoFragment extends StateFragment<
     }
 
     protected void trackAction(String action) {
-        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
-                "Event Info Action",
-                "Action", action,
-                "Event", mBundled.mEvent.getId(),
-                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
-                "Country", mBundled.mEvent.getVenue().getCountry());
+        ((DanceDeetsApp)getActivity().getApplication()).trackEvent(action, mBundled.mEvent);
     }
 
     @Override
@@ -151,11 +146,11 @@ public class EventInfoFragment extends StateFragment<
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_view_map:
-                trackAction("Map");
+                trackAction("View on Map");
                 openLocationOnMap();
                 return true;
             case R.id.action_view_facebook:
-                trackAction("Facebook");
+                trackAction("Open in Facebook");
                 Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
                 intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -276,11 +271,7 @@ public class EventInfoFragment extends StateFragment<
                 container, false);
         FullEvent event = FullEvent.parse(getArguments());
         mBundled.mEvent = event;
-        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
-                "Event Info",
-                "Event", event.getId(),
-                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
-                "Country", mBundled.mEvent.getVenue().getCountry());
+        trackAction("View Event");
         fillOutView(rootView, event);
         return rootView;
     }

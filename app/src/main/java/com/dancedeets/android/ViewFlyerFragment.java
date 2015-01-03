@@ -85,7 +85,7 @@ public class ViewFlyerFragment extends StateFragment<
                     @Override
                     public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
                                                          Intent intent) {
-                        trackAction("Share Flyer");
+                        ((DanceDeetsApp)getActivity().getApplication()).trackEvent("Share Flyer", mBundled.mEvent);
                         return false;
                     }
                 });
@@ -102,15 +102,6 @@ public class ViewFlyerFragment extends StateFragment<
         if (mBitmap != null) {
             setupShareIntent();
         }
-    }
-
-    protected void trackAction(String action) {
-        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
-                "Event Info Action",
-                "Action", action,
-                "Event", mBundled.mEvent.getId(),
-                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
-                "Country", mBundled.mEvent.getVenue().getCountry());
     }
 
     static private void loadPhoto(String imageUrl, final RetainedState retainedState) {
@@ -147,7 +138,7 @@ public class ViewFlyerFragment extends StateFragment<
 
         loadPhoto(mBundled.mEvent.getCoverUrl(), mRetained);
 
-        trackAction("View Flyer");
+        ((DanceDeetsApp)getActivity().getApplication()).trackEvent("View Flyer", mBundled.mEvent);
 
         return mImageViewTouch;
     }

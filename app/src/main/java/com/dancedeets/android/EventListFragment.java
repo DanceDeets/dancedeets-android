@@ -192,10 +192,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         } else {
             fetchJsonData();
         }
-        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
-                "Event List",
-                "Location", location,
-                "Keywords", keywords);
     }
 
     //TODO: Add caching to the new code:
@@ -332,6 +328,11 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         mBundled.mEventList.clear();
         Log.i(LOG_TAG, "fetchJsonData");
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
+
+        ((DanceDeetsApp)getActivity().getApplication()).track(
+                "Search Events",
+                "Location", mBundled.mSearchOptions.location,
+                "Keywords", mBundled.mSearchOptions.keywords);
     }
 
     public static class ResultsReceivedHandler implements DanceDeetsApi.OnResultsReceivedListener {
