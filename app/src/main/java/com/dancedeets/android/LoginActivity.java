@@ -22,7 +22,6 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,18 +32,10 @@ import java.security.NoSuchAlgorithmException;
 public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
-
-    public void trackLoginNav(String page) {
-        try {
-            JSONObject props = new JSONObject();
-            props.put("Link", page);
-            ((DanceDeetsApp) getApplication()).getMixPanel().track("Login Nav", props);
-        } catch (JSONException e) {
-        }
-    }
+    private boolean mClickedLogin;
 
     public void clickedExplainWhyLogin(View view) {
-        trackLoginNav("Explain Why Login");
+        AnalyticsUtil.track("Login - Explain Why");
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("ResourceID", R.layout.login_explain_why);
         intent.setAction(Intent.ACTION_DEFAULT);
@@ -52,7 +43,7 @@ public class LoginActivity extends FacebookActivity {
     }
 
     public void clickedUseWithoutFacebookLogin(View view) {
-        trackLoginNav("Use Without Facebook");
+        AnalyticsUtil.track("Login - Without Facebook");
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("ResourceID", R.layout.login_use_without_facebook_login);
         intent.setAction(Intent.ACTION_DEFAULT);
@@ -60,7 +51,7 @@ public class LoginActivity extends FacebookActivity {
     }
 
     public void clickedUseWebsite(View view) {
-        trackLoginNav("Use Website");
+        AnalyticsUtil.track("Login - Use Website");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.dancedeets.com/"));
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
@@ -70,15 +61,13 @@ public class LoginActivity extends FacebookActivity {
     private static class SendAuthRequest implements FetchLocation.AddressListener {
         private static final String LOG_TAG = "SendAuthRequest";
 
-        private final MixpanelAPI mMixPanel;
         private final Session mSession;
         private final FetchLocation mFetchLocation;
 
-        SendAuthRequest(MixpanelAPI mixPanel, Session session, FetchLocation fetchLocation) {
+        SendAuthRequest(Session session, FetchLocation fetchLocation) {
             Log.i(LOG_TAG, "Received session " + session + ", with " + fetchLocation);
             mSession = session;
             mFetchLocation = fetchLocation;
-            mMixPanel = mixPanel;
         }
 
         @Override
@@ -92,9 +81,9 @@ public class LoginActivity extends FacebookActivity {
                 // Only do this if we have an address, so future events get tagged with the user's location
                 try {
                     JSONObject props = new JSONObject();
-                    props.put("City", addressString);
-                    props.put("Country", address.getCountryCode());
-                    mMixPanel.registerSuperProperties(props);
+                    props.put("GPS City", addressString);
+                    props.put("GPS Country", address.getCountryCode());
+                    AnalyticsUtil.setGlobalProperties(props);
                 } catch (JSONException e) {
                 }
             } else {
@@ -110,20 +99,18 @@ public class LoginActivity extends FacebookActivity {
     static class MeCompleted implements Request.GraphUserCallback {
 
         private final Session mSession;
-        private final MixpanelAPI mMixPanel;
 
-        MeCompleted(MixpanelAPI mixPanel, Session session) {
-            mMixPanel = mixPanel;
+        MeCompleted(Session session) {
             mSession = session;
         }
         @Override
         public void onCompleted(GraphUser user, Response response) {
             if (mSession == Session.getActiveSession()) {
                 if (user != null) {
-                    // When we log-in (auto or manual), dentify as this uid,
+                    // When we log-in (auto or manual), identify as this uid,
                     // so all future events (across website and ios/android)
                     // can be correlated with each other.
-                    mMixPanel.identify(user.getId());
+                    AnalyticsUtil.login(user.getId());
                 }
             }
         }
@@ -133,13 +120,15 @@ public class LoginActivity extends FacebookActivity {
         // super.onSessionStateChange(session, state, exception);
         if (state.isOpened()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
-            trackLoginNav("Logged In");
+            // Only post Complete! events for people who clicked login (no autologin!)
+            if (mClickedLogin) {
+                AnalyticsUtil.track("Login - Completed");
+            }
 
-            MixpanelAPI mixPanel = ((DanceDeetsApp) getApplication()).getMixPanel();
-            Request.executeBatchAsync(Request.newMeRequest(session, new MeCompleted(mixPanel, session)));
+            Request.executeBatchAsync(Request.newMeRequest(session, new MeCompleted(session)));
 
             FetchLocation fetchLocation = new FetchLocation();
-            fetchLocation.onStart(this, new SendAuthRequest(mixPanel, session, fetchLocation));
+            fetchLocation.onStart(this, new SendAuthRequest(session, fetchLocation));
 
             Intent intent = new Intent(this, EventListActivity.class);
             intent.setAction(Intent.ACTION_DEFAULT);
@@ -157,6 +146,11 @@ public class LoginActivity extends FacebookActivity {
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+
+        Session cachedSession = Session.openActiveSessionFromCache(this);
+        if (cachedSession == null) {
+            AnalyticsUtil.track("Login - Not Logged In");
+        }
 
         // Set (DEBUG) title
         try {
@@ -208,7 +202,8 @@ public class LoginActivity extends FacebookActivity {
         authButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                trackLoginNav("Login Pressed");
+                mClickedLogin = true;
+                AnalyticsUtil.track("Login - FBLogin Button Pressed");
             }
         });
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?

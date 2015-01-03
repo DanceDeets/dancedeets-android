@@ -96,7 +96,7 @@ public class EventInfoFragment extends StateFragment<
                     @Override
                     public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
                                                          Intent intent) {
-                        trackAction("Share Event");
+                        AnalyticsUtil.trackEvent("Share Event", mBundled.mEvent);
                         return false;
                     }
                 });
@@ -137,20 +137,16 @@ public class EventInfoFragment extends StateFragment<
         }
     }
 
-    protected void trackAction(String action) {
-        ((DanceDeetsApp)getActivity().getApplication()).trackEvent(action, mBundled.mEvent);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_view_map:
-                trackAction("View on Map");
+                AnalyticsUtil.trackEvent("View on Map", mBundled.mEvent);
                 openLocationOnMap();
                 return true;
             case R.id.action_view_facebook:
-                trackAction("Open in Facebook");
+                AnalyticsUtil.trackEvent("Open in Facebook", mBundled.mEvent);
                 Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
                 intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -158,11 +154,11 @@ public class EventInfoFragment extends StateFragment<
                 }
                 return true;
             case R.id.action_translate:
-                trackAction("Translate");
+                AnalyticsUtil.trackEvent("Translate", mBundled.mEvent);
                 translatePage();
                 return true;
             case R.id.action_add_to_calendar:
-                trackAction("Add to Calendar");
+                AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getLocation());
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
@@ -271,7 +267,7 @@ public class EventInfoFragment extends StateFragment<
                 container, false);
         FullEvent event = FullEvent.parse(getArguments());
         mBundled.mEvent = event;
-        trackAction("View Event");
+        AnalyticsUtil.trackEvent("View Event", mBundled.mEvent);
         fillOutView(rootView, event);
         return rootView;
     }

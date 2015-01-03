@@ -26,7 +26,7 @@ public class FacebookActivity extends Activity {
             Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
 
             // Reset the user id, now that they've logged out
-            ((DanceDeetsApp)getApplication()).getMixPanel().reset();
+            AnalyticsUtil.logout();
 
             // On logout, send them back to the login screen.
             Intent intent = new Intent(this, LoginActivity.class);
@@ -100,7 +100,7 @@ public class FacebookActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        ((DanceDeetsApp)getApplication()).getMixPanel().flush();
+        AnalyticsUtil.flush();
         super.onDestroy();
         uiHelper.onDestroy();
     }

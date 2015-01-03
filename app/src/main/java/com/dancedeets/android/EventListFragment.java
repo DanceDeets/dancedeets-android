@@ -329,8 +329,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         Log.i(LOG_TAG, "fetchJsonData");
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
 
-        ((DanceDeetsApp)getActivity().getApplication()).track(
-                "Search Events",
+        AnalyticsUtil.track("Search Events",
                 "Location", mBundled.mSearchOptions.location,
                 "Keywords", mBundled.mSearchOptions.keywords);
     }

@@ -85,7 +85,7 @@ public class ViewFlyerFragment extends StateFragment<
                     @Override
                     public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
                                                          Intent intent) {
-                        ((DanceDeetsApp)getActivity().getApplication()).trackEvent("Share Flyer", mBundled.mEvent);
+                        AnalyticsUtil.trackEvent("Share Flyer", mBundled.mEvent);
                         return false;
                     }
                 });
@@ -138,7 +138,7 @@ public class ViewFlyerFragment extends StateFragment<
 
         loadPhoto(mBundled.mEvent.getCoverUrl(), mRetained);
 
-        ((DanceDeetsApp)getActivity().getApplication()).trackEvent("View Flyer", mBundled.mEvent);
+        AnalyticsUtil.trackEvent("View Flyer", mBundled.mEvent);
 
         return mImageViewTouch;
     }
