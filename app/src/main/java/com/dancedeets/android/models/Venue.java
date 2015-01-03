@@ -103,6 +103,32 @@ public class Venue implements Serializable {
         return mName;
     }
 
+    public String getCityStateCountry() {
+        List<String> addressParts = new ArrayList<>();
+        if (mCity != null) {
+            addressParts.add(mCity);
+        }
+        if (mState != null) {
+            addressParts.add(mState);
+        }
+        if (mCountry != null) {
+            addressParts.add(mCountry);
+        }
+        return TextUtils.join(", ", addressParts);
+    }
+
+    public String getCountry() {
+        List<String> addressParts = new ArrayList<>();
+        if (mState != null) {
+            addressParts.add(mState);
+        }
+        if (mCountry != null) {
+            addressParts.add(mCountry);
+        }
+        return TextUtils.join(", ", addressParts);
+    }
+
+
     public LatLong getLatLong() {
         return mLatLong;
     }

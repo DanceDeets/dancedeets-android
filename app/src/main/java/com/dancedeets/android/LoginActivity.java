@@ -70,13 +70,15 @@ public class LoginActivity extends FacebookActivity {
     private static class SendAuthRequest implements FetchLocation.AddressListener {
         private static final String LOG_TAG = "SendAuthRequest";
 
+        private final MixpanelAPI mMixPanel;
         private final Session mSession;
         private final FetchLocation mFetchLocation;
 
-        SendAuthRequest(Session session, FetchLocation fetchLocation) {
+        SendAuthRequest(MixpanelAPI mixPanel, Session session, FetchLocation fetchLocation) {
             Log.i(LOG_TAG, "Received session " + session + ", with " + fetchLocation);
             mSession = session;
             mFetchLocation = fetchLocation;
+            mMixPanel = mixPanel;
         }
 
         @Override
@@ -86,6 +88,15 @@ public class LoginActivity extends FacebookActivity {
             String addressString = null;
             if (address != null) {
                 addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+
+                // Only do this if we have an address, so future events get tagged with the user's location
+                try {
+                    JSONObject props = new JSONObject();
+                    props.put("City", addressString);
+                    props.put("Country", address.getCountryCode());
+                    mMixPanel.registerSuperProperties(props);
+                } catch (JSONException e) {
+                }
             } else {
                 Log.e(LOG_TAG, "Failed to get address from server, sending update with empty location.");
             }
@@ -128,7 +139,7 @@ public class LoginActivity extends FacebookActivity {
             Request.executeBatchAsync(Request.newMeRequest(session, new MeCompleted(mixPanel, session)));
 
             FetchLocation fetchLocation = new FetchLocation();
-            fetchLocation.onStart(this, new SendAuthRequest(session, fetchLocation));
+            fetchLocation.onStart(this, new SendAuthRequest(mixPanel, session, fetchLocation));
 
             Intent intent = new Intent(this, EventListActivity.class);
             intent.setAction(Intent.ACTION_DEFAULT);

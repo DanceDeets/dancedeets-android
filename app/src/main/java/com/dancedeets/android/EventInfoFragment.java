@@ -89,24 +89,19 @@ public class EventInfoFragment extends StateFragment<
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
 
-        // Tell analytics if someone hits the share button
-/*
-        ShareActionProvider shareActionProvider =
+        ShareActionProvider shareActionProvider = (ShareActionProvider)shareItem.getActionProvider();
+        // Track share item clicks
         shareActionProvider.setOnShareTargetSelectedListener(
                 new ShareActionProvider.OnShareTargetSelectedListener() {
                     @Override
                     public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
                                                          Intent intent) {
-                        //AnalyticsUtil.logAction(
-                        //        MainActivity .this, "sharing", "main-activity-action-bar");
-                        //return false;
+                        trackAction("Share");
+                        return false;
                     }
                 });
-*/
-        shareItem.setActionProvider(new ShareActionProvider(getActivity()));
 
         // Set up ShareActionProvider shareIntent
-        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         Intent intent = new Intent(Intent.ACTION_SEND);
         // We need to keep this as text/plain, not text/html, so we get the full set of apps to share to.
         intent.setType("text/plain");
@@ -142,14 +137,25 @@ public class EventInfoFragment extends StateFragment<
         }
     }
 
+    protected void trackAction(String action) {
+        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
+                "Event Info Action",
+                "Action", action,
+                "Event", mBundled.mEvent.getId(),
+                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
+                "Country", mBundled.mEvent.getVenue().getCountry());
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_view_map:
+                trackAction("Map");
                 openLocationOnMap();
                 return true;
             case R.id.action_view_facebook:
+                trackAction("Facebook");
                 Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
                 intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -157,9 +163,11 @@ public class EventInfoFragment extends StateFragment<
                 }
                 return true;
             case R.id.action_translate:
+                trackAction("Translate");
                 translatePage();
                 return true;
             case R.id.action_add_to_calendar:
+                trackAction("Add to Calendar");
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getLocation());
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
@@ -268,6 +276,11 @@ public class EventInfoFragment extends StateFragment<
                 container, false);
         FullEvent event = FullEvent.parse(getArguments());
         mBundled.mEvent = event;
+        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
+                "Event Info",
+                "Event", event.getId(),
+                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
+                "Country", mBundled.mEvent.getVenue().getCountry());
         fillOutView(rootView, event);
         return rootView;
     }

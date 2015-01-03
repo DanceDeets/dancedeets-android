@@ -192,6 +192,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         } else {
             fetchJsonData();
         }
+        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
+                "Event List",
+                "Location", location,
+                "Keywords", keywords);
     }
 
     //TODO: Add caching to the new code:

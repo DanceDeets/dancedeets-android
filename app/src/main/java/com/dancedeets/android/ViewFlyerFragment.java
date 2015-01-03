@@ -79,6 +79,17 @@ public class ViewFlyerFragment extends StateFragment<
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        // Track share item clicks
+        mShareActionProvider.setOnShareTargetSelectedListener(
+                new ShareActionProvider.OnShareTargetSelectedListener() {
+                    @Override
+                    public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
+                                                         Intent intent) {
+                        trackAction("Share Flyer");
+                        return false;
+                    }
+                });
+
         // We need to set a different history file name, as Android only stores one ShareIntent per ShareHistoryFileName.
         // This means the EventInfoFragment ShareIntent is overwritten by the ViewFlyerFragment ShareIntent,
         // and when the user navigates up/back, it uses the wrong ShareIntent.
@@ -91,6 +102,15 @@ public class ViewFlyerFragment extends StateFragment<
         if (mBitmap != null) {
             setupShareIntent();
         }
+    }
+
+    protected void trackAction(String action) {
+        ((DanceDeetsApp)getActivity().getApplication()).trackUINavigation(
+                "Event Info Action",
+                "Action", action,
+                "Event", mBundled.mEvent.getId(),
+                "City", mBundled.mEvent.getVenue().getCityStateCountry(),
+                "Country", mBundled.mEvent.getVenue().getCountry());
     }
 
     static private void loadPhoto(String imageUrl, final RetainedState retainedState) {
@@ -126,6 +146,9 @@ public class ViewFlyerFragment extends StateFragment<
         mImageViewTouch.setBackgroundColor(Color.BLACK);
 
         loadPhoto(mBundled.mEvent.getCoverUrl(), mRetained);
+
+        trackAction("View Flyer");
+
         return mImageViewTouch;
     }
 

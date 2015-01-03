@@ -9,9 +9,6 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by lambert on 2014/11/08.
  */
@@ -22,22 +19,15 @@ public class FacebookActivity extends Activity {
     private SessionState mLastSessionState;
     private String mLastSessionToken;
 
-    public void trackLoginState(boolean state) {
-        try {
-            JSONObject props = new JSONObject();
-            props.put("Logged-In", state);
-            ((DanceDeetsApp) getApplication()).getMixPanel().track("Login State", props);
-        } catch (JSONException e) {
-        }
-    }
-
     protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (state.isOpened()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
         } else if (state.isClosed()) {
             Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
 
-            trackLoginState(false);
+            // Reset the user id, now that they've logged out
+            ((DanceDeetsApp)getApplication()).getMixPanel().reset();
+
             // On logout, send them back to the login screen.
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setAction(Intent.ACTION_MAIN);
