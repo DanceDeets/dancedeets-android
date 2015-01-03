@@ -94,13 +94,6 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             mBundled = (MyBundledState) savedInstanceState.getSerializable(tag);
             initializeViewPagerWithBundledState();
         }
-
-        if (savedInstanceState == null) {
-            // TODO: PARSE
-            // Map<String,String> dimensions = new HashMap<String, String>();
-            // dimensions.put("Fragment", "Event Info");
-            // ParseAnalytics.trackEvent("Fragment", dimensions);
-        }
     }
 
     @Override

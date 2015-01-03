@@ -16,8 +16,6 @@ import com.dancedeets.android.models.FullEvent;
 import com.facebook.Session;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class EventListActivity extends FacebookActivity implements EventListFragment.Callbacks {
@@ -29,14 +27,6 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
      * device.
      */
     private boolean mTwoPane;
-
-    public void onStart() {
-        super.onStart();
-        Map<String, String> dimensions = new HashMap<String, String>();
-        dimensions.put("Fragment", "Event List");
-        //TODO: PARSE
-        // ParseAnalytics.trackEvent("Fragment", dimensions);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +61,6 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
 
         if (savedInstanceState == null) {
             handleIntent(getIntent());
-            //TODO: PARSE
-            // ParseAnalytics.trackAppOpened(getIntent());
         }
     }
 
