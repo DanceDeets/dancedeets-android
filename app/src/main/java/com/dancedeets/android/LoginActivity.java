@@ -110,7 +110,7 @@ public class LoginActivity extends FacebookActivity {
                     // When we log-in (auto or manual), identify as this uid,
                     // so all future events (across website and ios/android)
                     // can be correlated with each other.
-                    AnalyticsUtil.login(user.getId());
+                    AnalyticsUtil.login(user);
                 }
             }
         }
