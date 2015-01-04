@@ -2,28 +2,30 @@ package com.dancedeets.android;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.internal.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.util.Log;
 
-import com.dancedeets.android.models.Event;
-import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
-import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
+import com.android.support.test.deps.guava.base.Charsets;
+import com.android.support.test.deps.guava.io.Resources;
+import com.dancedeets.android.models.FullEvent;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.registerIdlingResources;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.doubleClick;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.test.TouchUtils.dragQuarterScreenDown;
 import static android.test.TouchUtils.dragQuarterScreenUp;
-import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
-import static com.google.android.apps.common.testing.ui.espresso.Espresso.registerIdlingResources;
-import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
-import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.doubleClick;
-import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withClassName;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -56,10 +58,13 @@ public class EventInfoActivityTest extends CommonActivityTest<EventInfoActivity>
     public Intent getStartIntent() throws Exception {
         String json = Resources.toString(getClass().getResource("local_volley/feed"), Charsets.UTF_8);
         JSONObject jsonObject = (JSONObject) new JSONArray(json).get(0);
-        Event event = Event.parse(jsonObject);
+        FullEvent event = FullEvent.parse(jsonObject);
 
-        String[] eventIdList = new String[]{"event1", "event2", "event3"};
-        Intent intent = EventInfoActivity.buildIntentFor(getInstrumentation().getTargetContext(), eventIdList, 0, event);
+        ArrayList<FullEvent> eventList = new ArrayList<>();
+        eventList.add(event);
+        eventList.add(event);
+        eventList.add(event);
+        Intent intent = EventInfoActivity.buildIntentFor(getInstrumentation().getTargetContext(), eventList, 0);
         return intent;
     }
 

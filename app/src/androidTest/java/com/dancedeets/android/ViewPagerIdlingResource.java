@@ -2,17 +2,16 @@ package com.dancedeets.android;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.support.test.espresso.IdlingResource;
+import android.support.test.runner.lifecycle.ActivityLifecycleCallback;
+import android.support.test.runner.lifecycle.Stage;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Scroller;
 
-import com.google.android.apps.common.testing.testrunner.ActivityLifecycleCallback;
-import com.google.android.apps.common.testing.testrunner.Stage;
-import com.google.android.apps.common.testing.ui.espresso.IdlingResource;
-
 import java.lang.reflect.Field;
 
-import static com.google.android.apps.common.testing.testrunner.util.Checks.checkNotNull;
+import static android.support.test.internal.util.Checks.checkNotNull;
 
 /**
  * Created by lambert on 2014/11/06.

@@ -3,17 +3,17 @@ package com.dancedeets.android;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.test.espresso.IdlingResource;
 import android.util.Log;
 
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.google.android.apps.common.testing.ui.espresso.IdlingResource;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
-import static com.google.android.apps.common.testing.testrunner.util.Checks.checkNotNull;
+import static android.support.test.internal.util.Checks.checkNotNull;
 
 /**
  * Created by lambert on 2014/10/28.

@@ -3,6 +3,10 @@ package com.dancedeets.android;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.test.espresso.Espresso;
+import android.support.test.internal.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.ActivityLifecycleCallback;
+import android.support.test.runner.lifecycle.Stage;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 
@@ -11,10 +15,6 @@ import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
-import com.google.android.apps.common.testing.testrunner.ActivityLifecycleCallback;
-import com.google.android.apps.common.testing.testrunner.ActivityLifecycleMonitorRegistry;
-import com.google.android.apps.common.testing.testrunner.Stage;
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
 
 import org.hamcrest.Matcher;
 
