@@ -20,8 +20,10 @@ public class AnalyticsUtil {
 
     private static final String LOG_TAG = "AnalyticsUtil";
 
-    public static final String PROD_MIXPANEL_TOKEN = "f5d9d18ed1bbe3b190f9c7c7388df243";
-    public static final String DEV_MIXPANEL_TOKEN = "668941ad91e251d2ae9408b1ea80f67b";
+    private static final String PROD_MIXPANEL_TOKEN = "f5d9d18ed1bbe3b190f9c7c7388df243";
+    private static final String DEV_MIXPANEL_TOKEN = "668941ad91e251d2ae9408b1ea80f67b";
+    private static final String GOOGLE_PROJECT_ID = "911140565156";
+
     private static MixpanelAPI mMixPanel;
 
     private static String getMixPanelToken() {
@@ -32,7 +34,7 @@ public class AnalyticsUtil {
         }
     }
 
-    private AnalyticsUtil(Context context) {
+    private AnalyticsUtil() {
     }
 
     public static void createInstance(Context context) {
@@ -51,6 +53,8 @@ public class AnalyticsUtil {
 
     public static void login(GraphUser user) {
         mMixPanel.identify(user.getId());
+        // Register for notifications
+        mMixPanel.getPeople().initPushHandling(GOOGLE_PROJECT_ID);
 
         MixpanelAPI.People people = mMixPanel.getPeople();
         people.identify(user.getId());
