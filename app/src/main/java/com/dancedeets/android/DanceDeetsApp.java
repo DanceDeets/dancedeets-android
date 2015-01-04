@@ -6,8 +6,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
-import com.parse.Parse;
-import com.parse.ParseInstallation;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -23,7 +21,6 @@ public class DanceDeetsApp extends Application {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
         initializeGoogle();
-        initializeParse();
         AnalyticsUtil.createInstance(getApplicationContext());
     }
 
@@ -33,11 +30,6 @@ public class DanceDeetsApp extends Application {
         GoogleAnalytics.getInstance(this).enableAutoActivityReports(this);
         Tracker gaTracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.activity_tracker);
         gaTracker.enableAutoActivityTracking(true);
-    }
-
-    protected void initializeParse() {
-        Parse.initialize(this, "pTFDiCGQv0TJ3z3TwBaMdnEIhXYCa9bD9g6GPNNH", "gIYvPu8KgIizCu19a9UW7QrugJlXzBGQPpyxIHyC");
-        ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 
 }
