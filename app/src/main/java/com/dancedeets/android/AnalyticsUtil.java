@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.dancedeets.android.models.FullEvent;
 import com.facebook.model.GraphUser;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import org.json.JSONException;
@@ -25,6 +28,8 @@ public class AnalyticsUtil {
     private static final String GOOGLE_PROJECT_ID = "911140565156";
 
     private static MixpanelAPI mMixPanel;
+    private static GoogleAnalytics mGoogleAnalytics;
+    private static Tracker mGoogleTracker;
 
     private static String getMixPanelToken() {
         if (BuildConfig.DEBUG) {
@@ -41,14 +46,17 @@ public class AnalyticsUtil {
         if (mMixPanel == null) {
             mMixPanel = MixpanelAPI.getInstance(context, getMixPanelToken());
         }
-    }
-
-    public static void logout() {
-        mMixPanel.reset();
+        if (mGoogleAnalytics == null) {
+            mGoogleAnalytics = GoogleAnalytics.getInstance(context);
+            //mGoogleAnalytics.setDryRun(false);
+            //mGoogleAnalytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+            mGoogleTracker = mGoogleAnalytics.newTracker(R.xml.global_tracker);
+        }
     }
 
     public static void flush() {
         mMixPanel.flush();
+        mGoogleAnalytics.dispatchLocalHits();
     }
 
     public static void login(GraphUser user) {
@@ -68,6 +76,13 @@ public class AnalyticsUtil {
         String today = DateFormat.format("yyyy-MM-dd'T'HH:mm:ss", Calendar.getInstance()).toString();
         people.set("Last Login", today);
         people.setOnce("$created", today);
+
+        // Google Analytics doesn't do per-user tracking
+    }
+
+    public static void logout() {
+        mMixPanel.reset();
+        //Google Analytics doesn't do any per-user tracking, so there's no per-user logout either
     }
 
     public static void setGlobalProperties(JSONObject props) {
@@ -86,6 +101,10 @@ public class AnalyticsUtil {
             mMixPanel.track(eventName, props);
         } catch (JSONException e) {
         }
+
+        mGoogleTracker.send(new HitBuilders.EventBuilder()
+                .setCategory(eventName)
+                .build());
     }
 
     public static void trackEvent(String eventName, FullEvent event, String... keyValuePairs) {
@@ -100,6 +119,12 @@ public class AnalyticsUtil {
             mMixPanel.track(eventName, props);
         } catch (JSONException e) {
         }
+
+        mGoogleTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Event")
+                .setAction(eventName)
+                .setLabel(event.getVenue().getCityStateCountry())
+                .build());
     }
 
 }

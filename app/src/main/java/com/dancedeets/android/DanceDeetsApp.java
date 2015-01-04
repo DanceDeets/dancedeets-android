@@ -14,8 +14,6 @@ import io.fabric.sdk.android.Fabric;
  */
 public class DanceDeetsApp extends Application {
 
-    public static final String SAVED_DATA_FILENAME = "SAVED_DATA";
-
     @Override
     public void onCreate() {
         super.onCreate();
