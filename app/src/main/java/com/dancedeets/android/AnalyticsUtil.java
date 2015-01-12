@@ -1,7 +1,6 @@
 package com.dancedeets.android;
 
 import android.content.Context;
-import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.dancedeets.android.models.FullEvent;
@@ -14,6 +13,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -73,7 +73,10 @@ public class AnalyticsUtil {
         people.set("FB Locale", user.getProperty("locale"));
         people.set("FB Timezone", user.getProperty("timezone"));
         people.set("$email", user.getProperty("email"));
-        String today = DateFormat.format("yyyy-MM-dd'T'HH:mm:ss", Calendar.getInstance()).toString();
+        // Use SimpleDateFormat instead of DateFormat,
+        // since older APIs' DateFormat doesn't support HH (just a hacked kk).
+        SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String today = df.format(Calendar.getInstance().getTime());
         people.set("Last Login", today);
         people.setOnce("$created", today);
 
