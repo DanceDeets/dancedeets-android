@@ -77,16 +77,16 @@ public class LoginActivity extends FacebookActivity {
             String addressString = null;
             if (address != null) {
                 if (address.getLocality() != null) {
-                    addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                    addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
                 } else {
-                    addressString = address.getAdminArea() + ", " + address.getCountryCode();
+                    addressString = address.getAdminArea() + ", " + address.getCountryName();
                 }
 
                 // Only do this if we have an address, so future events get tagged with the user's location
                 try {
                     JSONObject props = new JSONObject();
                     props.put("GPS City", addressString);
-                    props.put("GPS Country", address.getCountryCode());
+                    props.put("GPS Country", address.getCountryName());
                     AnalyticsUtil.setGlobalProperties(props);
                 } catch (JSONException e) {
                 }

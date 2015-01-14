@@ -156,9 +156,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         if (address != null) {
             String addressString;
             if (address.getLocality() != null) {
-                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
             } else {
-                addressString = address.getAdminArea() + ", " + address.getCountryCode();
+                addressString = address.getAdminArea() + ", " + address.getCountryName();
             }
             startSearchFor(addressString, "");
         } else {
