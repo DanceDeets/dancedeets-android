@@ -76,7 +76,11 @@ public class LoginActivity extends FacebookActivity {
 
             String addressString = null;
             if (address != null) {
-                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                if (address.getLocality() != null) {
+                    addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryCode();
+                } else {
+                    addressString = address.getAdminArea() + ", " + address.getCountryCode();
+                }
 
                 // Only do this if we have an address, so future events get tagged with the user's location
                 try {
