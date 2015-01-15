@@ -88,7 +88,7 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         if (address.getCountryName() != null) {
             components.add(address.getCountryName());
         }
-        return TextUtils.join(",", components);
+        return TextUtils.join(", ", components);
     }
 
     private void onAddressFound(Address address) {
