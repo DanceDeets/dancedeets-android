@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Created by lambert on 2015/01/03.
@@ -76,6 +77,7 @@ public class AnalyticsUtil {
         // Use SimpleDateFormat instead of DateFormat,
         // since older APIs' DateFormat doesn't support HH (just a hacked kk).
         SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
         String today = df.format(Calendar.getInstance().getTime());
         people.set("Last Login", today);
         people.setOnce("$created", today);
