@@ -152,14 +152,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     @Override
     public void onAddressFound(Location location, Address address) {
-        Log.i(LOG_TAG, "Address found: " + address);
+        String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
+        Log.i(LOG_TAG, "Address found: " + address + optionalSubLocality);
         if (address != null) {
-            String addressString;
-            if (address.getLocality() != null) {
-                addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
-            } else {
-                addressString = address.getAdminArea() + ", " + address.getCountryName();
-            }
+            String addressString = FetchLocation.formatAddress(address);
             startSearchFor(addressString, "");
         } else {
             if (location == null) {

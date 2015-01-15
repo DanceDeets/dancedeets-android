@@ -48,8 +48,7 @@ public abstract class ReverseGeocodeTask extends
             /*
              * Return 1 address.
              */
-            addresses = mGeocoder.getFromLocation(loc.getLatitude(),
-                    loc.getLongitude(), 1);
+            addresses = mGeocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
         } catch (IOException e1) {
             Log.e(LOG_TAG,
                     "IO Exception in getFromLocation()");

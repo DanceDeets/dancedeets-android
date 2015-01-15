@@ -72,15 +72,13 @@ public class LoginActivity extends FacebookActivity {
 
         @Override
         public void onAddressFound(Location location, Address address) {
-            Log.i(LOG_TAG, "onAddressFound with location: " + location + ", address: " + address);
+            // We special-case this because the address.toString() omits SubLocality for some reason, and it's useful to us.
+            String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
+            Log.i(LOG_TAG, "onAddressFound with location: " + location + ", address: " + address + optionalSubLocality);
 
             String addressString = null;
             if (address != null) {
-                if (address.getLocality() != null) {
-                    addressString = address.getLocality() + ", " + address.getAdminArea() + ", " + address.getCountryName();
-                } else {
-                    addressString = address.getAdminArea() + ", " + address.getCountryName();
-                }
+                addressString = FetchLocation.formatAddress(address);
 
                 // Only do this if we have an address, so future events get tagged with the user's location
                 try {
