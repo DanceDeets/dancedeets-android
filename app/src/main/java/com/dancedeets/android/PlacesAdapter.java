@@ -36,6 +36,7 @@ public class PlacesAdapter extends BaseAdapter implements Filterable {
         super();
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = resource;
+        mResultList = new ArrayList<>();
     }
 
     @Override
