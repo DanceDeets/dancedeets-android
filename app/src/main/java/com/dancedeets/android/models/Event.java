@@ -22,7 +22,6 @@ public class Event extends IdEvent {
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     protected String mTitle;
-    protected String mLocation;
     protected String mDescription;
     protected long mStartTime;
     protected long mEndTime;
@@ -49,7 +48,6 @@ public class Event extends IdEvent {
 
         event.mId = jsonEvent.getString("id");
         event.mTitle = jsonEvent.getString("title");
-        event.mLocation = jsonEvent.getString("location");
         event.mDescription = jsonEvent.getString("description");
 
         String startTimeString = jsonEvent.getString("start_time");
@@ -140,10 +138,6 @@ public class Event extends IdEvent {
         }
     }
 
-    public String getLocation() {
-        return mLocation;
-    }
-
     public String getDescription() {
         return mDescription;
     }
@@ -155,7 +149,6 @@ public class Event extends IdEvent {
         Event other = (Event)o;
         return (super.equals(o) &&
                 mTitle.equals(other.mTitle) &&
-                mLocation.equals(other.mLocation) &&
                 mDescription.equals(other.mDescription) &&
                 (mImageUrl == null ? other.mImageUrl == null : mImageUrl.equals(other.mImageUrl)) &&
                 (mCoverUrl == null ? other.mCoverUrl == null : mCoverUrl.equals(other.mCoverUrl)) &&

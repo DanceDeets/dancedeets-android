@@ -68,7 +68,11 @@ public class EventUIAdapter extends BaseAdapter {
             viewBinder.cover.setImageUrl(event.getCoverUrl(), thumbnailLoader);
         }
         viewBinder.title.setText(event.getTitle());
-        viewBinder.location.setText(event.getLocation());
+        if (event.getVenue().hasName()) {
+            viewBinder.location.setText(event.getVenue().getName());
+        } else {
+            viewBinder.location.setText("");
+        }
         viewBinder.startTime.setText(event.getStartTimeString());
     }
 

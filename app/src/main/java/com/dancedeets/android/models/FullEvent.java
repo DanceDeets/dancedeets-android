@@ -72,7 +72,6 @@ public class FullEvent extends Event {
 
         JSONObject jsonVenue = jsonEvent.getJSONObject("venue");
         event.mVenue = Venue.parse(jsonVenue);
-        event.mLocation = event.mVenue.getName();
 
         if (jsonEvent.isNull("admins")) {
             event.mAdminList = new ArrayList<>();

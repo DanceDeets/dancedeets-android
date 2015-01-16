@@ -83,7 +83,7 @@ public class Venue implements Serializable {
         // "id": "158623004183893"},
 
         venue.mId = jsonObject.optString("id", null);
-        venue.mName = jsonObject.getString("name");
+        venue.mName = jsonObject.optString("name", null);
         if (!jsonObject.isNull("geocode")) {
             JSONObject geocode = jsonObject.getJSONObject("geocode");
             venue.mLatLong = new LatLong(geocode.getDouble("latitude"), geocode.getDouble("longitude"));
@@ -101,6 +101,10 @@ public class Venue implements Serializable {
 
     public String getName() {
         return mName;
+    }
+
+    public boolean hasName() {
+        return mName != null && !mName.isEmpty();
     }
 
     public String getCityStateCountry() {

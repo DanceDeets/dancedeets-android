@@ -130,7 +130,11 @@ public class EventInfoFragment extends StateFragment<
          * We don't want to do a search around it because of #1 and #2 will search for the wrong things.
          * So instead, the best we can do is to label the lat/long point
          **/
-        Uri mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + "(" + Uri.encode(venue.getName())+")");
+        String venueSuffix = "";
+        if (getEvent().getVenue().hasName()) {
+            venueSuffix = "(" + Uri.encode(getEvent().getVenue().getName())+")";
+        }
+        Uri mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + venueSuffix);
         Intent intent = new Intent(Intent.ACTION_VIEW, mapUrl);
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);
@@ -160,7 +164,9 @@ public class EventInfoFragment extends StateFragment<
             case R.id.action_add_to_calendar:
                 AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getLocation());
+                if (getEvent().getVenue().hasName()) {
+                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getName());
+                }
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
@@ -291,11 +297,15 @@ public class EventInfoFragment extends StateFragment<
         TextView title = (TextView) rootView.findViewById(R.id.title);
         title.setText(event.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
-        // Set location View to be linkable text
 
-        SpannableString ss = new SpannableString(event.getLocation());
-        ss.setSpan(new URLSpan("#"), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        location.setText(ss, TextView.BufferType.SPANNABLE);
+        if (event.getVenue().hasName()) {
+            // Set location View to be linkable text
+            SpannableString ss = new SpannableString(event.getVenue().getName());
+            ss.setSpan(new URLSpan("#"), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            location.setText(ss, TextView.BufferType.SPANNABLE);
+        } else {
+            location.setText("");
+        }
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

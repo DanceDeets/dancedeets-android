@@ -13,11 +13,14 @@ public class EventSharing {
     public static String getBodyText(FullEvent event) {
         //TODO: Localize this.
         //TODO: Fill out location with proper data
-        return "Check out this dance event!" +
+        String result = "Check out this dance event!" +
                 "\n" + event.getUrl() +
                 "\n" +
                 "\nEvent: " + event.getTitle() +
-                "\nWhen: " + event.getStartTimeString() +
-                "\nWhere: " + event.getLocation();
+                "\nWhen: " + event.getStartTimeString();
+        if (event.getVenue().hasName()) {
+            result += "\nWhere: " + event.getVenue().getName();
+        }
+        return result;
     }
 }
