@@ -141,7 +141,12 @@ public class DanceDeetsApi {
                     VolleySingleton volley = VolleySingleton.getInstance();
                     volley.prefetchThumbnail(event.getThumbnailUrl());
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, "JSONException: " + e);
+                    String eventId = "";
+                    try {
+                        eventId = " " + jsonEventList.getJSONObject(i).getString("id");
+                    } catch (JSONException e2) {
+                    }
+                    Log.e(LOG_TAG, "JSONException on event" + eventId + ": " + e);
                 }
                 eventList.add(event);
             }
