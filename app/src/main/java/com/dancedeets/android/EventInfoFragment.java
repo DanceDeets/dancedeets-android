@@ -124,17 +124,21 @@ public class EventInfoFragment extends StateFragment<
          * 2) Venue Name: Queens Theatre in the Park
          * Street/City/State/Zip/Country: New York, NY, 11368, United States
          * Lat, Long: 40.7441611111, -73.8444222222
-         * 3) More normal scenarios, like a good venue and street address
+         * 3) Venue Name: "Hamburg"
+         * Street/City/State/Zip/Country: null
+         * Lat, Long: null
+         * 4) More normal scenarios, like a good venue and street address
          *
          * Given this, our most reliable source is lat/long.
          * We don't want to do a search around it because of #1 and #2 will search for the wrong things.
          * So instead, the best we can do is to label the lat/long point
          **/
-        String venueSuffix = "";
-        if (getEvent().getVenue().hasName()) {
-            venueSuffix = "(" + Uri.encode(getEvent().getVenue().getName())+")";
+        Uri mapUrl;
+        if (latLong != null) {
+            mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + "(" + Uri.encode(getEvent().getVenue().getName()) + ")");
+        } else {
+            mapUrl = Uri.parse("geo:0,0?q=" + Uri.encode(getEvent().getVenue().getName()));
         }
-        Uri mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + venueSuffix);
         Intent intent = new Intent(Intent.ACTION_VIEW, mapUrl);
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);
