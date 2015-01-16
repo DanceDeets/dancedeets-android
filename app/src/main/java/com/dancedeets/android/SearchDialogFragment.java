@@ -71,12 +71,15 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
 
         View view = inflater.inflate(R.layout.event_search_options, null);
         AutoCompleteTextView searchLocation = (AutoCompleteTextView) view.findViewById(R.id.search_location);
-        searchLocation.setAdapter(new PlacesAdapter(getActivity(), android.R.layout.simple_list_item_1));
         EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
 
         mBundled.mSearchOptions = (SearchOptions)getArguments().getSerializable(ARG_SEARCH_OPTIONS);
         searchLocation.setText(mBundled.mSearchOptions.location);
         searchKeywords.setText(mBundled.mSearchOptions.keywords);
+
+        // We explicitly set the searchLocation adapter after calling setText, so setText dosen't trigger the dropdown.
+        searchLocation.setAdapter(new PlacesAdapter(getActivity(), android.R.layout.simple_list_item_1));
+
         TextView messageView = (TextView) view.findViewById(R.id.search_message);
         String message = getArguments().getString(ARG_MESSAGE);
         if (message != null && !message.isEmpty()) {
