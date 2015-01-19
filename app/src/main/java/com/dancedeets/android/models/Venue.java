@@ -1,5 +1,7 @@
 package com.dancedeets.android.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
@@ -12,33 +14,7 @@ import java.util.List;
 /**
 * Created by lambert on 2014/10/14.
 */
-public class Venue implements Serializable {
-
-    public static class LatLong implements Serializable {
-        protected double mLatitude;
-        protected double mLongitude;
-
-        public LatLong(double latitude, double longitude) {
-            mLatitude = latitude;
-            mLongitude = longitude;
-        }
-
-        public double getLatitude() {
-            return mLatitude;
-        }
-
-        public double getLongitude() {
-            return mLongitude;
-        }
-
-        public boolean equals(Object o) {
-            if (!(o instanceof LatLong)) {
-                return false;
-            }
-            LatLong otherLatLong = (LatLong)o;
-            return mLatitude == otherLatLong.mLatitude && mLongitude == otherLatLong.mLongitude;
-        }
-    }
+public class Venue implements Parcelable, Serializable {
 
     protected String mId;
     protected String mName;
@@ -151,5 +127,46 @@ public class Venue implements Serializable {
                 (mZip == null ? other.mZip == null : mZip.equals(other.mZip)) &&
                 (mCountry == null ? other.mCountry == null : mCountry.equals(other.mCountry))
         );
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mName);
+        dest.writeParcelable(mLatLong, 0);
+        dest.writeString(mStreet);
+        dest.writeString(mCity);
+        dest.writeString(mState);
+        dest.writeString(mZip);
+        dest.writeString(mCountry);
+    }
+
+    public static final Parcelable.Creator<Venue> CREATOR
+            = new Parcelable.Creator<Venue>() {
+        public Venue createFromParcel(Parcel in) {
+            return new Venue(in);
+        }
+
+        public Venue[] newArray(int size) {
+            return new Venue[size];
+        }
+    };
+
+    @SuppressWarnings("unchecked")
+    private Venue(Parcel in) {
+        mId = in.readString();
+        mName = in.readString();
+        mLatLong = in.readParcelable(LatLong.class.getClassLoader());
+        mStreet = in.readString();
+        mCity = in.readString();
+        mState = in.readString();
+        mZip = in.readString();
+        mCountry = in.readString();
     }
 }

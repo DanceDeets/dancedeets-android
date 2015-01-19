@@ -1,5 +1,8 @@
 package com.dancedeets.android.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +14,7 @@ import java.util.List;
 /**
 * Created by lambert on 2014/10/14.
 */
-public class CoverData implements Serializable {
+public class CoverData implements Parcelable, Serializable {
     protected String mId;
 
     protected List<CoverImage> mCovers;
@@ -54,5 +57,34 @@ public class CoverData implements Serializable {
         return (mId.equals(other.mId) &&
                 mCovers.equals(other.mCovers)
         );
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeList(mCovers);
+    }
+
+    public static final Parcelable.Creator<CoverData> CREATOR
+            = new Parcelable.Creator<CoverData>() {
+        public CoverData createFromParcel(Parcel in) {
+            return new CoverData(in);
+        }
+
+        public CoverData[] newArray(int size) {
+            return new CoverData[size];
+        }
+    };
+
+
+    @SuppressWarnings("unchecked")
+    private CoverData(Parcel in) {
+        mId = in.readString();
+        mCovers = in.readArrayList(CoverImage.class.getClassLoader());
     }
 }

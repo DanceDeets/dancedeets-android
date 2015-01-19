@@ -28,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.LatLong;
 import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
@@ -115,7 +116,7 @@ public class EventInfoFragment extends StateFragment<
         // "geo:0,0?q=lat,lng(label)"
         // "geo:0,0?q=my+street+address"
         Venue venue = getEvent().getVenue();
-        Venue.LatLong latLong = venue.getLatLong();
+        LatLong latLong = venue.getLatLong();
         /**
          * We must support a few use cases:
          * 1) Venue Name: Each One Teach One

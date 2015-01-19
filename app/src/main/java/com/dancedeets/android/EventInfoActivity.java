@@ -62,7 +62,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     public static Intent buildIntentFor(Context context, ArrayList<FullEvent> eventList, int positionSelected) {
         Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_EVENT_LIST, eventList);
+        bundle.putParcelableArrayList(ARG_EVENT_LIST, eventList);
         bundle.putInt(ARG_EVENT_INDEX, positionSelected);
         Intent intent = new Intent(context, EventInfoActivity.class);
         intent.putExtras(bundle);
@@ -174,7 +174,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            mBundled.mEventList = (List<FullEvent>)b.getSerializable(ARG_EVENT_LIST);
+            mBundled.mEventList = b.getParcelableArrayList(ARG_EVENT_LIST);
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
 
             initializeViewPagerWithBundledState();
