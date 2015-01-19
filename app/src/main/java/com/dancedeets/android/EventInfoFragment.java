@@ -170,11 +170,12 @@ public class EventInfoFragment extends StateFragment<
                 AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 Log.i(LOG_TAG, "Loc " + getEvent().getVenue() + ": " + getEvent().getVenue().hasName() + " : " + getEvent().getVenue().getName());
+
+                String address = getEvent().getVenue().getAddress();
                 if (getEvent().getVenue().hasName()) {
-                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getName());
-                } else {
-                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getAddress());
+                    address = getEvent().getVenue().getName() + ", " + address;
                 }
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, address);
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
                 Log.i(LOG_TAG, "Start time " + getEvent().getStartTimeString() + ": " + getEvent().getStartTimeLong());
                 intent.putExtra(
@@ -190,9 +191,10 @@ public class EventInfoFragment extends StateFragment<
                             CalendarContract.EXTRA_EVENT_END_TIME,
                             getEvent().getStartTimeLong() + 2*60*60*1000);
                 }
+                String description = getEvent().getUrl() + "\n\n" + getEvent().getDescription();
                 intent.putExtra(
                         CalendarContract.Events.DESCRIPTION,
-                        getEvent().getDescription());
+                        description);
                 if (isAvailable(getActivity(), intent)) {
                     startActivity(intent);
                 } else {
