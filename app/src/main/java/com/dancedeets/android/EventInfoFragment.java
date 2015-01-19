@@ -170,15 +170,24 @@ public class EventInfoFragment extends StateFragment<
                 AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
                 if (getEvent().getVenue().hasName()) {
-                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getName());
+                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getAddress());
+                } else {
+                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, getEvent().getVenue().getAddress());
                 }
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
                         getEvent().getStartTimeLong());
-                intent.putExtra(
-                        CalendarContract.EXTRA_EVENT_END_TIME,
-                        getEvent().getEndTimeLong());
+                if (getEvent().getEndTimeLong() != 0) {
+                    intent.putExtra(
+                            CalendarContract.EXTRA_EVENT_END_TIME,
+                            getEvent().getEndTimeLong());
+                } else {
+                    // HACK to force an end-time, since Sunrise Calendaring doesn't handle missing-end-time intents very well
+                    intent.putExtra(
+                            CalendarContract.EXTRA_EVENT_END_TIME,
+                            getEvent().getStartTimeLong() + 2*60*60*1000);
+                }
                 intent.putExtra(
                         CalendarContract.Events.DESCRIPTION,
                         getEvent().getDescription());
