@@ -180,9 +180,16 @@ public class EventInfoFragment extends StateFragment<
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
                         getEvent().getStartTimeLong());
-                intent.putExtra(
-                        CalendarContract.EXTRA_EVENT_END_TIME,
-                        getEvent().getEndTimeLong());
+                if (getEvent().getEndTimeLong() != 0) {
+                    intent.putExtra(
+                            CalendarContract.EXTRA_EVENT_END_TIME,
+                            getEvent().getEndTimeLong());
+                } else {
+                    // HACK to force an end-time, since Sunrise Calendaring doesn't handle missing-end-time intents very well
+                    intent.putExtra(
+                            CalendarContract.EXTRA_EVENT_END_TIME,
+                            getEvent().getStartTimeLong() + 2*60*60*1000);
+                }
                 intent.putExtra(
                         CalendarContract.Events.DESCRIPTION,
                         getEvent().getDescription());
