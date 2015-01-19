@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,7 +42,16 @@ public class DanceDeetsApi {
         JSONObject jsonPayload = new JSONObject();
         try {
             jsonPayload.put("access_token", session.getAccessToken());
-            jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(session.getExpirationDate()));
+            Log.i(LOG_TAG, "access token is " + session.getAccessToken());
+            // Sometimes the cached payload has a far-future expiration date. Not really sure why...
+            // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
+            // must somehow have gotten cached to disk with that large value for the expiration.
+            // Alternately, these may represent infinite-duration tokens that never expire.
+            if (!session.getExpirationDate().equals(new Date(Long.MAX_VALUE))) {
+                jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(session.getExpirationDate()));
+            } else {
+                Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + session.getExpirationDate());
+            }
             jsonPayload.put("location", location);
             jsonPayload.put("client", "android");
         } catch (JSONException e) {
@@ -137,9 +147,11 @@ public class DanceDeetsApi {
                 try {
                     JSONObject jsonEvent = jsonEventList.getJSONObject(i);
                     event = FullEvent.parse(jsonEvent);
-                    // Prefetch images so scrolling "just works"
-                    VolleySingleton volley = VolleySingleton.getInstance();
-                    volley.prefetchThumbnail(event.getThumbnailUrl());
+                    // Prefetch the first few images, so scrolling "just works"
+                    if (i < 100) {
+                        VolleySingleton volley = VolleySingleton.getInstance();
+                        volley.prefetchThumbnail(event.getThumbnailUrl());
+                    }
                 } catch (JSONException e) {
                     String eventId = "";
                     try {

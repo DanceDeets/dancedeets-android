@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <!-- Hack to absorb the default focus, so that when they click into the field, it pops up the IME -->
+    <LinearLayout android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px" >
+        <requestFocus />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/search_message"
         android:layout_width="wrap_content"
