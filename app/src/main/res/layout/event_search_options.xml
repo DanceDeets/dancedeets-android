@@ -24,7 +24,9 @@
         android:layout_below="@id/search_location_label"
         android:layout_marginBottom="20dp"
         android:completionThreshold="1"
-        android:hint="@string/hint_enter_location" />
+        android:hint="@string/hint_enter_location"
+        android:singleLine="true"
+        />
 
     <TextView
         android:id="@+id/search_keywords_label"
