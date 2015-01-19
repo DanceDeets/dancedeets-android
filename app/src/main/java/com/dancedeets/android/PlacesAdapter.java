@@ -153,6 +153,11 @@ public class PlacesAdapter extends BaseAdapter implements Filterable {
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;
                     filterResults.count = resultList.size();
+                } else {
+                    // Don't allow null lists to leak out to publishResults when it sets mResultList,
+                    // or it will cause a crash later when getCount is called.
+                    filterResults.values = new ArrayList<>();
+                    filterResults.count = 0;
                 }
                 return filterResults;
             }
