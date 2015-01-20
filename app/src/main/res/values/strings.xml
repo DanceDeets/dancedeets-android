@@ -8,7 +8,7 @@
     <string name="action_search">Search</string>
     <string name="menu_add_to_calendar">Add to Calendar</string>
     <string name="retry_button">Retry</string>
-    <string name="no_events">No events found.</string>
+    <string name="no_events">No events found.\n\nMaybe we just don\'t have enough dancers signed up in this area. If you invite your friends, we promise to add more events!</string>
     <string name="action_refresh">Refresh Events</string>
     <string name="search_hint">Enter Location</string>
     <string name="search_location">Location:</string>
