@@ -169,7 +169,6 @@ public class EventInfoFragment extends StateFragment<
             case R.id.action_add_to_calendar:
                 AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
-                Log.i(LOG_TAG, "Loc " + getEvent().getVenue() + ": " + getEvent().getVenue().hasName() + " : " + getEvent().getVenue().getName());
 
                 String address = getEvent().getVenue().getAddress();
                 if (getEvent().getVenue().hasName()) {
@@ -177,7 +176,6 @@ public class EventInfoFragment extends StateFragment<
                 }
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, address);
                 intent.putExtra(CalendarContract.Events.TITLE, getEvent().getTitle());
-                Log.i(LOG_TAG, "Start time " + getEvent().getStartTimeString() + ": " + getEvent().getStartTimeLong());
                 intent.putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
                         getEvent().getStartTimeLong());
