@@ -9,9 +9,10 @@
     <string name="retry_button">Retry</string>
     <string name="no_events">No events found.\n\nMaybe we just don\'t have enough dancers signed up in this area. If you invite your friends, we promise to add more events!</string>
     <string name="action_refresh">Refresh Events</string>
-    <string name="search_hint">Enter Location</string>
     <string name="search_location">Location:</string>
     <string name="search_keywords">Keywords:</string>
+    <string name="hint_enter_location">Enter Location</string>
+    <string name="hint_enter_keywords">Enter optional keywords</string>
     <string name="cancel">Cancel</string>
     <string name="menu_translate">Translate</string>
     <string name="filter_title_viewevent">DanceDeets Event</string>
@@ -29,8 +30,6 @@
     <string name="login_or">or</string>
     <string name="enter_feedback_here">Enter feedback here:</string>
     <string name="flyer_title">Flyer for %1$s</string>
-    <string name="hint_enter_location">Enter Location</string>
-    <string name="hint_enter_keywords">Enter optional keywords</string>
     <string name="couldnt_detect_location">Could not detect your location. Enter your location here.</string>
     <string name="events_near">Events near %1$s</string>
     <string name="events_near_with_keyword">Events near %1$s with keywords "%2$s"</string>
