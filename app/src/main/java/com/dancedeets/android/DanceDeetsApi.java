@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by lambert on 2014/12/24.
@@ -32,13 +33,19 @@ public class DanceDeetsApi {
 
     private static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-    private static String getApiUrl(String apiPath) {
-        //return "http://www.dancedeets.com/api/" + apiPath;
-        return "http://www.dancedeets.com/api/" + VERSION + "/" + apiPath;
+    private static Uri.Builder generateApiBuilderFor(String apiPath) {
+        String url = "http://www.dancedeets.com/api/" + VERSION + "/" + apiPath;
+        Uri.Builder builder = Uri.parse(url).buildUpon();
+        builder.appendQueryParameter("hl", Locale.getDefault().getLanguage());
+        //TODO: Figure out if we want to use json payloads, query-param payloads, or get params
+        // But for now, this is the easiest way to pass this info on every request.
+        builder.appendQueryParameter("client", "android");
+        return builder;
     }
 
     public static void sendAuth(Session session, String location) {
         Log.i(LOG_TAG, "sendAuth with location: " + location);
+        Uri.Builder builder = generateApiBuilderFor("auth");
         JSONObject jsonPayload = new JSONObject();
         try {
             jsonPayload.put("access_token", session.getAccessToken());
@@ -60,7 +67,7 @@ public class DanceDeetsApi {
         }
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                getApiUrl("auth"),
+                builder.toString(),
                 jsonPayload,
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
@@ -84,8 +91,9 @@ public class DanceDeetsApi {
     }
 
     public static void getEvent(String id, final OnEventReceivedListener onEventReceivedListener) {
+        Uri.Builder builder = generateApiBuilderFor("events/" + id);
         JsonObjectRequest request = new JsonObjectRequest(
-                getApiUrl("events/" + id),
+                builder.toString(),
                 null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -176,7 +184,7 @@ public class DanceDeetsApi {
     }
 
     public static void runSearch(SearchOptions searchOptions, final OnResultsReceivedListener onResultsReceivedListener) {
-        Uri.Builder builder = Uri.parse(getApiUrl("search")).buildUpon();
+        Uri.Builder builder = generateApiBuilderFor("search");
         builder.appendQueryParameter("location", searchOptions.location);
         builder.appendQueryParameter("keywords", searchOptions.keywords);
         builder.appendQueryParameter("distance", "10");
