@@ -206,6 +206,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             case R.id.action_feedback:
                 SendFeedback.sendFeedback(this, null);
                 return true;
+            case R.id.action_help:
+                HelpSystem.openHelp(this);
+                return true;
             case R.id.action_logout:
                 Session.getActiveSession().closeAndClearTokenInformation();
                 return true;

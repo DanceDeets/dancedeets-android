@@ -225,6 +225,9 @@ public class LoginActivity extends FacebookActivity {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_help:
+                HelpSystem.openHelp(this);
+                return true;
             case R.id.action_feedback:
                 SendFeedback.sendFeedback(this, null);
                 return true;
