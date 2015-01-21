@@ -48,6 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/search_keywords_label"
+        android:hint="@string/hint_enter_keywords"
         android:selectAllOnFocus="true"
         android:inputType="textAutoCorrect"
         android:layout_marginBottom="10dp"

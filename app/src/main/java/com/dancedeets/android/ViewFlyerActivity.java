@@ -29,7 +29,7 @@ public class ViewFlyerActivity extends FacebookActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             FullEvent event = FullEvent.parse(b);
-            setTitle(getResources().getString(R.string.flyer_for) + event.getTitle());
+            setTitle(String.format(getResources().getString(R.string.flyer_title), event.getTitle()));
         }
 
         // savedInstanceState is non-null when there is fragment state

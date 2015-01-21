@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">DanceDeets</string>
-    <string name="menu_share">Share...</string>
+    <string name="menu_share">Share…</string>
     <string name="menu_view_map">View on Map</string>
     <string name="menu_view_facebook">View on Facebook</string>
     <string name="action_search">Search</string>
@@ -16,7 +15,7 @@
     <string name="cancel">Cancel</string>
     <string name="menu_translate">Translate</string>
     <string name="filter_title_viewevent">DanceDeets Event</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="facebook_app_id">2347064084</string>
     <string name="login_bubble">Looking to dance? We got the \'deets!\n\nClick Login below, and let\'s check out the world of dance events, both near and far!\n\nAnd of course, we promise not to spam or hack your Facebook account, just help you find and share dance events.</string>
     <string name="login_explain_why_login">Curious why we ask you to login with Facebook?</string>
@@ -29,6 +28,11 @@
     <string name="use_without_fblogin">Want to use DanceDeets without Facebook login?\n\nThe mobile apps currently require Facebook login to use. However, if you wish to search and view events without logging in, you can use the mobile website available at www.dancedeets.com .</string>
     <string name="login_or">or</string>
     <string name="enter_feedback_here">Enter feedback here:</string>
-    <string name="flyer_for">Flyer for</string>
+    <string name="flyer_title">Flyer for %1$s</string>
     <string name="hint_enter_location">Enter Location</string>
+    <string name="hint_enter_keywords">Enter optional keywords</string>
+    <string name="couldnt_detect_location">Could not detect your location. Enter your location here.</string>
+    <string name="events_near">Events near %1$s</string>
+    <string name="events_near_with_keyword">Events near %1$s with keywords "%2$s"</string>
+    <string name="events_with_keyword">Events with keywords "%1$s"</string>
 </resources>

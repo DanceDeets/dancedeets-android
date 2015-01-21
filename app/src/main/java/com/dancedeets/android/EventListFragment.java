@@ -72,7 +72,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     EventUIAdapter eventAdapter;
 
     View mEmptyListView;
-    TextView mEmptyText;
+    View mEmptyText;
     Button mRetryButton;
     TextView mListDescription;
 
@@ -178,13 +178,17 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         searchOptions.location = location;
         searchOptions.keywords = keywords;
         // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
+        String listDescription;
         if (searchOptions.keywords.isEmpty()) {
-            mListDescription.setText("Events near " + searchOptions.location);
+            listDescription = String.format(getString(R.string.events_near), searchOptions.location);
+        } else if (searchOptions.location.isEmpty()) {
+            listDescription = String.format(getString(R.string.events_with_keyword), searchOptions.keywords);
         } else {
-            mListDescription.setText("Events near " + searchOptions.location + " with keywords '" + searchOptions.keywords + "'");
+            listDescription = String.format(getString(R.string.events_near_with_keyword), searchOptions.location, searchOptions.keywords);
         }
+        mListDescription.setText(listDescription);
         if (searchOptions.location.isEmpty() && searchOptions.keywords.isEmpty()) {
-            showSearchDialog("Could not detect your location. Enter your location here.");
+            showSearchDialog(getString(R.string.couldnt_detect_location));
         } else {
             fetchJsonData();
         }
@@ -277,7 +281,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
                 container, false);
-        mEmptyText = (TextView) mEmptyListView.findViewById(R.id.empty_events_list_text);
+        mEmptyText = mEmptyListView.findViewById(R.id.empty_events_list_text);
         mRetryButton = (Button) mEmptyListView.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
