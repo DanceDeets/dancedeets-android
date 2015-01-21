@@ -197,7 +197,6 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         // it should all be captured in BundledState by now.
         setIntent(intent);
         Log.i(LOG_TAG, "onNewIntent");
-        mBundled = buildBundledState();
         handleIntent(intent);
     }
 
