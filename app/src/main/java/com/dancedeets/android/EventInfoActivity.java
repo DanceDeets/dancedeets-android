@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -92,6 +93,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             // and only be overridden by any onNewIntent down the line.
             String tag = getUniqueTag();
             mBundled = (MyBundledState) savedInstanceState.getSerializable(tag);
+            Crashlytics.log("onCreate.savedInstanceState: List size is " + mBundled.mEventList.size());
+            Crashlytics.log("onCreate.savedInstanceState: Event index is " + mBundled.mEventIndex);
             initializeViewPagerWithBundledState();
         }
     }
@@ -109,6 +112,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
      * and can be re-called after calling onNewIntent later in the activity lifecycle flow.
      */
     public void initializeViewPagerWithBundledState() {
+        Crashlytics.log("List size is " + mBundled.mEventList.size());
+        Crashlytics.log("Event index is " + mBundled.mEventIndex);
+
         mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mBundled.mEventList);
         Log.i(LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
         mViewPager.setAdapter(mEventInfoPagerAdapter);
@@ -116,6 +122,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         // However, we must call setCurrentItem on all the intent-derived initializations,
         // and the flow just makes it easier to store/restore our own EventIndex for everyone here.
         mViewPager.setCurrentItem(mBundled.mEventIndex);
+
+        Crashlytics.setInt("mEventIndex", mBundled.mEventIndex);
+        Crashlytics.setInt("mBundled.mEventList.size()", mBundled.mEventList.size());
 
         // Since onPageSelected is not called until the first swipe, always initialize the title here.
         FullEvent event = mBundled.mEventList.get(mBundled.mEventIndex);
@@ -127,6 +136,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             public void onPageSelected(int position) {
                 mBundled.mEventIndex = position;
                 setTitle(mBundled.mEventList.get(position).getTitle());
+                Crashlytics.log("onPageSelected: List size is " + mBundled.mEventList.size());
+                Crashlytics.log("onPageSelected: Event index is " + mBundled.mEventIndex);
             }
         });
     }
@@ -169,13 +180,19 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
                 // Add Event requests
+                // TODO(lambert): I think if we leave/relaunch before this event is completed,
+                // then we reload without an eventlist, and trigger a crash loading the zero'th index.
                 DanceDeetsApi.getEvent(eventId, new EventHandler(mRetained));
             }
+            Crashlytics.log("handleIntent: Loading " + url);
+            Crashlytics.setString("Intent View URL", url.toString());
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
             mBundled.mEventList = b.getParcelableArrayList(ARG_EVENT_LIST);
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
+            Crashlytics.log("Intent.getExtras: List size is " + mBundled.mEventList.size());
+            Crashlytics.log("Intent.getExtras: Event index is " + mBundled.mEventIndex);
 
             initializeViewPagerWithBundledState();
             return true;
@@ -187,6 +204,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         mBundled.mEventList = new ArrayList<>(1);
         mBundled.mEventList.add(event);
         mBundled.mEventIndex = 0;
+        Crashlytics.log("onEventReceived: List size is " + mBundled.mEventList.size());
+        Crashlytics.log("onEventReceived: Event index is " + mBundled.mEventIndex);
         //eventInfoActivity.mEventInfoPagerAdapter.notifyDataSetChanged();
         initializeViewPagerWithBundledState();
     }
