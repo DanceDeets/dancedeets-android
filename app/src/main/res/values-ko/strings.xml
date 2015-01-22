@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_share">공유</string>
+    <string name="menu_view_map">지도에서 열기</string>
+    <string name="menu_view_facebook">페이스북에서 보기</string>
+    <string name="action_search">검색</string>
+    <string name="menu_add_to_calendar">일정추가</string>
+    <string name="retry_button">재시도</string>
+    <string name="no_events">검색 결과 없음.\n\n페이스북에 등록된 이벤트 페이지가 없습니다. 이벤트 페이지를 페이스북에서 만들면 앱에 자동적으로 등록됩니다.</string>
+    <string name="action_refresh">새로고침</string>
+    <string name="search_location">위치:</string>
+    <string name="search_keywords">키워드:</string>
+    <string name="hint_enter_location">위치 입력</string>
+    <string name="hint_enter_keywords">키워드 입력</string>
+    <string name="cancel">취소</string>
+    <string name="menu_translate">번역</string>
+    <string name="filter_title_viewevent">DanceDeets 이벤트</string>
+    <string name="loading">로딩 중…</string>
+    <string name="facebook_app_id">2347064084</string>
+    <string name="login_bubble">Want to dance? We got the \'deets!(Detail의 줄임말)n\n아래의 로그인 버튼을 클릭, 단 한번 의 클릭으로 전 세계의 댄스 이벤트를 검색할 수 있습니다!\n\n 페이스북 로그인은 이벤트 공유와 추가 목적으로만 사용됩니다.</string>
+    <string name="login_explain_why_login">Curious why we ask you to login with Facebook?</string>
+    <string name="login_use_without_fblogin">Want to use DanceDeets without Facebook login?</string>
+    <string name="action_help">도움</string>
+    <string name="action_logout">로그아웃</string>
+    <string name="action_add_event">이벤트 추가</string>
+    <string name="action_feedback">피드백</string>
+    <string name="explain_why_login">Why does DanceDeets require Facebook login?\n\nDanceDeets is built on the Facebook platform, and all the DanceDeets events are pulled from Facebook. To find and collect the dance events, DanceDeets depends on dancers signing up with their Facebook accounts and sharing their dance events with DanceDeets. For this reason, the DanceDeets mobile apps use Facebook login.</string>
+    <string name="login_use_website">www.dancedeets.com 바로가기</string>
+    <string name="use_without_fblogin">Want to use DanceDeets without Facebook login?\n\nThe mobile apps currently require Facebook login to use. However, if you wish to search and view events without logging in, you can use the mobile website available at www.dancedeets.com .</string>
+    <string name="login_or">or</string>
+    <string name="enter_feedback_here">Enter feedback here:</string>
+    <string name="flyer_title">포스터 %1$s</string>
+    <string name="couldnt_detect_location">Could not detect your location. Enter your location here.</string>
+    <string name="events_near">근처 이벤트 %1$s</string>
+    <string name="events_near_with_keyword">근처 이벤트 %1$s 검색 키워드 "%2$s"</string>
+    <string name="events_with_keyword">키워드 검색 이벤트 "%1$s"</string>
+</resources>

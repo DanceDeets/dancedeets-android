@@ -21,6 +21,7 @@
     <string name="login_use_without_fblogin">Want to use DanceDeets without Facebook login?</string>
     <string name="action_help">ヘルプ</string>
     <string name="action_logout">ログアウト</string>
+    <string name="action_add_event">イベントを参加</string>
     <string name="action_feedback">フィードバックを送信</string>
     <string name="explain_why_login">Why does DanceDeets require Facebook login?\n\nDanceDeets is built on the Facebook platform, and all the DanceDeets events are pulled from Facebook. To find and collect the dance events, DanceDeets depends on dancers signing up with their Facebook accounts and sharing their dance events with DanceDeets. For this reason, the DanceDeets mobile apps use Facebook login.</string>
     <string name="login_use_website">www.dancedeets.comを開く</string>
