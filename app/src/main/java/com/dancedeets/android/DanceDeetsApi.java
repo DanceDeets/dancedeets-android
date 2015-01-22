@@ -49,7 +49,6 @@ public class DanceDeetsApi {
         JSONObject jsonPayload = new JSONObject();
         try {
             jsonPayload.put("access_token", session.getAccessToken());
-            Log.i(LOG_TAG, "access token is " + session.getAccessToken());
             // Sometimes the cached payload has a far-future expiration date. Not really sure why...
             // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
             // must somehow have gotten cached to disk with that large value for the expiration.
