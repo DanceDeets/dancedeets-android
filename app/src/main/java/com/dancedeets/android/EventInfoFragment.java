@@ -328,8 +328,8 @@ public class EventInfoFragment extends StateFragment<
                 openLocationOnMap();
             }
         });
-        TextView startTime  = (TextView) rootView.findViewById(R.id.start_time);
-        startTime.setText(event.getStartTimeString());
+        TextView startTime = (TextView) rootView.findViewById(R.id.date_time);
+        startTime.setText(event.getFullTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
         description.setText(event.getDescription());
     }

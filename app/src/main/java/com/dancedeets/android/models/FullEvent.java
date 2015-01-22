@@ -24,6 +24,7 @@ public class FullEvent implements Parcelable, Serializable {
 
     static DateFormat localizedDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
     static DateFormat localizedDateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+    static DateFormat localizedTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
 
     static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     static DateFormat isoDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -176,7 +177,9 @@ public class FullEvent implements Parcelable, Serializable {
 
     public String getEndTimeString() {
         if (getEndTimeLong() != 0) {
-            if (mAllDayEvent) {
+            if (mEndTime - mStartTime < 1000*60*60*12) {
+                return localizedTimeFormat.format(getEndTimeLong());
+            } else if (mAllDayEvent) {
                 return localizedDateFormat.format(getEndTimeLong());
             } else {
                 return localizedDateTimeFormat.format(getEndTimeLong());
@@ -188,7 +191,9 @@ public class FullEvent implements Parcelable, Serializable {
 
     public String getEndTimeString(Locale locale) {
         if (getEndTimeLong() != 0) {
-            if (mAllDayEvent) {
+            if (mEndTime - mStartTime < 1000*60*60*12) {
+                return localizedTimeFormat.format(getEndTimeLong());
+            } else if (mAllDayEvent) {
                 return DateFormat.getDateInstance(DateFormat.MEDIUM, locale).format(getEndTimeLong());
             } else {
                 return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, locale).format(getEndTimeLong());
@@ -196,6 +201,14 @@ public class FullEvent implements Parcelable, Serializable {
         } else {
             return null;
         }
+    }
+
+    public String getFullTimeString() {
+        String fullTime = getStartTimeString();
+        if (mEndTime != 0) {
+            fullTime += " - " + getEndTimeString();
+        }
+        return fullTime;
     }
 
     public String getDescription() {
