@@ -15,4 +15,12 @@ public class HelpSystem {
             activity.startActivity(intent);
         }
     }
+
+    public static void openAddEvent(EventListActivity activity) {
+        AnalyticsUtil.track("Add Event");
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.dancedeets.com/events_add"));
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivity(intent);
+        }
+    }
 }

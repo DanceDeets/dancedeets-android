@@ -8,6 +8,10 @@
         android:showAsAction="ifRoom|collapseActionView"
         />
 
+    <item android:id="@+id/action_add_event"
+        android:title="@string/action_add_event"
+        android:showAsAction="never" />
+
     <item android:id="@+id/action_refresh"
         android:title="@string/action_refresh"
         android:showAsAction="never" />
