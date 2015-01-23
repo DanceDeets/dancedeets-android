@@ -16,7 +16,6 @@
     <string name="menu_translate">번역</string>
     <string name="filter_title_viewevent">DanceDeets 이벤트</string>
     <string name="loading">로딩 중…</string>
-    <string name="facebook_app_id">2347064084</string>
     <string name="login_bubble">Want to dance? We got the \'deets!(Detail의 줄임말)n\n아래의 로그인 버튼을 클릭, 단 한번 의 클릭으로 전 세계의 댄스 이벤트를 검색할 수 있습니다!\n\n 페이스북 로그인은 이벤트 공유와 추가 목적으로만 사용됩니다.</string>
     <string name="login_explain_why_login">Curious why we ask you to login with Facebook?</string>
     <string name="login_use_without_fblogin">Want to use DanceDeets without Facebook login?</string>
