@@ -133,7 +133,9 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
     public void onStop() {
         Log.i(LOG_TAG, "onStop");
         // Disconnecting the client invalidates it.
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
         mAddressListener = null;
         if (mReverseGeocodeTask != null) {
             mReverseGeocodeTask.cancel(true);
