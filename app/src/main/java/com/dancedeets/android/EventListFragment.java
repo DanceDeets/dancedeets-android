@@ -1,7 +1,6 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
@@ -44,7 +43,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     static public class MyRetainedState extends RetainedState {
-        private FetchLocationWithDialog mFetchLocationWithDialog;
+        private FetchLocation mFetchLocation;
 
     }
 
@@ -101,13 +100,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         return LOG_TAG;
     }
 
+    /* Only use this if we are using a FetchLocationWithDialog,
+       returning control to the client after upgrading Google Play Services.
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
-        if (mRetained.mFetchLocationWithDialog != null) {
-            mRetained.mFetchLocationWithDialog.onActivityResult(getActivity(), requestCode, resultCode, data);
+        if (mRetained.mFetchLocation != null) {
+            mRetained.mFetchLocation.onActivityResult(getActivity(), requestCode, resultCode, data);
         }
     }
+    */
 
     protected void handleEventList(List<FullEvent> eventList) {
         mBundled.mEventList.clear();
@@ -137,16 +139,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public void onStart() {
         super.onStart();
         if (mBundled.mSearchOptions.location.isEmpty()) {
-            mRetained.mFetchLocationWithDialog = new FetchLocationWithDialog();
-            mRetained.mFetchLocationWithDialog.onStart(getActivity(), this);
+            mRetained.mFetchLocation = new FetchLocation();
+            mRetained.mFetchLocation.onStart(getActivity(), this);
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mRetained.mFetchLocationWithDialog != null) {
-            mRetained.mFetchLocationWithDialog.onStop();
+        if (mRetained.mFetchLocation != null) {
+            mRetained.mFetchLocation.onStop();
         }
     }
 

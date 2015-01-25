@@ -126,7 +126,8 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
                     .addConnectionCallbacks(this)
                     .build();
         } else {
-            Log.i(LOG_TAG, "Unable to connect to Google Play Services");
+            Log.e(LOG_TAG, "Unable to connect to Google Play Services");
+            onAddressFound(null);
         }
     }
 
