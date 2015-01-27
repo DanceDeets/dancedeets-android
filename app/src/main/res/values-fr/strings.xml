@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_share">Partager…</string>
+    <string name="menu_view_map">Localiser sur une carte</string>
+    <string name="menu_view_facebook">Ouvrir sur Facebook</string>
+    <string name="action_search">Recherche</string>
+    <string name="menu_add_to_calendar">Ajouter au calendrier</string>
+    <string name="retry_button">Réessayer</string>
+    <string name="no_events">Pas d’événement trouvé.\n\nPeut-être que nous n’avons pas assez de danseurs inscrits dans cette région. Si vous invitez vos amis, nous promettons qu’il y aura plus d’événements!</string>
+    <string name="action_refresh">Rafraichir la liste</string>
+    <string name="search_location">Emplacement:</string>
+    <string name="search_keywords">Mots-clés:</string>
+    <string name="hint_enter_location">Entrer votre lieu</string>
+    <string name="hint_enter_keywords">Entrer des mots-clés optionnels</string>
+    <string name="cancel">Annuler</string>
+    <string name="menu_translate">Traduire</string>
+    <string name="filter_title_viewevent">Evénement DanceDeets</string>
+    <string name="loading">Chargement…</string>
+    <string name="login_bubble">Envie de danser? On a tous les \'deet’ails qu’il vous faut!\n\nCliquez Entrer ci-dessous, et accédez à tous les événements de danse du monde, aussi proches que loins. Votre compte sera uniquement utilisé afin de vous aider à trouver et partager des évenements de danse. (Zéro spam garanti!)</string>
+    <string name="login_explain_why_login">Pourquoi s’identifier via Facebook?</string>
+    <string name="login_use_without_fblogin">Comment utiliser DanceDeets sans compte Facebook?</string>
+    <string name="action_help">Aide</string>
+    <string name="action_logout">Se déconnecter</string>
+    <string name="action_add_event">Ajouter un événement</string>
+    <string name="action_feedback">Envoyer vos suggestions</string>
+    <string name="explain_why_login">Pourquoi s’identifier via Facebook?\n\nDanceDeets est construit sur la plateforme Facebook, où l’application trouve la majorité de ses événements. DanceDeets, créé par les danseurs pour les danseurs, a donc besoin de votre aide afin d’accéder aux événements sur Facebook qui sont partagés avec l’application.</string>
+    <string name="login_use_website">Accéder au site www.dancedeets.com</string>
+    <string name="use_without_fblogin">Comment utiliser DanceDeets sans compte Facebook?\n\nL’application mobile nécessite actuellement une connection Facebook. Mais si vous souhaitez accéder aux événements sans utiliser Facebook, vous pouvez aussi visiter notre site web: www.dancedeets.com .</string>
+    <string name="login_or">ou</string>
+    <string name="enter_feedback_here">Envoyer vos suggestions ici:</string>
+    <string name="flyer_title">Flyer pour %1$s</string>
+    <string name="couldnt_detect_location">Nous ne pouvons détecter votre emplacement. Entrez votre location ici:</string>
+    <string name="events_near">Evénements à proximité de %1$s</string>
+    <string name="events_near_with_keyword">Evénements à proximité de %1$s contenant les mots-clés "%2$s"</string>
+    <string name="events_with_keyword">Evénements contenant les mots-clés "%1$s"</string>
+</resources>
+
+
