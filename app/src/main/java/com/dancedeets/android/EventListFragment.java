@@ -126,7 +126,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     public void onStart() {
         super.onStart();
-        if (mBundled.mSearchOptions.location.isEmpty()) {
+        if (mBundled.mSearchOptions.location.isEmpty() && mBundled.mSearchOptions.keywords.isEmpty()) {
             mRetained.mFetchLocation = new FetchLocation();
             mRetained.mFetchLocation.onStart(getActivity(), this);
         }
