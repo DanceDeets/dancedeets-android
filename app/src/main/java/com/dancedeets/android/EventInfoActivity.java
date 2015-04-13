@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.ParcelableUtil;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
@@ -26,12 +27,8 @@ import com.facebook.Session;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,18 +72,14 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     private static void writeFile(File eventListFile, ArrayList<FullEvent> eventList) throws IOException {
         OutputStream fos = new FileOutputStream(eventListFile);
-        ObjectOutputStream os = new ObjectOutputStream(fos);
-        os.writeObject(eventList);
-        os.close();
+        fos.write(ParcelableUtil.marshallList(eventList));
         fos.close();
     }
 
     private static ArrayList<FullEvent> readFile(File eventListFile) throws IOException, ClassNotFoundException {
-        InputStream fis = new FileInputStream(eventListFile);
-        ObjectInputStream is = new ObjectInputStream(fis);
-        ArrayList<FullEvent> eventList = (ArrayList<FullEvent>) is.readObject();
-        is.close();
-        fis.close();
+        byte[] bytes = ParcelableUtil.readBytes(eventListFile);
+        ArrayList<FullEvent> eventList = new ArrayList<>();
+        ParcelableUtil.unmarshallList(bytes, eventList, FullEvent.CREATOR);
         return eventList;
     }
 
