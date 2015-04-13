@@ -25,6 +25,14 @@ import com.facebook.Session;
 
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +41,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     private static final String LOG_TAG = "EventInfoActivity";
 
-    public static final String ARG_EVENT_LIST = "EVENT_ID_LIST";
+    public static final String ARG_EVENT_LIST_FILENAME = "EVENT_ID_LIST_FILENAME";
     public static final String ARG_EVENT_INDEX = "EVENT_INDEX";
 
     protected ViewPager mViewPager;
@@ -61,9 +69,38 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         return new RetainedState();
     }
 
+    private static File getCacheFile(Context context) {
+        return new File(context.getExternalCacheDir(), "event_list.json");
+    }
+
+    private static void writeFile(File eventListFile, ArrayList<FullEvent> eventList) throws IOException {
+        OutputStream fos = new FileOutputStream(eventListFile);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(eventList);
+        os.close();
+        fos.close();
+    }
+
+    private static ArrayList<FullEvent> readFile(File eventListFile) throws IOException, ClassNotFoundException {
+        InputStream fis = new FileInputStream(eventListFile);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        ArrayList<FullEvent> eventList = (ArrayList<FullEvent>) is.readObject();
+        is.close();
+        fis.close();
+        return eventList;
+    }
+
     public static Intent buildIntentFor(Context context, ArrayList<FullEvent> eventList, int positionSelected) {
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(ARG_EVENT_LIST, eventList);
+        File eventListFile = getCacheFile(context);
+        try {
+            writeFile(eventListFile, eventList);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error writing event list cache file: " + e);
+            return null;
+        }
+        String eventListFilename = eventListFile.getAbsolutePath();
+        bundle.putString(ARG_EVENT_LIST_FILENAME, eventListFilename);
         bundle.putInt(ARG_EVENT_INDEX, positionSelected);
         Intent intent = new Intent(context, EventInfoActivity.class);
         intent.putExtras(bundle);
@@ -189,7 +226,12 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            mBundled.mEventList = b.getParcelableArrayList(ARG_EVENT_LIST);
+            try {
+                mBundled.mEventList = readFile(new File(b.getString(ARG_EVENT_LIST_FILENAME)));
+            } catch (IOException | ClassNotFoundException e) {
+                mBundled.mEventList = null;
+                Log.e(LOG_TAG, "Error reading event list cache file: " + e);
+            }
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
             Crashlytics.log("Intent.getExtras: List size is " + mBundled.mEventList.size());
             Crashlytics.log("Intent.getExtras: Event index is " + mBundled.mEventIndex);
