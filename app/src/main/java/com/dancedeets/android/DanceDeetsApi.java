@@ -170,6 +170,7 @@ public class DanceDeetsApi {
                 eventList.add(event);
             }
             if (mOnResultsReceivedListener != null) {
+                Log.i(LOG_TAG, "Received " + eventList.size() + " results from server");
                 mOnResultsReceivedListener.onResultsReceived(eventList);
             }
         }
