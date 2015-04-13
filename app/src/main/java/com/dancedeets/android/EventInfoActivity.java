@@ -72,14 +72,18 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     private static void writeFile(File eventListFile, ArrayList<FullEvent> eventList) throws IOException {
         OutputStream fos = new FileOutputStream(eventListFile);
+        long time = System.currentTimeMillis();
         fos.write(ParcelableUtil.marshallList(eventList));
+        Log.i(LOG_TAG, "Writing eventList to disk took " + (System.currentTimeMillis() - time) + "ms");
         fos.close();
     }
 
     private static ArrayList<FullEvent> readFile(File eventListFile) throws IOException, ClassNotFoundException {
         byte[] bytes = ParcelableUtil.readBytes(eventListFile);
         ArrayList<FullEvent> eventList = new ArrayList<>();
+        long time = System.currentTimeMillis();
         ParcelableUtil.unmarshallList(bytes, eventList, FullEvent.CREATOR);
+        Log.i(LOG_TAG, "Loading eventList from disk took " + (System.currentTimeMillis() - time) + "ms");
         return eventList;
     }
 
