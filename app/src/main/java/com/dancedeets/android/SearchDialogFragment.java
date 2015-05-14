@@ -55,7 +55,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        // Don't overwrite the retainedstate's searchlistener with our empty one, if we're being recreated9
+        // Don't overwrite the retainedstate's searchlistener with our empty one, if we're being recreated
         if (mTempOnSearchListener != null) {
             mRetained.mOnSearchListener = mTempOnSearchListener;
         }
