@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.dancedeets.android.models.CoverData;
+import com.dancedeets.android.models.CoverImage;
 import com.dancedeets.android.models.FullEvent;
 
 import java.util.List;
@@ -17,9 +19,10 @@ import java.util.List;
  * An Adapter for mapping Event objects to the Event ListView UI.
  */
 public class EventUIAdapter extends BaseAdapter {
+
     static class ViewBinder {
         NetworkImageView icon;
-        NetworkImageView cover;
+        PlaceholderNetworkImageView cover;
         TextView title;
         TextView location;
         TextView startTime;
@@ -32,7 +35,6 @@ public class EventUIAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mEventList = eventBundleList;
         mResource = resource;
-
     }
     public int getCount() {
         return mEventList.size();
@@ -65,7 +67,13 @@ public class EventUIAdapter extends BaseAdapter {
             viewBinder.icon.setImageUrl(event.getThumbnailUrl(), thumbnailLoader);
         }
         if (viewBinder.cover != null) {
-            viewBinder.cover.setImageUrl(event.getCoverUrl(), thumbnailLoader);
+            CoverData coverData = event.getCoverData();
+            if (coverData != null) {
+                CoverImage largestCover = coverData.getLargestCover();
+                viewBinder.cover.setImageUrl(largestCover.getSourceUrl(), thumbnailLoader, largestCover.getWidth(), largestCover.getHeight());
+            } else {
+                viewBinder.cover.setImageDrawable(null);
+            }
         }
         viewBinder.title.setText(event.getTitle());
         if (event.getVenue().hasName()) {
@@ -87,8 +95,8 @@ public class EventUIAdapter extends BaseAdapter {
         if (convertView == null) {
             view = mInflater.inflate(resource, parent, false);
             ViewBinder viewBinder = new ViewBinder();
-            viewBinder.icon = (NetworkImageView )view.findViewById(R.id.event_list_icon);
-            //viewBinder.cover = (NetworkImageView )view.findViewById(R.id.event_list_cover);
+            //viewBinder.icon = (NetworkImageView)view.findViewById(R.id.event_list_icon);
+            viewBinder.cover = (PlaceholderNetworkImageView)view.findViewById(R.id.event_list_cover);
             viewBinder.title = (TextView)view.findViewById(R.id.event_list_title);
             viewBinder.location = (TextView)view.findViewById(R.id.event_list_location);
             viewBinder.startTime = (TextView)view.findViewById(R.id.event_list_start_time);

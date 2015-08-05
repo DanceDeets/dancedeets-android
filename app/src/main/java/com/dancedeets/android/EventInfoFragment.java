@@ -316,7 +316,7 @@ public class EventInfoFragment extends StateFragment<
 
         if (event.getVenue().hasName()) {
             // Set location View to be linkable text
-            SpannableString ss = new SpannableString(event.getVenue().getName());
+            SpannableString ss = new SpannableString(event.getVenue().getName() + ", " + event.getVenue().getAddress());
             ss.setSpan(new URLSpan("#"), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             location.setText(ss, TextView.BufferType.SPANNABLE);
         } else {
