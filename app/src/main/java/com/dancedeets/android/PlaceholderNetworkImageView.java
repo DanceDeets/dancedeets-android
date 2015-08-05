@@ -15,7 +15,7 @@ import com.android.volley.toolbox.NetworkImageView;
  * This requires that we know the image size before we load it,
  * but allows us to avoid hiccups and re-layouting.
  */
-class PlaceholderNetworkImageView extends ImageView {
+public class PlaceholderNetworkImageView extends ImageView {
 
     /** The URL of the network image to load */
     private String mUrl;
