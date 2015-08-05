@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.facebook.Session;
 
@@ -116,6 +117,7 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
     public void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected) {
         FullEvent event = allEvents.get(positionSelected);
         Log.i(LOG_TAG, "Sending Event: " + event);
+        Crashlytics.log("onEventSelected: Index " + positionSelected + ": Event " + event.getId());
         if (mTwoPane) {
             Bundle bundle = event.getBundle();
             // In two-pane mode, show the detail view in this activity by

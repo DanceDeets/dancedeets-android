@@ -95,23 +95,31 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(view)
                 // Add action buttons
-                .setPositiveButton(R.string.action_search, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Dialog d = (Dialog) dialog;
-                        EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
-                        EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
-
-                        mRetained.mOnSearchListener.onSearch(
-                                searchLocation.getText().toString(),
-                                searchKeywords.getText().toString());
-                    }
-                })
+                .setPositiveButton(R.string.action_search, new OnSearchClickHandler(mRetained))
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
         return builder.create();
+    }
+
+    static class OnSearchClickHandler implements DialogInterface.OnClickListener {
+        private final MyRetainedState mRetained;
+
+        public OnSearchClickHandler(MyRetainedState retained) {
+            mRetained = retained;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int id) {
+            Dialog d = (Dialog) dialog;
+            EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
+            EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
+
+            mRetained.mOnSearchListener.onSearch(
+                    searchLocation.getText().toString(),
+                    searchKeywords.getText().toString());
+        }
     }
 
     public void setOnClickHandler(OnSearchListener onSearchListener) {

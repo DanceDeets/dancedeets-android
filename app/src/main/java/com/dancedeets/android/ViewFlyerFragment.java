@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -115,7 +116,6 @@ public class ViewFlyerFragment extends StateFragment<
                 if (viewFlyerFragment.mShareActionProvider != null) {
                     viewFlyerFragment.setupShareIntent();
                 }
-
             }
 
             @Override
@@ -127,9 +127,19 @@ public class ViewFlyerFragment extends StateFragment<
     }
 
     @Nullable
+    private String getEvent() {
+        if (mBundled.mEvent != null) {
+            return mBundled.mEvent.getId();
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBundled.mEvent = FullEvent.parse(getArguments());
+        Crashlytics.log("ViewFlyerFragment.onCreateView: Event " + getEvent());
         Log.i(LOG_TAG, "Received Bundle: " + getArguments());
         mImageViewTouch = new ImageViewTouch(getActivity(), null);
         mImageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
@@ -144,12 +154,14 @@ public class ViewFlyerFragment extends StateFragment<
     }
 
     public void setupShareIntent() {
+        Crashlytics.log("setupShareIntent: Event " + getEvent());
         // Save off flyers to the Pictures/DanceDeets/ directory (they'll show up in Gallery too)
         File localImageUriDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DanceDeets");
         localImageUriDir.mkdirs();
         // Name the files using the sortable event title and date
         String dateString = new SimpleDateFormat("yyyyMMdd").format(mBundled.mEvent.getStartTimeLong());
-        File localImageUri = new File(localImageUriDir, dateString + " - " + mBundled.mEvent.getTitle() + ".jpg");
+        String sanitizedTitle = mBundled.mEvent.getTitle().replace("/", "-");
+        File localImageUri = new File(localImageUriDir, dateString + " - " + sanitizedTitle + ".jpg");
         Log.i(LOG_TAG, "Saving flyer to " + localImageUri);
         try {
             OutputStream out = new FileOutputStream(localImageUri);
