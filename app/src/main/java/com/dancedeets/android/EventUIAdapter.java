@@ -77,7 +77,7 @@ public class EventUIAdapter extends BaseAdapter {
         }
         viewBinder.title.setText(event.getTitle());
         if (event.getVenue().hasName()) {
-            viewBinder.location.setText(event.getVenue().getName());
+            viewBinder.location.setText(event.getVenue().getName() + ", " + event.getVenue().getCityStateCountry());
         } else {
             viewBinder.location.setText("");
         }
