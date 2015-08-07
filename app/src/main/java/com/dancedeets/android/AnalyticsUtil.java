@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.dancedeets.android.models.FullEvent;
-import com.facebook.model.GraphUser;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -60,20 +59,19 @@ public class AnalyticsUtil {
         mGoogleAnalytics.dispatchLocalHits();
     }
 
-    public static void login(GraphUser user) {
-        mMixPanel.identify(user.getId());
+    public static void login(JSONObject user) throws JSONException {
+        mMixPanel.identify(user.getString("id"));
         // Register for notifications
         mMixPanel.getPeople().initPushHandling(GOOGLE_PROJECT_ID);
 
         MixpanelAPI.People people = mMixPanel.getPeople();
-        people.identify(user.getId());
-        people.set("$first_name", user.getFirstName());
-        people.set("$last_name", user.getLastName());
-        people.set("FB Birthday", user.getBirthday());
-        people.set("FB Gender", user.getProperty("gender"));
-        people.set("FB Locale", user.getProperty("locale"));
-        people.set("FB Timezone", user.getProperty("timezone"));
-        people.set("$email", user.getProperty("email"));
+        people.identify(user.getString("id"));
+        people.set("$first_name", user.getString("first_name"));
+        people.set("$last_name", user.getString("last_name"));
+        people.set("FB Gender", user.getString("gender"));
+        people.set("FB Locale", user.getString("locale"));
+        people.set("FB Timezone", user.getString("timezone"));
+        people.set("$email", user.getString("email"));
         // Use SimpleDateFormat instead of DateFormat,
         // since older APIs' DateFormat doesn't support HH (just a hacked kk).
         SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

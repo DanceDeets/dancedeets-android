@@ -22,7 +22,7 @@ import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
-import com.facebook.Session;
+import com.facebook.login.LoginManager;
 
 import org.json.JSONException;
 
@@ -262,13 +262,13 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_feedback:
-                SendFeedback.sendFeedback(this, null);
+                SendFeedback.sendFeedback(this);
                 return true;
             case R.id.action_help:
                 HelpSystem.openHelp(this);
                 return true;
             case R.id.action_logout:
-                Session.getActiveSession().closeAndClearTokenInformation();
+                LoginManager.getInstance().logOut();
                 return true;
             // Respond to the action bar's Up/Home button
             case android.R.id.home:

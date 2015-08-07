@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-     <string name="app_name" translatable="false">DanceDeets</string>
+    <string name="app_name" translatable="false">DanceDeets</string>
     <string name="menu_share">Share…</string>
     <string name="menu_view_map">View on Map</string>
     <string name="menu_view_facebook">View on Facebook</string>

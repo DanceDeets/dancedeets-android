@@ -21,7 +21,7 @@
         android:contentDescription="@string/penguin_name"/>
 
 
-    <com.facebook.widget.LoginButton
+    <com.facebook.login.widget.LoginButton
         android:id="@+id/authButton"
         android:layout_below="@id/penguin"
         android:layout_width="wrap_content"

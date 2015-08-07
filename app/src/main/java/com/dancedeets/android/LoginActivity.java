@@ -16,12 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.SessionState;
-import com.facebook.model.GraphUser;
-import com.facebook.widget.LoginButton;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +32,7 @@ public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
     private boolean mClickedLogin;
+    private AccessTokenTracker mAccessTokenTracker;
 
     public void clickedExplainWhyLogin(View view) {
         AnalyticsUtil.track("Login - Explain Why");
@@ -61,12 +61,12 @@ public class LoginActivity extends FacebookActivity {
     private static class SendAuthRequest implements FetchLocation.AddressListener {
         private static final String LOG_TAG = "SendAuthRequest";
 
-        private final Session mSession;
+        private final AccessToken mAccessToken;
         private final FetchLocation mFetchLocation;
 
-        SendAuthRequest(Session session, FetchLocation fetchLocation) {
-            Log.i(LOG_TAG, "Received session " + session + ", with " + fetchLocation);
-            mSession = session;
+        SendAuthRequest(AccessToken accessToken, FetchLocation fetchLocation) {
+            Log.i(LOG_TAG, "Received access token " + accessToken + ", with " + fetchLocation);
+            mAccessToken = accessToken;
             mFetchLocation = fetchLocation;
         }
 
@@ -91,57 +91,56 @@ public class LoginActivity extends FacebookActivity {
             } else {
                 Log.e(LOG_TAG, "Failed to get address from server, sending update with empty location.");
             }
-            DanceDeetsApi.sendAuth(mSession, addressString);
+            DanceDeetsApi.sendAuth(mAccessToken, addressString);
 
             mFetchLocation.onStop();
         }
     }
 
     // Static context so we don't retain a reference to the possibly-destroyed Activity
-    static class MeCompleted implements Request.GraphUserCallback {
+    static class MeCompleted implements GraphRequest.GraphJSONObjectCallback {
 
-        private final Session mSession;
+        MeCompleted() {}
 
-        MeCompleted(Session session) {
-            mSession = session;
-        }
         @Override
-        public void onCompleted(GraphUser user, Response response) {
-            if (mSession == Session.getActiveSession()) {
-                if (user != null) {
-                    // When we log-in (auto or manual), identify as this uid,
-                    // so all future events (across website and ios/android)
-                    // can be correlated with each other.
-                    AnalyticsUtil.login(user);
+        public void onCompleted(
+                JSONObject object,
+                GraphResponse response) {
+            if (object != null) {
+                // When we log-in (auto or manual), identify as this uid,
+                // so all future events (across website and ios/android)
+                // can be correlated with each other.
+                try {
+                    AnalyticsUtil.login(object);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error sending user data to MixPanel: " + e);
                 }
             }
         }
     }
-    protected void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        // Don't call the super, since we don't want it sending us back to the LoginActivity when logged out
-        // super.onSessionStateChange(session, state, exception);
-        if (state.isOpened()) {
-            Log.i(LOG_TAG, "Activity " + this + " is logged in, with state: " + state);
-            // Only post Complete! events for people who clicked login (no autologin!)
-            if (mClickedLogin) {
-                AnalyticsUtil.track("Login - Completed");
-            }
 
-            Request.executeBatchAsync(Request.newMeRequest(session, new MeCompleted(session)));
+    public void handleLogin(AccessToken accessToken) {
+        // Set the access token using
+        // currentAccessToken when it's loaded or set.
+        Log.i(LOG_TAG, "Activity " + this + " is logged in: " + accessToken);
 
-            FetchLocation fetchLocation = new FetchLocation();
-            fetchLocation.onStart(this, new SendAuthRequest(session, fetchLocation));
+        GraphRequest request = GraphRequest.newMeRequest(
+                accessToken, new MeCompleted());
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link");
+        request.setParameters(parameters);
+        request.executeAsync();
 
-            Intent intent = new Intent(this, EventListActivity.class);
-            intent.setAction(Intent.ACTION_DEFAULT);
-            // We can't use the noHistory option on this activity as we need state retained:
-            // Facebook login navigate to a sub-activity expecting a response back to this one.
-            // So any navigation away must manually ensure there is no history stack retained.
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        } else if (state.isClosed()) {
-            Log.i(LOG_TAG, "Activity " + this + " is logged out, with state: " + state);
-        }
+        FetchLocation fetchLocation = new FetchLocation();
+        fetchLocation.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchLocation));
+
+        Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
+        intent.setAction(Intent.ACTION_DEFAULT);
+        // We can't use the noHistory option on this activity as we need state retained:
+        // Facebook login navigate to a sub-activity expecting a response back to this one.
+        // So any navigation away must manually ensure there is no history stack retained.
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override
@@ -149,9 +148,11 @@ public class LoginActivity extends FacebookActivity {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
 
-        Session cachedSession = Session.openActiveSessionFromCache(this);
-        if (cachedSession == null) {
+        AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+        if (currentAccessToken == null) {
             AnalyticsUtil.track("Login - Not Logged In");
+        } else {
+            handleLogin(currentAccessToken);
         }
 
         // Set (DEBUG) title
@@ -191,16 +192,16 @@ public class LoginActivity extends FacebookActivity {
         }
         setContentView(layoutId);
 
-        TextView link1 = (TextView)findViewById(R.id.login_use_without_fblogin);
+        TextView link1 = (TextView) findViewById(R.id.login_use_without_fblogin);
         if (link1 != null) {
             link1.setTextColor(link1.getLinkTextColors());
         }
-        TextView link2 = (TextView)findViewById(R.id.login_explain_why_login);
+        TextView link2 = (TextView) findViewById(R.id.login_explain_why_login);
         if (link2 != null) {
             link2.setTextColor(link2.getLinkTextColors());
         }
 
-        LoginButton authButton = (LoginButton)findViewById(R.id.authButton);
+        LoginButton authButton = (LoginButton) findViewById(R.id.authButton);
         authButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -210,6 +211,27 @@ public class LoginActivity extends FacebookActivity {
         });
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
         authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
+
+        mAccessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(
+                    AccessToken oldAccessToken,
+                    AccessToken newAccessToken) {
+
+                Log.i(LOG_TAG, "FacebookCallback.onSuccess: " + newAccessToken);
+                // Only post Complete! events for people who clicked login (no autologin!)
+                if (mClickedLogin) {
+                    AnalyticsUtil.track("Login - Completed");
+                }
+                handleLogin(newAccessToken);
+            }
+        };
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAccessTokenTracker.stopTracking();
     }
 
     @Override
@@ -229,7 +251,7 @@ public class LoginActivity extends FacebookActivity {
                 HelpSystem.openHelp(this);
                 return true;
             case R.id.action_feedback:
-                SendFeedback.sendFeedback(this, null);
+                SendFeedback.sendFeedback(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

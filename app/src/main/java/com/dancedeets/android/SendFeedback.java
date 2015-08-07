@@ -8,21 +8,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
 
-import com.facebook.model.GraphUser;
+import com.facebook.Profile;
 
 /**
  * Created by lambert on 2014/12/20.
  */
 public class SendFeedback {
-    public static void sendFeedback(Activity activity, GraphUser user) {
-        Intent intent = buildIntent(activity, user);
+    public static void sendFeedback(Activity activity) {
+        Intent intent = buildIntent(activity);
         activity.startActivity(Intent.createChooser(intent, "Send feedback..."));
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivity(intent);
         }
     }
 
-    private static Intent buildIntent(Activity activity, GraphUser user) {
+    private static Intent buildIntent(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setType("text/plain");
         String subject = "Feedback for Android DanceDeets " + getAppVersion(activity);
@@ -31,8 +31,8 @@ public class SendFeedback {
                         "\nDevice Info:" +
                         getDeviceInformation(activity) +
                         //TODO(lambert): re-enable user information, when we can grab a GraphUser
-                        //"\nUser Info:" +
-                        //getUserInformation(user) +
+                        "\nUser Info:" +
+                        getUserInformation(Profile.getCurrentProfile()) +
                         "\n____________________" +
                         "\n" + activity.getResources().getString(R.string.enter_feedback_here) +
                         "\n";
@@ -44,7 +44,7 @@ public class SendFeedback {
         return intent;
     }
 
-    private static String getUserInformation(GraphUser user) {
+    private static String getUserInformation(com.facebook.Profile user) {
         StringBuilder userInfoBuilder = new StringBuilder();
         userInfoBuilder.append("\nUID: ").append(user.getId());
         userInfoBuilder.append("\nName: ").append(user.getName());

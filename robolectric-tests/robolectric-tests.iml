@@ -71,6 +71,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="internal_impl-21.0.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="library-1.0.6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
@@ -79,11 +80,10 @@
     <orderEntry type="library" exported="" scope="TEST" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="internal_impl-21.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="bolts-android-1.1.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="bolts-android-1.2.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_classes_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_dependency_cache_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="android" level="project" />

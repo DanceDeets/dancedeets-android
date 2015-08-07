@@ -9,7 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.FullEvent;
-import com.facebook.Session;
+import com.facebook.AccessToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,20 +43,20 @@ public class DanceDeetsApi {
         return builder;
     }
 
-    public static void sendAuth(Session session, String location) {
+    public static void sendAuth(AccessToken accessToken, String location) {
         Log.i(LOG_TAG, "sendAuth with location: " + location);
         Uri.Builder builder = generateApiBuilderFor("auth");
         JSONObject jsonPayload = new JSONObject();
         try {
-            jsonPayload.put("access_token", session.getAccessToken());
+            jsonPayload.put("access_token", accessToken.getToken());
             // Sometimes the cached payload has a far-future expiration date. Not really sure why...
             // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
             // must somehow have gotten cached to disk with that large value for the expiration.
             // Alternately, these may represent infinite-duration tokens that never expire.
-            if (!session.getExpirationDate().equals(new Date(Long.MAX_VALUE))) {
-                jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(session.getExpirationDate()));
+            if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
+                jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
             } else {
-                Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + session.getExpirationDate());
+                Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
             }
             jsonPayload.put("location", location);
             jsonPayload.put("client", "android");

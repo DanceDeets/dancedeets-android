@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
-import com.facebook.Session;
+import com.facebook.login.LoginManager;
 
 import java.util.ArrayList;
 
@@ -76,7 +76,7 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_feedback:
-                SendFeedback.sendFeedback(this, null);
+                SendFeedback.sendFeedback(this);
                 return true;
             case R.id.action_add_event:
                 HelpSystem.openAddEvent(this);
@@ -85,7 +85,7 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
                 HelpSystem.openHelp(this);
                 return true;
             case R.id.action_logout:
-                Session.getActiveSession().closeAndClearTokenInformation();
+                LoginManager.getInstance().logOut();
                 return true;
         }
         return super.onOptionsItemSelected(item);

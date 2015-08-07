@@ -56,7 +56,7 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.6'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
     compile 'com.mixpanel.android:mixpanel-android:4.5.0@aar'
-    compile project(':facebook')
+    compile 'com.facebook.android:facebook-android-sdk:4.1.0'
     // Even if we want the advanced features of junit, we can't import it here, or it conflicts with android's junit
     //androidTestCompile('junit:junit:4.11+') {
     //    exclude group: 'org.hamcrest'
