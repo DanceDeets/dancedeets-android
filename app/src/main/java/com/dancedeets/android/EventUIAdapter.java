@@ -61,6 +61,7 @@ public class EventUIAdapter extends BaseAdapter {
     protected void bindView(int position, View view) {
         FullEvent event = (FullEvent)getItem(position);
         ImageLoader thumbnailLoader = VolleySingleton.getInstance().getThumbnailLoader();
+        ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
 
         ViewBinder viewBinder = (ViewBinder)view.getTag();
         if (viewBinder.icon != null) {
@@ -70,7 +71,7 @@ public class EventUIAdapter extends BaseAdapter {
             CoverData coverData = event.getCoverData();
             if (coverData != null) {
                 CoverImage largestCover = coverData.getLargestCover();
-                viewBinder.cover.setImageUrl(largestCover.getSourceUrl(), thumbnailLoader, largestCover.getWidth(), largestCover.getHeight());
+                viewBinder.cover.setImageUrl(largestCover.getSourceUrl(), photoLoader, largestCover.getWidth(), largestCover.getHeight());
             } else {
                 viewBinder.cover.setImageDrawable(null);
             }
