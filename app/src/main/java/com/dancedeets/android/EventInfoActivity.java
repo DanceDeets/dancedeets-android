@@ -94,6 +94,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             writeFile(eventListFile, eventList);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error writing event list cache file: " + e);
+            Crashlytics.log("Error writing event list cache file: " + e);
             return null;
         }
         String eventListFilename = eventListFile.getAbsolutePath();
