@@ -33,11 +33,22 @@
             android:textIsSelectable="true"
             />
 
+
+        <TextView
+            android:id="@+id/rsvp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:text="RSVP"
+            android:textSize="20sp"
+            android:clickable="true"
+            />
+
         <TextView
             android:id="@+id/location"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/title"
+            android:layout_below="@id/rsvp"
             android:ellipsize="marquee"
             android:singleLine="true"
             android:text=""

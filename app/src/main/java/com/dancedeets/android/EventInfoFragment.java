@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,16 +35,29 @@ import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 public class EventInfoFragment extends StateFragment<
         EventInfoFragment.MyBundledState,
         RetainedState> {
+
+    private CallbackManager mCallbackManager;
 
     static protected class MyBundledState extends BundledState {
         FullEvent mEvent;
@@ -79,6 +93,7 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCallbackManager = CallbackManager.Factory.create();
         setHasOptionsMenu(true);
     }
 
@@ -146,6 +161,81 @@ public class EventInfoFragment extends StateFragment<
         }
     }
 
+    public void openRsvpMenu(View rsvpButton) {
+        PopupMenu rsvpMenu = new PopupMenu(getActivity(), rsvpButton);
+        rsvpMenu.inflate(R.menu.rsvp_menu);
+        rsvpMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.attending:
+                        setRsvp("attending");
+                        return true;
+                    case R.id.maybe:
+                        setRsvp("maybe");
+                        return true;
+                    case R.id.declined:
+                        setRsvp("declined");
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        rsvpMenu.show();
+    }
+
+    protected void requestPermissionsAndRetry(final String rsvp) {
+        LoginManager.getInstance().logInWithPublishPermissions(
+                getActivity(),
+                Collections.singletonList("rsvp_event"));
+
+        LoginManager.getInstance().registerCallback(mCallbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        setRsvp(rsvp);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(getActivity(), "RSVP permission was denied, so cannot RSVP on Facebook.", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(FacebookException e) {
+                        Toast.makeText(getActivity(), "Error when requesting RSVP permission, please try again.", Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    protected void setRsvp(final String rsvp) {
+        // Best way to tell if we have permission is to just try
+        // (the cached access token may have stale info)
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + mBundled.mEvent.getId() + "/" + rsvp,
+                null,
+                HttpMethod.POST,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        Log.i(LOG_TAG, "onCompleted: " + response);
+                        FacebookRequestError error = response.getError();
+                        if (error != null && error.getRequestStatusCode() == 403) {
+                            Log.e(LOG_TAG, "Failed to set RSVP, requesting permissions to retry.");
+                            requestPermissionsAndRetry(rsvp);
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
@@ -187,7 +277,7 @@ public class EventInfoFragment extends StateFragment<
                     // HACK to force an end-time, since Sunrise Calendaring doesn't handle missing-end-time intents very well
                     intent.putExtra(
                             CalendarContract.EXTRA_EVENT_END_TIME,
-                            getEvent().getStartTimeLong() + 2*60*60*1000);
+                            getEvent().getStartTimeLong() + 2 * 60 * 60 * 1000);
                 }
                 String description = getEvent().getUrl() + "\n\n" + getEvent().getDescription();
                 intent.putExtra(
@@ -253,15 +343,15 @@ public class EventInfoFragment extends StateFragment<
             Uri translateUrl = Uri.parse("https://translate.google.com/translate_a/t").buildUpon()
                     // I believe this stands for Translate Android
                     .appendQueryParameter("client", "ta")
-                    // version 1.0 returns simple json output, while 2.0 returns more complex data used by the Translate app
+                            // version 1.0 returns simple json output, while 2.0 returns more complex data used by the Translate app
                     .appendQueryParameter("v", "1.0")
-                    // This is necessary, or Google Translate will mistakenly interpret utf8-encoded text as Shift_JIS, and return garbage.
+                            // This is necessary, or Google Translate will mistakenly interpret utf8-encoded text as Shift_JIS, and return garbage.
                     .appendQueryParameter("ie", "UTF-8")
-                    // And really, there's no reason to return data as Shift_JIS either, just creates more room for error.
+                            // And really, there's no reason to return data as Shift_JIS either, just creates more room for error.
                     .appendQueryParameter("oe", "UTF-8")
-                    // Source language unknown
+                            // Source language unknown
                     .appendQueryParameter("sl", "auto")
-                    // And target language is always the locale's language
+                            // And target language is always the locale's language
                     .appendQueryParameter("tl", Locale.getDefault().getLanguage())
                     .build();// android language
             RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
@@ -296,7 +386,7 @@ public class EventInfoFragment extends StateFragment<
 
     public void fillOutView(View rootView, FullEvent event) {
         List<NamedPerson> adminList = event.getAdmins();
-        Log.i(LOG_TAG, "admin list: "+adminList);
+        Log.i(LOG_TAG, "admin list: " + adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
         cover.setImageUrl(event.getCoverUrl(), photoLoader);
@@ -332,14 +422,23 @@ public class EventInfoFragment extends StateFragment<
         startTime.setText(event.getFullTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
         description.setText(event.getDescription());
+
+        TextView rsvpButton = (TextView) rootView.findViewById(R.id.rsvp);
+        rsvpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openRsvpMenu(v);
+            }
+        });
+
     }
 
     /* check if intent is available */
     public static boolean isAvailable(Context ctx, Intent intent) {
         final PackageManager mgr = ctx.getPackageManager();
         List<ResolveInfo> list =
-        mgr.queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
+                mgr.queryIntentActivities(intent,
+                        PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
 
