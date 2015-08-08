@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.LoginButton;
@@ -32,7 +31,6 @@ public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
     private boolean mClickedLogin;
-    private AccessTokenTracker mAccessTokenTracker;
 
     public void clickedExplainWhyLogin(View view) {
         AnalyticsUtil.track("Login - Explain Why");
@@ -143,18 +141,27 @@ public class LoginActivity extends FacebookActivity {
         startActivity(intent);
     }
 
+    protected void logIn(AccessToken newAccessToken) {
+        Log.i(LOG_TAG, "onCurrentAccessTokenChanged: " + newAccessToken);
+        // Only post Complete! events for people who clicked login (no autologin!)
+        if (mClickedLogin) {
+            AnalyticsUtil.track("Login - Completed");
+        }
+        handleLogin(newAccessToken);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
 
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+        Log.i(LOG_TAG, "currentAccessToken is " + currentAccessToken);
         if (currentAccessToken == null) {
             AnalyticsUtil.track("Login - Not Logged In");
         } else {
             handleLogin(currentAccessToken);
         }
-
         // Set (DEBUG) title
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -211,29 +218,6 @@ public class LoginActivity extends FacebookActivity {
         });
         // We should ask for "rsvp_event" later, when needed to actually rsvp for the user? And implement that on the website, too?
         authButton.setReadPermissions("email", "public_profile", "user_events", "user_friends");
-
-        mAccessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(
-                    AccessToken oldAccessToken,
-                    AccessToken newAccessToken) {
-
-                Log.i(LOG_TAG, "FacebookCallback.onSuccess: " + newAccessToken);
-                // Only post Complete! events for people who clicked login (no autologin!)
-                if (mClickedLogin) {
-                    AnalyticsUtil.track("Login - Completed");
-                }
-                if (newAccessToken != null) {
-                    handleLogin(newAccessToken);
-                }
-            }
-        };
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAccessTokenTracker.stopTracking();
     }
 
     @Override

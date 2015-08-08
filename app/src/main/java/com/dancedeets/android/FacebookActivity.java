@@ -30,17 +30,25 @@ public class FacebookActivity extends Activity {
                     AccessToken newAccessToken) {
                 Log.i(LOG_TAG, "onCurrentAccessTokenChanged: " + oldAccessToken + " -> " + newAccessToken);
                 if (newAccessToken == null) {
-                    // Reset the user id, now that they've logged out
-                    AnalyticsUtil.logout();
-
-                    // On logout, send them back to the login screen.
-                    Intent intent = new Intent(FacebookActivity.this, LoginActivity.class);
-                    intent.setAction(Intent.ACTION_MAIN);
-                    startActivity(intent);
+                    logOut();
+                } else if (oldAccessToken == null && newAccessToken != null) {
+                    logIn(newAccessToken);
                 }
             }
         };
+    }
 
+    protected void logOut() {
+        // Reset the user id, now that they've logged out
+        AnalyticsUtil.logout();
+
+        // On logout, send them back to the login screen.
+        Intent intent = new Intent(FacebookActivity.this, LoginActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        startActivity(intent);
+    }
+
+    protected void logIn(AccessToken accessToken) {
     }
 
     @Override
@@ -51,7 +59,7 @@ public class FacebookActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mAccessTokenTracker.stopTracking();
+        super.onDestroy();
     }
 }
