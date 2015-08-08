@@ -33,22 +33,11 @@
             android:textIsSelectable="true"
             />
 
-
-        <TextView
-            android:id="@+id/rsvp"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title"
-            android:text="RSVP"
-            android:textSize="20sp"
-            android:clickable="true"
-            />
-
         <TextView
             android:id="@+id/location"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/rsvp"
+            android:layout_below="@id/title"
             android:ellipsize="marquee"
             android:singleLine="true"
             android:text=""
@@ -70,10 +59,34 @@
             />
 
         <TextView
+            android:id="@+id/rsvp_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date_time"
+            android:text="RSVP: "
+            android:layout_alignBaseline="@+id/rsvp"
+            android:textSize="14sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            />
+
+        <Button
+            android:id="@id/rsvp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date_time"
+            android:layout_toRightOf="@id/rsvp_label"
+            android:layout_toEndOf="@id/rsvp_label"
+            android:text="undecided"
+            android:textSize="14sp"
+            android:clickable="true"
+            />
+
+        <TextView
             android:id="@+id/description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/date_time"
+            android:layout_below="@id/rsvp"
             android:text=""
             android:textSize="14sp"
             android:autoLink="all"

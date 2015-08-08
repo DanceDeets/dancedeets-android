@@ -41,8 +41,10 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
@@ -58,6 +60,7 @@ public class EventInfoFragment extends StateFragment<
         RetainedState> {
 
     private CallbackManager mCallbackManager;
+    private TextView mRsvpButton;
 
     static protected class MyBundledState extends BundledState {
         FullEvent mEvent;
@@ -105,7 +108,7 @@ public class EventInfoFragment extends StateFragment<
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
 
-        ShareActionProvider shareActionProvider = (ShareActionProvider)shareItem.getActionProvider();
+        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         // Track share item clicks
         shareActionProvider.setOnShareTargetSelectedListener(
                 new ShareActionProvider.OnShareTargetSelectedListener() {
@@ -159,6 +162,55 @@ public class EventInfoFragment extends StateFragment<
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);
         }
+    }
+
+    static protected class RsvpReturnedCallback implements GraphRequest.Callback {
+        private RetainedState mRetainedState;
+        private String mRsvp;
+
+        RsvpReturnedCallback(RetainedState retainedState, String rsvp) {
+            mRetainedState = retainedState;
+            mRsvp = rsvp;
+        }
+
+        @Override
+        public void onCompleted(GraphResponse graphResponse) {
+            try {
+                JSONArray rsvpList = graphResponse.getJSONObject().getJSONArray("data");
+                if (rsvpList.length() > 0) {
+                    ((EventInfoFragment) mRetainedState.getTargetFragment()).setRsvpDisplay(mRsvp);
+                }
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "Error loading rsvp data: " + e);
+            }
+        }
+    }
+
+    protected void setRsvpDisplay(String rsvp) {
+        Log.i(LOG_TAG, "rsvp is " + rsvp + " for event " + getEvent().getId());
+        mRsvpButton.setText(rsvp);
+    }
+
+    protected GraphRequest fetchRsvpRequest(String rsvp) {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        Profile profile = Profile.getCurrentProfile();
+        return new GraphRequest(
+                accessToken,
+                "/" + mBundled.mEvent.getId() + "/" + rsvp + "/" + profile.getId(),
+                null,
+                HttpMethod.GET,
+                new RsvpReturnedCallback(mRetained, rsvp)
+        );
+    }
+
+    protected void loadRsvp() {
+        Log.i(LOG_TAG, "Loading event " + getEvent().getId() + " rsvps from facebook");
+        GraphRequestBatch batch = new GraphRequestBatch(
+                fetchRsvpRequest("attending"),
+                fetchRsvpRequest("maybe"),
+                fetchRsvpRequest("declined")
+        );
+        batch.executeAsync();
     }
 
     public void openRsvpMenu(View rsvpButton) {
@@ -224,6 +276,8 @@ public class EventInfoFragment extends StateFragment<
                         if (error != null && error.getRequestStatusCode() == 403) {
                             Log.e(LOG_TAG, "Failed to set RSVP, requesting permissions to retry.");
                             requestPermissionsAndRetry(rsvp);
+                        } else {
+                            setRsvpDisplay(rsvp);
                         }
                     }
                 }
@@ -423,14 +477,14 @@ public class EventInfoFragment extends StateFragment<
         TextView description = (TextView) rootView.findViewById(R.id.description);
         description.setText(event.getDescription());
 
-        TextView rsvpButton = (TextView) rootView.findViewById(R.id.rsvp);
-        rsvpButton.setOnClickListener(new View.OnClickListener() {
+        mRsvpButton = (TextView) rootView.findViewById(R.id.rsvp);
+        loadRsvp();
+        mRsvpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openRsvpMenu(v);
             }
         });
-
     }
 
     /* check if intent is available */
