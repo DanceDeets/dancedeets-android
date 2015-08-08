@@ -3,12 +3,15 @@ package com.dancedeets.android;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.dancedeets.android.models.CoverData;
+import com.dancedeets.android.models.CoverImage;
 
 /**
  * This is a NetworkImageView, that keeps a Placeholder image size before loading the image.
@@ -19,6 +22,7 @@ public class PlaceholderNetworkImageView extends ImageView {
 
     /** The URL of the network image to load */
     private String mUrl;
+    private CoverData mCoverData;
     private int mWidth;
     private int mHeight;
 
@@ -73,6 +77,39 @@ public class PlaceholderNetworkImageView extends ImageView {
     }
 
     /**
+     * Can use setCoverImage or setImageUrl to construct this object.
+     *
+     * It will then fetch the image URL appropriately...in the case of setCoverImage,
+     * it will fetch the smallest image that is larger than our screen size,
+     * to save on network bandwidth.
+     *
+     * @param coverData
+     * @param imageLoader
+     */
+    public void setCoverImage(CoverData coverData, ImageLoader imageLoader) {
+        mCoverData = coverData;
+        mImageLoader = imageLoader;
+        CoverImage cover = coverData.getLargestCover();
+        mWidth = cover.getWidth();
+        mHeight = cover.getHeight();
+        // The URL has potentially changed. See if we need to load it.
+        loadImageIfNecessary(false);
+    }
+
+    protected String getUrl(int width, int height) {
+        if (mUrl != null) {
+            return mUrl;
+        } else {
+            CoverImage image = mCoverData.getSmallestCoverLargerThan(width, height);
+            if (image == null) {
+                image = mCoverData.getLargestCover();
+            }
+            Log.i(VIEW_LOG_TAG, "Largest cover has width " + mCoverData.getLargestCover().getWidth() + ", using cover with width " + image.getWidth());
+            return image.getSourceUrl();
+        }
+    }
+
+    /**
      * Sets the default image resource ID to be used for this view until the attempt to load it
      * completes.
      */
@@ -114,9 +151,10 @@ public class PlaceholderNetworkImageView extends ImageView {
             return;
         }
 
+        String url = getUrl(width, height);
         // if the URL to be loaded in this view is empty, cancel any old requests and clear the
         // currently loaded image.
-        if (TextUtils.isEmpty(mUrl)) {
+        if (TextUtils.isEmpty(url)) {
             if (mImageContainer != null) {
                 mImageContainer.cancelRequest();
                 mImageContainer = null;
@@ -127,7 +165,7 @@ public class PlaceholderNetworkImageView extends ImageView {
 
         // if there was an old request in this view, check if it needs to be canceled.
         if (mImageContainer != null && mImageContainer.getRequestUrl() != null) {
-            if (mImageContainer.getRequestUrl().equals(mUrl)) {
+            if (mImageContainer.getRequestUrl().equals(url)) {
                 // if the request is from the same URL, return.
                 return;
             } else {
@@ -139,7 +177,7 @@ public class PlaceholderNetworkImageView extends ImageView {
 
         // The pre-existing content of this view didn't match the current URL. Load the new image
         // from the network.
-        ImageLoader.ImageContainer newContainer = mImageLoader.get(mUrl,
+        ImageLoader.ImageContainer newContainer = mImageLoader.get(url,
                 new ImageLoader.ImageListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {

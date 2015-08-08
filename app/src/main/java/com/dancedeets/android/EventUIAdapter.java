@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dancedeets.android.models.CoverData;
-import com.dancedeets.android.models.CoverImage;
 import com.dancedeets.android.models.FullEvent;
 
 import java.util.List;
@@ -70,8 +69,7 @@ public class EventUIAdapter extends BaseAdapter {
         if (viewBinder.cover != null) {
             CoverData coverData = event.getCoverData();
             if (coverData != null) {
-                CoverImage largestCover = coverData.getLargestCover();
-                viewBinder.cover.setImageUrl(largestCover.getSourceUrl(), photoLoader, largestCover.getWidth(), largestCover.getHeight());
+                viewBinder.cover.setCoverImage(coverData, photoLoader);
             } else {
                 viewBinder.cover.setImageDrawable(null);
             }

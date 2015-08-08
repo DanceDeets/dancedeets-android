@@ -37,7 +37,20 @@ public class CoverData implements Parcelable, Serializable {
         return mId;
     }
 
-    //TODO: implement more mCover accessors as needed, and optimize as needed
+    public CoverImage getSmallestCoverLargerThan(int width, int height) {
+        CoverImage bestCover = null;
+        for (CoverImage cover : mCovers) {
+            if (bestCover == null || (
+                    (cover.getWidth() > width && cover.getHeight() > height)
+                            &&
+                    (cover.getWidth() < bestCover.getWidth() || cover.getHeight() < bestCover.getHeight())
+            ))
+            {
+                bestCover = cover;
+            }
+        }
+        return bestCover;
+    }
 
     public CoverImage getLargestCover() {
         CoverImage largestCover = null;
