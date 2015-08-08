@@ -127,7 +127,7 @@ public class LoginActivity extends FacebookActivity {
         GraphRequest request = GraphRequest.newMeRequest(
                 accessToken, new MeCompleted());
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link");
+        parameters.putString("fields", "id,name,first_name,last_name,gender,locale,timezone,email,link");
         request.setParameters(parameters);
         request.executeAsync();
 
@@ -223,7 +223,9 @@ public class LoginActivity extends FacebookActivity {
                 if (mClickedLogin) {
                     AnalyticsUtil.track("Login - Completed");
                 }
-                handleLogin(newAccessToken);
+                if (newAccessToken != null) {
+                    handleLogin(newAccessToken);
+                }
             }
         };
     }
