@@ -8,6 +8,7 @@ import android.util.Log;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
+import com.facebook.appevents.AppEventsLogger;
 
 /**
  * Created by lambert on 2014/11/08.
@@ -61,5 +62,17 @@ public class FacebookActivity extends Activity {
     public void onDestroy() {
         mAccessTokenTracker.stopTracking();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AppEventsLogger.deactivateApp(this);
     }
 }
