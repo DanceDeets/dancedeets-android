@@ -30,7 +30,7 @@
         android:layout_centerHorizontal="true"
         android:text="@string/login_or"/>
 
-    <com.facebook.widget.LoginButton
+    <com.facebook.login.widget.LoginButton
         android:id="@+id/authButton"
         android:layout_below="@id/or_text_view"
         android:layout_width="wrap_content"
