@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <fragment
-        android:id="@+id/event_list_fragment"
-        android:name="com.dancedeets.android.EventListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".EventList"
-        tools:layout="@layout/event_list_layout" />
+    android:layout_height="match_parent" >
 
-</FrameLayout>
+    <android.support.v4.view.PagerTabStrip
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:textColor="#000000" />
+
+</android.support.v4.view.ViewPager>

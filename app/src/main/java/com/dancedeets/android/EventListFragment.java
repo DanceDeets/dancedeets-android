@@ -29,8 +29,22 @@ import java.util.List;
 
 public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
 
-    static protected class MyBundledState extends BundledState {
+    private EventSearchType mEventSearchType;
 
+    private final static String EVENT_SEARCH_TYPE = "EVENT_SEARCH_TYPE";
+
+    enum EventSearchType {
+        UPCOMING("UPCOMING"),
+        ONGOING("ONGOING");
+
+        private final String mType;
+
+        EventSearchType(String type) {
+            mType = type;
+        }
+    }
+
+    static protected class MyBundledState extends BundledState {
         /**
          * The current activated item position. Only used on tablets.
          */
@@ -83,6 +97,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public EventListFragment() {
     }
 
+    public void setEventSearchType(EventSearchType eventSearchType) {
+        mEventSearchType = eventSearchType;
+    }
 
     @Override
     public MyBundledState buildBundledState() {
@@ -96,7 +113,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     @Override
     public String getUniqueTag() {
-        return LOG_TAG;
+        return LOG_TAG + "." + mEventSearchType;
     }
 
     protected void handleEventList(List<FullEvent> eventList) {

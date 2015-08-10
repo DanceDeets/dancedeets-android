@@ -24,14 +24,14 @@ import static org.hamcrest.text.StringContains.containsString;
 /**
  * Created by lambert on 2014/10/28.
  */
-public class EventListActivityTest extends CommonActivityTest<EventListActivity> {
+public class SearchListActivityTest extends CommonActivityTest<SearchListActivity> {
 
     private final static String LOG_TAG = "EventListActivityTest";
 
     private final static String mEventTitle = "Event 1";
 
-    public EventListActivityTest() throws NoSuchFieldException {
-        super(EventListActivity.class);
+    public SearchListActivityTest() throws NoSuchFieldException {
+        super(SearchListActivity.class);
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +20,7 @@ import com.facebook.login.LoginManager;
 import java.util.ArrayList;
 
 
-public class EventListActivity extends FacebookActivity implements EventListFragment.Callbacks {
+public class SearchListActivity extends FacebookActivity implements EventListFragment.Callbacks {
 
     private static final String LOG_TAG = "EventListActivity";
 
@@ -28,6 +29,8 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
      * device.
      */
     private boolean mTwoPane;
+
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,13 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
         }
 
         setContentView(R.layout.activity_event_list);
+
+
+        // Locate the viewpager in activity_main.xml
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+
+        // Set the ViewPagerAdapter into ViewPager
+        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager()));
 
         if (findViewById(R.id.event_info_fragment) != null) {
             // The detail container view will be present only in the
@@ -103,9 +113,14 @@ public class EventListActivity extends FacebookActivity implements EventListFrag
     private void handleIntent(Intent intent) {
         Log.i(LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
-                    R.id.event_list_fragment);
-            fragment.startSearchFor("", intent.getStringExtra(SearchManager.QUERY));
+            // TODO: Search tab 0 each time??
+            EventListFragment upcomingFragment = (EventListFragment)mViewPager.getAdapter().instantiateItem(mViewPager, 0);
+            //EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
+            //        R.id.event_list_fragment);
+            upcomingFragment.startSearchFor("", intent.getStringExtra(SearchManager.QUERY));
+            //TODO: Switch to tab??
+            //Update all tabs?
+            // Fix search routing procedures!
         }
     }
 

@@ -30,25 +30,26 @@ public class RobolectricTest {
 
     @Test
     public void testSomething() throws Exception {
-        ActivityController<EventListActivity> activityController = Robolectric.buildActivity(EventListActivity.class);
-        EventListActivity activity = activityController.create().get();
+        ActivityController<SearchListActivity> activityController = Robolectric.buildActivity(SearchListActivity.class);
+        SearchListActivity activity = activityController.create().get();
         assertNotNull(activity);
 
         // Assert that we get the single-pane view
         EventListFragment listFragment = (EventListFragment)activity.getFragmentManager().findFragmentById(R.id.event_list_fragment);
         assertNotNull(listFragment);
-        listFragment.mGoogleApiClient = new MockGoogleApiClient(listFragment);
+        FetchLocation fetchLocation = listFragment.mRetained.mFetchLocation;
+        listFragment.mGoogleApiClient = new MockGoogleApiClient(fetchLocation);
         Location location = new Location("flp");
         location.setLatitude(37.377166);
         location.setLongitude(-122.086966);
         location.setAccuracy(3.0f);
-        listFragment.mLocationProviderApi = new MockLocationProviderApi(location);
+        fetchLocation.mLocationProviderApi = new MockLocationProviderApi(location);
 
         assertNull(activity.findViewById(R.id.event_info_fragment));
-        assertEquals(0, listFragment.mEventList.size());
+        assertEquals(0, listFragment.mBundled.mEventList.size());
 
 
-        ShadowGeocoder geocoder = Robolectric.shadowOf(listFragment.mGeocoder);
+        ShadowGeocoder geocoder = Robolectric.shadowOf(fetchLocation.mGeocoder);
         geocoder.setSimulatedResponse("", "New York", "NY", "", "US");
 
         Bundle restoreBundle = new Bundle();
@@ -56,7 +57,7 @@ public class RobolectricTest {
 
         // Run the background task (which should be the data load)
         Robolectric.runUiThreadTasksIncludingDelayedTasks();
-        assertEquals(0, listFragment.mEventList.size());
+        assertEquals(0, listFragment.mBundled.mEventList.size());
 
     }
 }

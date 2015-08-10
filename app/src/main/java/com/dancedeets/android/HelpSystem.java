@@ -18,7 +18,7 @@ public class HelpSystem {
         }
     }
 
-    public static void openAddEvent(EventListActivity activity) {
+    public static void openAddEvent(SearchListActivity activity) {
         AnalyticsUtil.track("Add Event");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.dancedeets.com/events_add?hl=" + Locale.getDefault().getLanguage()));
         if (intent.resolveActivity(activity.getPackageManager()) != null) {

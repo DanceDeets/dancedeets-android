@@ -132,7 +132,7 @@ public class LoginActivity extends FacebookActivity {
         FetchLocation fetchLocation = new FetchLocation();
         fetchLocation.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchLocation));
 
-        Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
+        Intent intent = new Intent(LoginActivity.this, SearchListActivity.class);
         intent.setAction(Intent.ACTION_DEFAULT);
         // We can't use the noHistory option on this activity as we need state retained:
         // Facebook login navigate to a sub-activity expecting a response back to this one.

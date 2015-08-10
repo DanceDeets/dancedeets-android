@@ -8,7 +8,7 @@
     <bool name="ga_reportUncaughtExceptions">true</bool>
 
     <!-- The screen names that will appear in reports -->
-    <screenName name="com.dancedeets.android.EventListActivity">
+    <screenName name="com.dancedeets.android.SearchListActivity">
         Event List
     </screenName>
     <screenName name="com.dancedeets.android.EventInfoActivity">
