@@ -51,6 +51,7 @@ import com.facebook.login.LoginResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.List;
@@ -182,9 +183,15 @@ public class EventInfoFragment extends StateFragment<
                 Crashlytics.log("FB Error loading rsvp data: " + error);
             } else {
                 try {
-                    JSONArray rsvpList = graphResponse.getJSONObject().getJSONArray("data");
-                    if (rsvpList.length() > 0) {
-                        ((EventInfoFragment) mRetainedState.getTargetFragment()).setRsvpDisplay(mRsvp);
+                    JSONObject result = graphResponse.getJSONObject();
+                    if (result == null) {
+                        Log.e(LOG_TAG, "JSON Error loading rsvp data, no json object: " + graphResponse.getRawResponse());
+                        Crashlytics.log("JSON Error loading rsvp data, no json object: " + graphResponse.getRawResponse());
+                    } else {
+                        JSONArray rsvpList = result.getJSONArray("data");
+                        if (rsvpList.length() > 0) {
+                            ((EventInfoFragment) mRetainedState.getTargetFragment()).setRsvpDisplay(mRsvp);
+                        }
                     }
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "JSON Error loading rsvp data: " + e);
