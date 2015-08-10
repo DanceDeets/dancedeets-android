@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.LatLong;
 import com.dancedeets.android.models.NamedPerson;
@@ -175,13 +176,20 @@ public class EventInfoFragment extends StateFragment<
 
         @Override
         public void onCompleted(GraphResponse graphResponse) {
-            try {
-                JSONArray rsvpList = graphResponse.getJSONObject().getJSONArray("data");
-                if (rsvpList.length() > 0) {
-                    ((EventInfoFragment) mRetainedState.getTargetFragment()).setRsvpDisplay(mRsvp);
+            FacebookRequestError error = graphResponse.getError();
+            if (error != null) {
+                Log.e(LOG_TAG, "FB Error loading rsvp data: " + error);
+                Crashlytics.log("FB Error loading rsvp data: " + error);
+            } else {
+                try {
+                    JSONArray rsvpList = graphResponse.getJSONObject().getJSONArray("data");
+                    if (rsvpList.length() > 0) {
+                        ((EventInfoFragment) mRetainedState.getTargetFragment()).setRsvpDisplay(mRsvp);
+                    }
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "JSON Error loading rsvp data: " + e);
+                    Crashlytics.log("JSON Error loading rsvp data: " + e);
                 }
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Error loading rsvp data: " + e);
             }
         }
     }
