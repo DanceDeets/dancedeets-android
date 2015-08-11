@@ -30,20 +30,9 @@ import java.util.List;
 public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
 
     private boolean mTwoPane;
-    private EventSearchType mEventSearchType;
+    private SearchOptions.TimePeriod mEventSearchType;
 
     private final static String EVENT_SEARCH_TYPE = "EVENT_SEARCH_TYPE";
-
-    enum EventSearchType {
-        UPCOMING("UPCOMING"),
-        ONGOING("ONGOING");
-
-        private final String mType;
-
-        EventSearchType(String type) {
-            mType = type;
-        }
-    }
 
     static protected class MyBundledState extends BundledState {
         /**
@@ -102,7 +91,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         mTwoPane = twoPane;
     }
 
-    public void setEventSearchType(EventSearchType eventSearchType) {
+    public void setEventSearchType(SearchOptions.TimePeriod eventSearchType) {
         mEventSearchType = eventSearchType;
     }
 
@@ -189,6 +178,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         SearchOptions searchOptions = mBundled.mSearchOptions;
         searchOptions.location = location;
         searchOptions.keywords = keywords;
+        searchOptions.timePeriod = mEventSearchType;
         // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
         String listDescription;
         if (searchOptions.keywords.isEmpty()) {

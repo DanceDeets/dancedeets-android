@@ -9,7 +9,7 @@ import android.support.v13.app.FragmentPagerAdapter;
  */
 public class SearchPagerAdapter extends FragmentPagerAdapter {
     // Tab Titles
-    private static final String tabTitles[] = new String[] { "Upcoming Events" };//, "Ongoing Events" };
+    private static final String tabTitles[] = new String[] { "Upcoming Events", "Ongoing Events" };
     final static int PAGE_COUNT = tabTitles.length;
 
     private boolean mTwoPane;
@@ -25,13 +25,13 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 EventListFragment upcoming_fragment = new EventListFragment();
-                upcoming_fragment.setEventSearchType(EventListFragment.EventSearchType.UPCOMING);
+                upcoming_fragment.setEventSearchType(SearchOptions.TimePeriod.UPCOMING);
                 upcoming_fragment.setTwoPane(mTwoPane);
                 return upcoming_fragment;
 
             case 1:
                 EventListFragment ongoing_fragment = new EventListFragment();
-                ongoing_fragment.setEventSearchType(EventListFragment.EventSearchType.ONGOING);
+                ongoing_fragment.setEventSearchType(SearchOptions.TimePeriod.ONGOING);
                 ongoing_fragment.setTwoPane(mTwoPane);
                 return ongoing_fragment;
         }

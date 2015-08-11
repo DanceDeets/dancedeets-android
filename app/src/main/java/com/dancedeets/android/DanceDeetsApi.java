@@ -29,7 +29,7 @@ public class DanceDeetsApi {
 
     private static String LOG_TAG = "DanceDeetsApi";
 
-    private static String VERSION = "v1.0";
+    private static String VERSION = "v1.1";
 
     private static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
@@ -187,6 +187,7 @@ public class DanceDeetsApi {
         Uri.Builder builder = generateApiBuilderFor("search");
         builder.appendQueryParameter("location", searchOptions.location);
         builder.appendQueryParameter("keywords", searchOptions.keywords);
+        builder.appendQueryParameter("time_period", searchOptions.timePeriod.toString());
         builder.appendQueryParameter("distance", "10");
         builder.appendQueryParameter("distance_units", "miles");
         final Uri searchUri = builder.build();
