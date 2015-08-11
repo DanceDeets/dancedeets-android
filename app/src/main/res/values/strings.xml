@@ -36,4 +36,7 @@
     <string name="events_near">Events near %1$s</string>
     <string name="events_near_with_keyword">Events near %1$s with keywords "%2$s"</string>
     <string name="events_with_keyword">Events with keywords "%1$s"</string>
+    <string name="tab_upcoming_events">Upcoming Events</string>
+    <string name="tab_ongoing_events">Ongoing Events</string>
+    <string name="tab_past_events">Past Events</string>
 </resources>

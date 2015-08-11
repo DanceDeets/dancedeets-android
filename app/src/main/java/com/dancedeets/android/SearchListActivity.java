@@ -63,7 +63,7 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
         }
 
         // Set the ViewPagerAdapter into ViewPager
-        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), mTwoPane));
+        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), getResources(), mTwoPane));
 
         if (savedInstanceState == null) {
             handleIntent(getIntent());

@@ -2,6 +2,7 @@ package com.dancedeets.android;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.res.Resources;
 import android.support.v13.app.FragmentPagerAdapter;
 
 /**
@@ -9,13 +10,16 @@ import android.support.v13.app.FragmentPagerAdapter;
  */
 public class SearchPagerAdapter extends FragmentPagerAdapter {
     // Tab Titles
-    private static final String tabTitles[] = new String[] { "Upcoming Events", "Ongoing Events", "Past Events" };
-    final static int PAGE_COUNT = tabTitles.length;
+    private static final int tabTitles[] = new int[] { R.string.tab_upcoming_events, R.string.tab_ongoing_events, R.string.tab_past_events};
+    private static final int PAGE_COUNT = tabTitles.length;
+
+    private final Resources mResources;
 
     private boolean mTwoPane;
 
-    public SearchPagerAdapter(FragmentManager fm, boolean twoPane) {
+    public SearchPagerAdapter(FragmentManager fm, Resources resources, boolean twoPane) {
         super(fm);
+        mResources = resources;
         mTwoPane = twoPane;
     }
 
@@ -46,7 +50,7 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return tabTitles[position];
+        return mResources.getString(tabTitles[position]);
     }
 
     @Override
