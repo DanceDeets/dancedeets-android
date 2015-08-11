@@ -29,8 +29,9 @@ import java.util.List;
 
 public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
 
-    private boolean mTwoPane;
     private SearchOptions.TimePeriod mEventSearchType;
+
+    private boolean mTwoPane;
 
     private final static String EVENT_SEARCH_TYPE = "EVENT_SEARCH_TYPE";
 
@@ -43,6 +44,15 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         ArrayList<FullEvent> mEventList = new ArrayList<>();
 
         SearchOptions mSearchOptions = new SearchOptions();
+
+        SearchOptions.TimePeriod mEventSearchType;
+
+        boolean mTwoPane;
+
+        MyBundledState(SearchOptions.TimePeriod eventSearchType, boolean twoPane) {
+            mEventSearchType = eventSearchType;
+            mTwoPane = twoPane;
+        }
     }
 
     static public class MyRetainedState extends RetainedState {
@@ -88,26 +98,48 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     public void setTwoPane(boolean twoPane) {
-        mTwoPane = twoPane;
+        if (mBundled != null) {
+            mBundled.mTwoPane = twoPane;
+        } else {
+            mTwoPane = twoPane;
+        }
     }
 
     public void setEventSearchType(SearchOptions.TimePeriod eventSearchType) {
-        mEventSearchType = eventSearchType;
+        if (mBundled != null) {
+            mBundled.mEventSearchType = eventSearchType;
+        } else {
+            mEventSearchType = eventSearchType;
+        }
     }
 
     @Override
     public MyBundledState buildBundledState() {
-        return new MyBundledState();
+        /**
+         *
+         * Before this function is called, we read/set mEventSearchType/mTwoPane directly on this class.
+         * This allows us to initialize this class with its identity and index as a tab.
+         * This is used by getUniqueTag to construct an correctly named Retained fragment onAttach.
+         * Then we construct a Bundled object here, copying over the relevant fields.
+         * After this function is called, we use the fields on the persistable mBundled object directly.
+         * Then we rely on persisting through the Bundled object.
+         */
+
+        return new MyBundledState(mEventSearchType, mTwoPane);
+    }
+
+    @Override
+    public String getUniqueTag() {
+        if (mBundled != null) {
+            return LOG_TAG + "." + mBundled.mEventSearchType;
+        } else {
+            return LOG_TAG + "." + mEventSearchType;
+        }
     }
 
     @Override
     public MyRetainedState buildRetainedState() {
         return new MyRetainedState();
-    }
-
-    @Override
-    public String getUniqueTag() {
-        return LOG_TAG + "." + mEventSearchType;
     }
 
     protected void handleEventList(List<FullEvent> eventList) {
@@ -178,7 +210,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         SearchOptions searchOptions = mBundled.mSearchOptions;
         searchOptions.location = location;
         searchOptions.keywords = keywords;
-        searchOptions.timePeriod = mEventSearchType;
+        searchOptions.timePeriod = mBundled.mEventSearchType;
         // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
         String listDescription;
         if (searchOptions.keywords.isEmpty()) {
@@ -312,7 +344,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         // In two-pane mode, list items should be given the
         // 'activated' state when touched.
-        if (mTwoPane) {
+        if (mBundled.mTwoPane) {
             // When setting CHOICE_MODE_SINGLE, ListView will automatically
             // give items the 'activated' state when touched.
             listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
