@@ -99,13 +99,15 @@ public class PlaceholderNetworkImageView extends ImageView {
     protected String getUrl(int width, int height) {
         if (mUrl != null) {
             return mUrl;
-        } else {
+        } else if (mCoverData != null) {
             CoverImage image = mCoverData.getSmallestCoverLargerThan(width, height);
             if (image == null) {
                 image = mCoverData.getLargestCover();
             }
             Log.i(VIEW_LOG_TAG, "Largest cover has width " + mCoverData.getLargestCover().getWidth() + ", using cover with width " + image.getWidth());
             return image.getSourceUrl();
+        } else {
+            return null;
         }
     }
 
