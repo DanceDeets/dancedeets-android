@@ -29,6 +29,7 @@ import java.util.List;
 
 public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
 
+    private boolean mTwoPane;
     private EventSearchType mEventSearchType;
 
     private final static String EVENT_SEARCH_TYPE = "EVENT_SEARCH_TYPE";
@@ -95,6 +96,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     LocationManager mLocationManager;
 
     public EventListFragment() {
+    }
+
+    public void setTwoPane(boolean twoPane) {
+        mTwoPane = twoPane;
     }
 
     public void setEventSearchType(EventSearchType eventSearchType) {
@@ -303,7 +308,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          * the ProgressBar and ListContainer(List+EmptyView) to alternate.
          * And within the List, it will then alternate with the EmptyView.
          */
-        ViewParent listContainerView = listRootView.findViewById(android.R.id.list).getParent();
+        ListView listView = (ListView)listRootView.findViewById(android.R.id.list);
+        ViewParent listContainerView = listView.getParent();
         ((ViewGroup) listContainerView).addView(mEmptyListView);
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
@@ -313,6 +319,17 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         if (savedInstanceState != null) {
             onEventListFilled();
         }
+
+        // In two-pane mode, list items should be given the
+        // 'activated' state when touched.
+        if (mTwoPane) {
+            // When setting CHOICE_MODE_SINGLE, ListView will automatically
+            // give items the 'activated' state when touched.
+            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        } else {
+            listView.setChoiceMode(ListView.CHOICE_MODE_NONE);
+        }
+
 
         return rootView;
     }
@@ -405,20 +422,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
             mCallbacks.onEventSelected(mBundled.mEventList, position);
-        }
-    }
-
-    /**
-     * Turns on activate-on-click mode. When this mode is on, list items will be
-     * given the 'activated' state when touched.
-     */
-    public void setActivateOnItemClick(boolean activateOnItemClick) {
-        if (activateOnItemClick) {
-            // When setting CHOICE_MODE_SINGLE, ListView will automatically
-            // give items the 'activated' state when touched.
-            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        } else {
-            getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
         }
     }
 

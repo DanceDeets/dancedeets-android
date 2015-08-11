@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/event_list_twopane_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,23 +9,16 @@
 
     <FrameLayout
         android:layout_height="match_parent"
-        android:layout_width="0px"
-        android:layout_weight="0.8"
+        android:layout_width="320dp"
+        android:layout_weight="0"
         >
-        <fragment
-            android:id="@+id/event_list_fragment"
-            android:name="com.dancedeets.android.EventListFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".EventList"
-            tools:layout="@layout/event_list_layout" />
-
+        <include layout="@layout/fragment_pager" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/event_info_fragment"
         android:layout_width="0px"
-        android:layout_weight="0"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         />
 </LinearLayout>
