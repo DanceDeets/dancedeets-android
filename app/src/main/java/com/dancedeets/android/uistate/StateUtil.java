@@ -9,6 +9,8 @@ import android.os.Bundle;
  */
 public class StateUtil {
 
+    private static String BUNDLED_STATE = "BUNDLED_STATE";
+
     public static<Retained extends RetainedState> Retained createRetained(StateHolder<?, Retained> stateHolder, Activity activity) {
         String fragmentTag = "Fragment" + stateHolder.getUniqueTag();
 
@@ -41,16 +43,15 @@ public class StateUtil {
 
 
     public static<Bundled extends BundledState> Bundled createBundled(StateHolder<Bundled, ?> stateHolder, Bundle savedInstanceState) {
-        String tag = stateHolder.getUniqueTag();
         if (savedInstanceState != null) {
-            return (Bundled) savedInstanceState.getSerializable(tag);
+            return (Bundled) savedInstanceState.getSerializable(BUNDLED_STATE);
         } else {
             return stateHolder.buildBundledState();
         }
     }
 
     public static<Bundled extends BundledState> void saveBundled(StateHolder<Bundled, ?> stateHolder, Bundled mBundled, Bundle outState) {
-        outState.putSerializable(stateHolder.getUniqueTag(), mBundled);
+        outState.putSerializable(BUNDLED_STATE, mBundled);
     }
 
 
