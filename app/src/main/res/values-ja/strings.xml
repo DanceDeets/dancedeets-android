@@ -33,4 +33,7 @@
     <string name="events_near">%1$sに近いイベント</string>
     <string name="events_near_with_keyword">「%2$s」を含む%1$sに近いイベント</string>
     <string name="events_with_keyword">「%1$s」を含むイベント</string>
+    <string name="tab_upcoming_events">今後のイベント</string>
+    <string name="tab_ongoing_events">進行中のイベント</string>
+    <string name="tab_past_events">過去のイベント</string>
 </resources>

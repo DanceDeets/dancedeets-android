@@ -33,4 +33,7 @@
     <string name="events_near">근처 이벤트 %1$s</string>
     <string name="events_near_with_keyword">근처 이벤트 %1$s 검색 키워드 "%2$s"</string>
     <string name="events_with_keyword">키워드 검색 이벤트 "%1$s"</string>
+    <string name="tab_upcoming_events">다가오는 이벤트</string>
+    <string name="tab_ongoing_events">진행중인 이벤트</string>
+    <string name="tab_past_events">지난 이벤트</string>
 </resources>
