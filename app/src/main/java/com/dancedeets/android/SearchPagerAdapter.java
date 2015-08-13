@@ -10,7 +10,7 @@ import android.support.v13.app.FragmentPagerAdapter;
  */
 public class SearchPagerAdapter extends FragmentPagerAdapter {
     // Tab Titles
-    private static final int tabTitles[] = new int[] { R.string.tab_upcoming_events, R.string.tab_ongoing_events, R.string.tab_past_events};
+    private static final int tabTitles[] = new int[] { R.string.tab_upcoming_events};//, R.string.tab_ongoing_events, R.string.tab_past_events};
     private static final int PAGE_COUNT = tabTitles.length;
 
     private final Resources mResources;
