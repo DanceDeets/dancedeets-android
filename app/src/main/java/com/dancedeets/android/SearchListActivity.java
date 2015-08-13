@@ -106,7 +106,7 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
     }
 
     private void handleIntent(Intent intent) {
-        Log.i(LOG_TAG, "handleIntent: " + intent);
+        Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // TODO: Search tab 0 each time??
             EventListFragment upcomingFragment = (EventListFragment)mViewPager.getAdapter().instantiateItem(mViewPager, 0);
@@ -126,7 +126,7 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
     @Override
     public void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected) {
         FullEvent event = allEvents.get(positionSelected);
-        Log.i(LOG_TAG, "Sending Event: " + event);
+        Crashlytics.log(Log.INFO, LOG_TAG, "Sending Event: " + event);
         Crashlytics.log("onEventSelected: Index " + positionSelected + ": Event " + event.getId());
         if (mTwoPane) {
             Bundle bundle = event.getBundle();

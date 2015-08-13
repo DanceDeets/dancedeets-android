@@ -179,14 +179,12 @@ public class EventInfoFragment extends StateFragment<
         public void onCompleted(GraphResponse graphResponse) {
             FacebookRequestError error = graphResponse.getError();
             if (error != null) {
-                Log.e(LOG_TAG, "FB Error loading rsvp data: " + error);
-                Crashlytics.log("FB Error loading rsvp data: " + error);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "FB Error loading rsvp data: " + error);
             } else {
                 try {
                     JSONObject result = graphResponse.getJSONObject();
                     if (result == null) {
-                        Log.e(LOG_TAG, "JSON Error loading rsvp data, no json object: " + graphResponse.getRawResponse());
-                        Crashlytics.log("JSON Error loading rsvp data, no json object: " + graphResponse.getRawResponse());
+                        Crashlytics.log(Log.ERROR, LOG_TAG, "JSON Error loading rsvp data, no json object: " + graphResponse.getRawResponse());
                     } else {
                         JSONArray rsvpList = result.getJSONArray("data");
                         if (rsvpList.length() > 0) {
@@ -194,21 +192,21 @@ public class EventInfoFragment extends StateFragment<
                         }
                     }
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, "JSON Error loading rsvp data: " + e);
-                    Crashlytics.log("JSON Error loading rsvp data: " + e);
+                    Crashlytics.log(Log.ERROR, LOG_TAG, "JSON Error loading rsvp data: " + e);
                 }
             }
         }
     }
 
     protected void setRsvpDisplay(String rsvp) {
-        Log.i(LOG_TAG, "rsvp is " + rsvp + " for event " + getEvent().getId());
+        Crashlytics.log(Log.INFO, LOG_TAG, "rsvp is " + rsvp + " for event " + getEvent().getId());
         mRsvpButton.setText(rsvp);
     }
 
     protected GraphRequest fetchRsvpRequest(String rsvp) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
+        Crashlytics.log(Log.INFO, LOG_TAG, "AccessToken is " + accessToken + ", profile is " + profile + ", mBundle is " + mBundled);
         return new GraphRequest(
                 accessToken,
                 "/" + mBundled.mEvent.getId() + "/" + rsvp + "/" + profile.getId(),
@@ -219,7 +217,7 @@ public class EventInfoFragment extends StateFragment<
     }
 
     protected void loadRsvp() {
-        Log.i(LOG_TAG, "Loading event " + getEvent().getId() + " rsvps from facebook");
+        Crashlytics.log(Log.INFO, LOG_TAG, "Loading event " + getEvent().getId() + " rsvps from facebook");
         GraphRequestBatch batch = new GraphRequestBatch(
                 fetchRsvpRequest("attending"),
                 fetchRsvpRequest("maybe"),
@@ -286,10 +284,10 @@ public class EventInfoFragment extends StateFragment<
                 HttpMethod.POST,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
-                        Log.i(LOG_TAG, "onCompleted: " + response);
+                        Crashlytics.log(Log.INFO, LOG_TAG, "onCompleted: " + response);
                         FacebookRequestError error = response.getError();
                         if (error != null && error.getRequestStatusCode() == 403) {
-                            Log.e(LOG_TAG, "Failed to set RSVP, requesting permissions to retry.");
+                            Crashlytics.log(Log.INFO, LOG_TAG, "Failed to set RSVP, requesting permissions to retry.");
                             requestPermissionsAndRetry(rsvp);
                         } else {
                             setRsvpDisplay(rsvp);
@@ -378,14 +376,14 @@ public class EventInfoFragment extends StateFragment<
                 eventInfoFragment.mBundled.mTranslatedDescription = response.getJSONArray(1).getString(0);
                 eventInfoFragment.swapTitleAndDescription();
             } catch (JSONException error) {
-                Log.e(LOG_TAG, "Translation failed: " + error);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Translation failed: " + error);
                 Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
             }
         }
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Log.e(LOG_TAG, "Translation failed: " + error);
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Translation failed: " + error);
             Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
         }
     }
@@ -455,14 +453,14 @@ public class EventInfoFragment extends StateFragment<
 
     public void fillOutView(View rootView, FullEvent event) {
         List<NamedPerson> adminList = event.getAdmins();
-        Log.i(LOG_TAG, "admin list: " + adminList);
+        Crashlytics.log(Log.INFO, LOG_TAG, "admin list: " + adminList);
         ImageLoader photoLoader = VolleySingleton.getInstance().getPhotoLoader();
         NetworkImageView cover = (NetworkImageView) rootView.findViewById(R.id.cover);
         cover.setImageUrl(event.getCoverUrl(), photoLoader);
         cover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "Creating intent for flyer view.");
+                Crashlytics.log(Log.INFO, LOG_TAG, "Creating intent for flyer view.");
                 Intent detailIntent = new Intent(getActivity(), ViewFlyerActivity.class);
                 detailIntent.putExtras(getEvent().getBundle());
                 startActivity(detailIntent);

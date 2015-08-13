@@ -74,7 +74,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         OutputStream fos = new FileOutputStream(eventListFile);
         long time = System.currentTimeMillis();
         fos.write(ParcelableUtil.marshallList(eventList));
-        Log.i(LOG_TAG, "Writing eventList to disk took " + (System.currentTimeMillis() - time) + "ms");
+        Crashlytics.log(Log.INFO, LOG_TAG, "Writing eventList to disk took " + (System.currentTimeMillis() - time) + "ms");
         fos.close();
     }
 
@@ -83,7 +83,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         ArrayList<FullEvent> eventList = new ArrayList<>();
         long time = System.currentTimeMillis();
         ParcelableUtil.unmarshallList(bytes, eventList, FullEvent.CREATOR);
-        Log.i(LOG_TAG, "Loading eventList from disk took " + (System.currentTimeMillis() - time) + "ms");
+        Crashlytics.log(Log.INFO, LOG_TAG, "Loading eventList from disk took " + (System.currentTimeMillis() - time) + "ms");
         return eventList;
     }
 
@@ -93,8 +93,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         try {
             writeFile(eventListFile, eventList);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error writing event list cache file: " + e);
-            Crashlytics.log("Error writing event list cache file: " + e);
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Error writing event list cache file: " + e);
             return null;
         }
         String eventListFilename = eventListFile.getAbsolutePath();
@@ -128,8 +127,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             // and only be overridden by any onNewIntent down the line.
             String tag = getUniqueTag();
             mBundled = (MyBundledState) savedInstanceState.getSerializable(tag);
-            Crashlytics.log("onCreate.savedInstanceState: List size is " + mBundled.mEventList.size());
-            Crashlytics.log("onCreate.savedInstanceState: Event index is " + mBundled.mEventIndex);
+            Crashlytics.log(Log.INFO, LOG_TAG, "onCreate.savedInstanceState: List size is " + mBundled.mEventList.size());
+            Crashlytics.log(Log.INFO, LOG_TAG, "onCreate.savedInstanceState: Event index is " + mBundled.mEventIndex);
             initializeViewPagerWithBundledState();
         }
     }
@@ -147,11 +146,11 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
      * and can be re-called after calling onNewIntent later in the activity lifecycle flow.
      */
     public void initializeViewPagerWithBundledState() {
-        Crashlytics.log("List size is " + mBundled.mEventList.size());
-        Crashlytics.log("Event index is " + mBundled.mEventIndex);
+        Crashlytics.log(Log.INFO, LOG_TAG, "List size is " + mBundled.mEventList.size());
+        Crashlytics.log(Log.INFO, LOG_TAG, "Event index is " + mBundled.mEventIndex);
 
         mEventInfoPagerAdapter = new EventInfoPagerAdapter(getFragmentManager(), mBundled.mEventList);
-        Log.i(LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
+        Crashlytics.log(Log.INFO, LOG_TAG, "setAdapter(new EventInfoPagerAdapter(...))");
         mViewPager.setAdapter(mEventInfoPagerAdapter);
         // The ViewPager retains its own CurrentItem state, so this is not strictly necessary here.
         // However, we must call setCurrentItem on all the intent-derived initializations,
@@ -171,8 +170,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             public void onPageSelected(int position) {
                 mBundled.mEventIndex = position;
                 setTitle(mBundled.mEventList.get(position).getTitle());
-                Crashlytics.log("onPageSelected: List size is " + mBundled.mEventList.size());
-                Crashlytics.log("onPageSelected: Event index is " + mBundled.mEventIndex);
+                Crashlytics.log(Log.INFO, LOG_TAG, "onPageSelected: List size is " + mBundled.mEventList.size());
+                Crashlytics.log(Log.INFO, LOG_TAG, "onPageSelected: Event index is " + mBundled.mEventIndex);
             }
         });
     }
@@ -198,9 +197,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         @Override
         public void onError(Exception e) {
             if (e instanceof JSONException) {
-                Log.e(LOG_TAG, "Error reading from event api: " + e);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading from event api: " + e);
             } else {
-                Log.e(LOG_TAG, "Error retrieving data: " + e);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving data: " + e);
             }
             Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to load event info! " + e, Toast.LENGTH_LONG).show();
             //TODO(lambert): implement a better error handling display to the user
@@ -210,7 +209,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
     public boolean handleIntent(Intent intent) {
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             Uri url = intent.getData();
-            Log.i(LOG_TAG, "Viewing URL: " + url);
+            Crashlytics.log(Log.INFO, LOG_TAG, "Viewing URL: " + url);
             List<String> pathSegments = url.getPathSegments();
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
@@ -219,7 +218,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 // then we reload without an eventlist, and trigger a crash loading the zero'th index.
                 DanceDeetsApi.getEvent(eventId, new EventHandler(mRetained));
             }
-            Crashlytics.log("handleIntent: Loading " + url);
+            Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: Loading " + url);
             Crashlytics.setString("Intent View URL", url.toString());
             return true;
         } else if (intent.getExtras() != null) {
@@ -228,11 +227,11 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 mBundled.mEventList = readFile(new File(b.getString(ARG_EVENT_LIST_FILENAME)));
             } catch (IOException | ClassNotFoundException e) {
                 mBundled.mEventList = null;
-                Log.e(LOG_TAG, "Error reading event list cache file: " + e);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading event list cache file: " + e);
             }
             mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
-            Crashlytics.log("Intent.getExtras: List size is " + mBundled.mEventList.size());
-            Crashlytics.log("Intent.getExtras: Event index is " + mBundled.mEventIndex);
+            Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: List size is " + mBundled.mEventList.size());
+            Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: Event index is " + mBundled.mEventIndex);
 
             initializeViewPagerWithBundledState();
             return true;
@@ -244,8 +243,8 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         mBundled.mEventList = new ArrayList<>(1);
         mBundled.mEventList.add(event);
         mBundled.mEventIndex = 0;
-        Crashlytics.log("onEventReceived: List size is " + mBundled.mEventList.size());
-        Crashlytics.log("onEventReceived: Event index is " + mBundled.mEventIndex);
+        Crashlytics.log(Log.INFO, LOG_TAG, "onEventReceived: List size is " + mBundled.mEventList.size());
+        Crashlytics.log(Log.INFO, LOG_TAG, "onEventReceived: Event index is " + mBundled.mEventIndex);
         //eventInfoActivity.mEventInfoPagerAdapter.notifyDataSetChanged();
         initializeViewPagerWithBundledState();
     }
@@ -255,7 +254,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         // Even if our old intent had better information,
         // it should all be captured in BundledState by now.
         setIntent(intent);
-        Log.i(LOG_TAG, "onNewIntent");
+        Crashlytics.log(Log.INFO, LOG_TAG, "onNewIntent");
         handleIntent(intent);
     }
 

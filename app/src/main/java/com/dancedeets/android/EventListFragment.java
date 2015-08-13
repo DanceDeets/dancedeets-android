@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
@@ -43,6 +44,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         ArrayList<FullEvent> mEventList = new ArrayList<>();
 
+        // TODO: This is now not-shared between EventListFragments, which cause them to re-request the search location in gps-less worlds.
+        // Also unlikely to share keywords. Need to split this out a bit, and/or force set them on a real search at the top-level.
         SearchOptions mSearchOptions = new SearchOptions();
 
         SearchOptions.TimePeriod mEventSearchType;
@@ -161,7 +164,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, "onCreate");
+        Crashlytics.log(Log.INFO, LOG_TAG, "onCreate");
         // Restore the previously serialized activated item position.
         setHasOptionsMenu(true);
     }
@@ -186,7 +189,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public void onAddressFound(Location location, Address address) {
         String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
-        Log.i(LOG_TAG, "Address found: " + address + optionalSubLocality);
+        Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
         if (address != null) {
             String addressString = FetchLocation.formatAddress(address);
             startSearchFor(addressString, "");
@@ -200,7 +203,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                 // Could be without network connectivity, or just a transient failure.
                 // Is their cached data we can use? Or just use the lat/long directly?
                 Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
-                Log.e(LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
+                Crashlytics.log(Log.ERROR, LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
                 startSearchFor("", "");
             }
         }
@@ -241,7 +244,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         location.setLatitude(pref.getFloat("latitude", -1));
         location.setLongitude(pref.getFloat("longitude", -1));
     }
-    Log.i(LOG_TAG, "Final location is " + location);
+    Crashlytics.log(Log.INFO, LOG_TAG, "Final location is " + location);
     if (location != null) {
         // TODO: Location: Sometimes this times out too, just randomly.
         // Should we store prefs for the final geocoded location too?
@@ -283,7 +286,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         @Override
         public void onSearch(String location, String keywords) {
-            Log.i(LOG_TAG, "Search: " + location + ", " + keywords);
+            Crashlytics.log(Log.INFO, LOG_TAG, "Search: " + location + ", " + keywords);
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             listFragment.startSearchFor(location, keywords);
         }
@@ -358,7 +361,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i(LOG_TAG, "onViewCreated");
+        Crashlytics.log(Log.INFO, LOG_TAG, "onViewCreated");
         getListView().setEmptyView(mEmptyListView);
     }
 
@@ -372,7 +375,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          */
         setListShown(false);
         mBundled.mEventList.clear();
-        Log.i(LOG_TAG, "fetchJsonData");
+        Crashlytics.log(Log.INFO, LOG_TAG, "fetchJsonData");
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
 
         AnalyticsUtil.track("Search Events",
@@ -396,7 +399,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         @Override
         public void onError(Exception exception) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            Log.e(LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
             listFragment.mEmptyText.setVisibility(View.GONE);
             listFragment.mRetryButton.setVisibility(View.VISIBLE);
             listFragment.setListAdapter(listFragment.eventAdapter);
@@ -430,7 +433,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         super.onListItemClick(listView, view, position, id);
 
         FullEvent event = mBundled.mEventList.get(position);
-        Log.i(LOG_TAG, "onListItemClick: fb event id: " + event.getId());
+        Crashlytics.log(Log.INFO, LOG_TAG, "onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();
         // Prefetch Images

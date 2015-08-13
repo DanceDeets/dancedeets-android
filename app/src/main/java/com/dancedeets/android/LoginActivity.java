@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -63,7 +64,7 @@ public class LoginActivity extends FacebookActivity {
         private final FetchLocation mFetchLocation;
 
         SendAuthRequest(AccessToken accessToken, FetchLocation fetchLocation) {
-            Log.i(LOG_TAG, "Received access token " + accessToken + ", with " + fetchLocation);
+            Crashlytics.log(Log.INFO, LOG_TAG, "Received access token " + accessToken + ", with " + fetchLocation);
             mAccessToken = accessToken;
             mFetchLocation = fetchLocation;
         }
@@ -72,7 +73,7 @@ public class LoginActivity extends FacebookActivity {
         public void onAddressFound(Location location, Address address) {
             // We special-case this because the address.toString() omits SubLocality for some reason, and it's useful to us.
             String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
-            Log.i(LOG_TAG, "onAddressFound with location: " + location + ", address: " + address + optionalSubLocality);
+            Crashlytics.log(Log.INFO, LOG_TAG, "onAddressFound with location: " + location + ", address: " + address + optionalSubLocality);
 
             String addressString = null;
             if (address != null) {
@@ -87,7 +88,7 @@ public class LoginActivity extends FacebookActivity {
                 } catch (JSONException e) {
                 }
             } else {
-                Log.e(LOG_TAG, "Failed to get address from server, sending update with empty location.");
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Failed to get address from server, sending update with empty location.");
             }
             DanceDeetsApi.sendAuth(mAccessToken, addressString);
 
@@ -111,7 +112,7 @@ public class LoginActivity extends FacebookActivity {
                 try {
                     AnalyticsUtil.login(object);
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, "Error sending user data to MixPanel: " + e);
+                    Crashlytics.log(Log.ERROR, LOG_TAG, "Error sending user data to MixPanel: " + e);
                 }
             }
         }
@@ -120,7 +121,7 @@ public class LoginActivity extends FacebookActivity {
     public void handleLogin(AccessToken accessToken) {
         // Set the access token using
         // currentAccessToken when it's loaded or set.
-        Log.i(LOG_TAG, "Activity " + this + " is logged in: " + accessToken);
+        Crashlytics.log(Log.INFO, LOG_TAG, "Activity " + this + " is logged in: " + accessToken);
 
         GraphRequest request = GraphRequest.newMeRequest(
                 accessToken, new MeCompleted());
@@ -142,7 +143,7 @@ public class LoginActivity extends FacebookActivity {
     }
 
     protected void logIn(AccessToken newAccessToken) {
-        Log.i(LOG_TAG, "onCurrentAccessTokenChanged: " + newAccessToken);
+        Crashlytics.log(Log.INFO, LOG_TAG, "onCurrentAccessTokenChanged: " + newAccessToken);
         // Only post Complete! events for people who clicked login (no autologin!)
         if (mClickedLogin) {
             AnalyticsUtil.track("Login - Completed");
@@ -156,9 +157,9 @@ public class LoginActivity extends FacebookActivity {
         super.onCreate(savedInstanceState);
 
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-        Log.i(LOG_TAG, "currentAccessToken is " + currentAccessToken);
+        Crashlytics.log(Log.INFO, LOG_TAG, "currentAccessToken is " + currentAccessToken);
         if (currentAccessToken == null) {
-            AnalyticsUtil.track("Login - Not Logged In");
+            AnalyticsUtil.track("Login - Not Crashlytics.log(Log.ERROR, d In");
         } else {
             handleLogin(currentAccessToken);
         }
