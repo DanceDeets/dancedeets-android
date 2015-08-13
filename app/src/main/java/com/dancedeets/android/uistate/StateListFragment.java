@@ -3,6 +3,9 @@ package com.dancedeets.android.uistate;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Created by lambert on 2014/10/23.
@@ -27,6 +30,7 @@ public abstract class StateListFragment<Bundled extends BundledState, Retained e
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBundled = StateUtil.createBundled(this, savedInstanceState);
+        Crashlytics.log(Log.INFO, "StateListFragment", "In onCreate, mBundled is " + mBundled);
     }
 
     public void onSaveInstanceState(Bundle outState) {

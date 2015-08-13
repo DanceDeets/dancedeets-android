@@ -339,6 +339,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
+        Crashlytics.log(Log.INFO, LOG_TAG, "In onCreateView, mBundled is " + mBundled);
+
         eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
 
         if (savedInstanceState != null) {
