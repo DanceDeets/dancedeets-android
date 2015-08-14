@@ -491,13 +491,18 @@ public class EventInfoFragment extends StateFragment<
         description.setText(event.getDescription());
 
         mRsvpButton = (TextView) rootView.findViewById(R.id.rsvp);
-        loadRsvp();
-        mRsvpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openRsvpMenu(v);
-            }
-        });
+        if (AccessToken.getCurrentAccessToken() != null) {
+            loadRsvp();
+            mRsvpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openRsvpMenu(v);
+                }
+            });
+        } else {
+            mRsvpButton.setVisibility(View.GONE);
+            rootView.findViewById(R.id.rsvp_label).setVisibility(View.GONE);
+        }
     }
 
     /* check if intent is available */
