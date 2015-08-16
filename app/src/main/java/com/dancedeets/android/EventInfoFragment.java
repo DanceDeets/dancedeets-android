@@ -266,6 +266,7 @@ public class EventInfoFragment extends StateFragment<
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
+                        AnalyticsUtil.trackEvent("RSVP", mBundled.mEvent, "RSVP Value", rsvp);
                         setRsvp(rsvp);
                     }
 
