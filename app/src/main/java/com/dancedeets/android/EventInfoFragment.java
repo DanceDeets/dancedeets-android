@@ -98,7 +98,14 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set up Event
+        FullEvent event = FullEvent.parse(getArguments());
+        mBundled.mEvent = event;
+        AnalyticsUtil.trackEvent("View Event", mBundled.mEvent);
         mCallbackManager = CallbackManager.Factory.create();
+
+        // This may call onCreateOptionsMenu on Android 4.0/4.1 devices,
+        // so we need to do it after setting mBundled.mEvent above.
         setHasOptionsMenu(true);
     }
 
@@ -444,10 +451,7 @@ public class EventInfoFragment extends StateFragment<
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_event_info,
                 container, false);
-        FullEvent event = FullEvent.parse(getArguments());
-        mBundled.mEvent = event;
-        AnalyticsUtil.trackEvent("View Event", mBundled.mEvent);
-        fillOutView(rootView, event);
+        fillOutView(rootView, getEvent());
         return rootView;
     }
 
