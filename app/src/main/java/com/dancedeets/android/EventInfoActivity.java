@@ -129,7 +129,11 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             mBundled = (MyBundledState) savedInstanceState.getSerializable(tag);
             Crashlytics.log(Log.INFO, LOG_TAG, "onCreate.savedInstanceState: List size is " + mBundled.mEventList.size());
             Crashlytics.log(Log.INFO, LOG_TAG, "onCreate.savedInstanceState: Event index is " + mBundled.mEventIndex);
-            initializeViewPagerWithBundledState();
+            // Only initialize the viewpager if we've gotten a full bundled state,
+            // otherwise we're probably waiting for an event callback, so do nothing here.
+            if (mBundled.mEventList.size() != 0) {
+                initializeViewPagerWithBundledState();
+            }
         }
     }
 
