@@ -42,7 +42,7 @@ public class SearchListActivityTest extends CommonActivityTest<SearchListActivit
 
     @SuppressWarnings("unchecked")
     public void testEventNavigation() {
-        onView(withId(R.id.event_list_fragment));
+        onView(withId(R.id.event_list_description));
         waitForVolley(true);
         // Click on an event
         onView(withText(mEventTitle)).perform(click());
@@ -60,7 +60,7 @@ public class SearchListActivityTest extends CommonActivityTest<SearchListActivit
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Log.i(LOG_TAG, "Wait for View");
-        onView(withId(R.id.event_list_fragment));
+        onView(withId(R.id.event_list_description));
         onView(withClassName(endsWith("ProgressBar"))).check(matches(isDisplayed()));
 
         Log.i(LOG_TAG, "Rotating");
