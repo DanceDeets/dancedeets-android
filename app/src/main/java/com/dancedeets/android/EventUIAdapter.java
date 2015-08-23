@@ -48,7 +48,7 @@ public class EventUIAdapter extends BaseAdapter {
     public long getItemId(int position) {
         // The facebook ID is not guaranteed to fit into a 'long',
         // so we use the hashcode of the string, which should be good enough for uniqueness.
-        return mEventList.get(position).getId().hashCode();
+        return Math.abs(mEventList.get(position).getId().hashCode());
     }
 
     @Override

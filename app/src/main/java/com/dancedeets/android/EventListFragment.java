@@ -1,22 +1,18 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.location.Address;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
@@ -28,13 +24,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, EventListFragment.MyRetainedState> implements FetchLocation.AddressListener {
+public class EventListFragment extends StateListFragment<EventListFragment.MyBundledState, RetainedState> implements SearchTarget {
 
-    private SearchOptions.TimePeriod mEventSearchType;
-
+    private static final String LIST_STATE = "LIST_STATE";
+    private SearchOptions mSearchOptions = new SearchOptions();
     private boolean mTwoPane;
 
-    private final static String EVENT_SEARCH_TYPE = "EVENT_SEARCH_TYPE";
+    private boolean mPendingSearch = false;
 
     static protected class MyBundledState extends BundledState {
         /**
@@ -44,23 +40,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         ArrayList<FullEvent> mEventList = new ArrayList<>();
 
-        // TODO: This is now not-shared between EventListFragments, which cause them to re-request the search location in gps-less worlds.
-        // Also unlikely to share keywords. Need to split this out a bit, and/or force set them on a real search at the top-level.
-        SearchOptions mSearchOptions = new SearchOptions();
-
-        SearchOptions.TimePeriod mEventSearchType;
+        boolean mDirty = true; // Start out dirty
 
         boolean mTwoPane;
 
-        MyBundledState(SearchOptions.TimePeriod eventSearchType, boolean twoPane) {
-            mEventSearchType = eventSearchType;
+        SearchOptions mSearchOptions;
+
+        MyBundledState(boolean twoPane, SearchOptions searchOptions) {
             mTwoPane = twoPane;
+            mSearchOptions = searchOptions;
         }
-    }
-
-    static public class MyRetainedState extends RetainedState {
-        private FetchLocation mFetchLocation;
-
     }
 
     /**
@@ -78,7 +67,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         /**
          * Callback for when an item has been selected.
          */
-        public void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected);
+        void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected);
     }
 
     static final String LOG_TAG = "EventListFragment";
@@ -94,7 +83,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     GoogleApiClient mGoogleApiClient;
 
     // These are exposed as member variables for the sake of testing.
-    SearchDialogFragment mSearchDialog;
     LocationManager mLocationManager;
 
     public EventListFragment() {
@@ -109,10 +97,14 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     public void setEventSearchType(SearchOptions.TimePeriod eventSearchType) {
+        getSearchOptions().timePeriod = eventSearchType;
+    }
+
+    protected SearchOptions getSearchOptions() {
         if (mBundled != null) {
-            mBundled.mEventSearchType = eventSearchType;
+            return mBundled.mSearchOptions;
         } else {
-            mEventSearchType = eventSearchType;
+            return mSearchOptions;
         }
     }
 
@@ -120,7 +112,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public MyBundledState buildBundledState() {
         /**
          *
-         * Before this function is called, we read/set mEventSearchType/mTwoPane directly on this class.
+         * Before this function is called, we read/set mTwoPane/mSearchOptions directly on this class.
          * This allows us to initialize this class with its identity and index as a tab.
          * This is used by getUniqueTag to construct an correctly named Retained fragment onAttach.
          * Then we construct a Bundled object here, copying over the relevant fields.
@@ -128,21 +120,17 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          * Then we rely on persisting through the Bundled object.
          */
 
-        return new MyBundledState(mEventSearchType, mTwoPane);
+        return new MyBundledState(mTwoPane, mSearchOptions);
     }
 
     @Override
     public String getUniqueTag() {
-        if (mBundled != null) {
-            return LOG_TAG + "." + mBundled.mEventSearchType;
-        } else {
-            return LOG_TAG + "." + mEventSearchType;
-        }
+        return LOG_TAG + "." + getSearchOptions().timePeriod;
     }
 
     @Override
-    public MyRetainedState buildRetainedState() {
-        return new MyRetainedState();
+    public RetainedState buildRetainedState() {
+        return new RetainedState(); //TODO: replace with null support
     }
 
     protected void handleEventList(List<FullEvent> eventList) {
@@ -161,74 +149,16 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         setListAdapter(eventAdapter);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Crashlytics.log(Log.INFO, LOG_TAG, "onCreate");
-        // Restore the previously serialized activated item position.
-        setHasOptionsMenu(true);
-    }
-
-
-    public void onStart() {
-        super.onStart();
-        if (mBundled.mSearchOptions.location.isEmpty() && mBundled.mSearchOptions.keywords.isEmpty()) {
-            mRetained.mFetchLocation = new FetchLocation();
-            mRetained.mFetchLocation.onStart(getActivity(), this);
-        }
-    }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (mRetained.mFetchLocation != null) {
-            mRetained.mFetchLocation.onStop();
-        }
-    }
-
-    @Override
-    public void onAddressFound(Location location, Address address) {
-        String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
-        Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
-        if (address != null) {
-            String addressString = FetchLocation.formatAddress(address);
-            startSearchFor(addressString, "");
-        } else {
-            if (location == null) {
-                // Both are null. No GPS, but perhaps there still is network connectivity...
-                // Perhaps we can return a list of selected cities/locations?
-                startSearchFor("", "");
-            } else {
-                // We have GPS, but our reverse geocode from the GMaps API failed.
-                // Could be without network connectivity, or just a transient failure.
-                // Is their cached data we can use? Or just use the lat/long directly?
-                Toast.makeText(getActivity(), "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
-                Crashlytics.log(Log.ERROR, LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
-                startSearchFor("", "");
-            }
-        }
-    }
-
-    public void startSearchFor(String location, String keywords) {
-        SearchOptions searchOptions = mBundled.mSearchOptions;
-        searchOptions.location = location;
-        searchOptions.keywords = keywords;
-        searchOptions.timePeriod = mBundled.mEventSearchType;
-        // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
-        String listDescription;
-        if (searchOptions.keywords.isEmpty()) {
-            listDescription = String.format(getString(R.string.events_near), searchOptions.location);
-        } else if (searchOptions.location.isEmpty()) {
-            listDescription = String.format(getString(R.string.events_with_keyword), searchOptions.keywords);
-        } else {
-            listDescription = String.format(getString(R.string.events_near_with_keyword), searchOptions.location, searchOptions.keywords);
-        }
-        mListDescription.setText(listDescription);
-        if (searchOptions.location.isEmpty() && searchOptions.keywords.isEmpty()) {
-            showSearchDialog(getString(R.string.couldnt_detect_location));
-        } else {
-            fetchJsonData();
-        }
+    public void prepareForSearchOptions(SearchOptions newSearchOptions) {
+        Log("prepareForSearchOptions: " + newSearchOptions);
+        SearchOptions searchOptions = getSearchOptions();
+        searchOptions.location = newSearchOptions.location;
+        searchOptions.keywords = newSearchOptions.keywords;
+        if (mBundled != null) {
+            mBundled.mDirty = true;
+        } // If mBundled is empty (for instantiation), then when it is constructed, it will default to true anyway
     }
 
     //TODO: Add caching to the new code:
@@ -244,7 +174,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         location.setLatitude(pref.getFloat("latitude", -1));
         location.setLongitude(pref.getFloat("longitude", -1));
     }
-    Crashlytics.log(Log.INFO, LOG_TAG, "Final location is " + location);
+    Log("Final location is " + location);
     if (location != null) {
         // TODO: Location: Sometimes this times out too, just randomly.
         // Should we store prefs for the final geocoded location too?
@@ -252,60 +182,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     */
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.events_list, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_search:
-                showSearchDialog("");
-                return true;
-            case R.id.action_refresh:
-                startSearchFor(mBundled.mSearchOptions.location, mBundled.mSearchOptions.keywords);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-    public static class SearchListener implements SearchDialogFragment.OnSearchListener {
-
-        private final MyRetainedState mRetained;
-
-        public SearchListener(MyRetainedState retainedState) {
-            mRetained = retainedState;
-        }
-
-        @Override
-        public void onSearch(String location, String keywords) {
-            Crashlytics.log(Log.INFO, LOG_TAG, "Search: " + location + ", " + keywords);
-            EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            listFragment.startSearchFor(location, keywords);
-        }
-    }
-
-    public void showSearchDialog(String message) {
-        mSearchDialog = new SearchDialogFragment();
-        Bundle b = new Bundle();
-        b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, mBundled.mSearchOptions);
-        b.putString(SearchDialogFragment.ARG_MESSAGE, message);
-        mSearchDialog.setArguments(b);
-        mSearchDialog.setOnClickHandler(new SearchListener(mRetained));
-        mSearchDialog.show(getFragmentManager(), "search");
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreateView");
+        Log("onCreateView, mBundled is " + mBundled);
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.event_list_layout, container, false);
 
         // Construct the ListFragment's UI objects in super, and stick them inside our rootView in the appropriate place.
@@ -323,7 +202,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fetchJsonData();
+                startSearch();
             }
         });
 
@@ -338,8 +217,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         ((ViewGroup) listContainerView).addView(mEmptyListView);
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
-
-        Crashlytics.log(Log.INFO, LOG_TAG, "In onCreateView, mBundled is " + mBundled);
 
         eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
 
@@ -363,11 +240,54 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Crashlytics.log(Log.INFO, LOG_TAG, "onViewCreated");
         getListView().setEmptyView(mEmptyListView);
+
+        // Reload scroll state
+        if (savedInstanceState != null) {
+            Parcelable savedState = savedInstanceState.getParcelable(LIST_STATE);
+            if (savedState != null) {
+                getListView().onRestoreInstanceState(savedState);
+            }
+        }
     }
 
-    public void fetchJsonData() {
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        // Save scroll state
+        if (getView() != null) {
+            state.putParcelable(LIST_STATE, getListView().onSaveInstanceState());
+        }
+    }
+
+    public void loadSearchTab() {
+        AnalyticsUtil.track("SearchTab Selected",
+                "Tab", mBundled.mSearchOptions.timePeriod.toString());
+        if (mBundled.mDirty) {
+            mBundled.mDirty = false;
+            startSearch();
+        }
+    }
+
+    protected void startSearch() {
+        if (getActivity() == null) {
+            Log("startSearch called too early, setting mPendingSearch");
+            mPendingSearch = true;
+            return;
+        }
+        SearchOptions searchOptions = getSearchOptions();
+        Log("startSearch: " + searchOptions);
+        // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
+        String listDescription;
+        if (searchOptions.keywords.isEmpty()) {
+            listDescription = String.format(getString(R.string.events_near), searchOptions.location);
+        } else if (searchOptions.location.isEmpty()) {
+            listDescription = String.format(getString(R.string.events_with_keyword), searchOptions.keywords);
+        } else {
+            listDescription = String.format(getString(R.string.events_near_with_keyword), searchOptions.location, searchOptions.keywords);
+        }
+        mListDescription.setText(listDescription);
+
         // Show the progress bar
         setListAdapter(null);
         /* We need to call setListShown after setListAdapter,
@@ -377,12 +297,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          */
         setListShown(false);
         mBundled.mEventList.clear();
-        Crashlytics.log(Log.INFO, LOG_TAG, "fetchJsonData");
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
-
-        AnalyticsUtil.track("Search Events",
-                "Location", mBundled.mSearchOptions.location,
-                "Keywords", mBundled.mSearchOptions.keywords);
     }
 
     public static class ResultsReceivedHandler implements DanceDeetsApi.OnResultsReceivedListener {
@@ -408,9 +323,18 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
     }
 
+    protected void Log(String log) {
+        Crashlytics.log(Log.INFO, LOG_TAG, getSearchOptions().timePeriod.toString() +  ": " + log);
+    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+        Log("onAttach " + this + ": " + activity);
+        if (mPendingSearch) {
+            mPendingSearch = false;
+            startSearch();
+        }
 
         // Activities containing this fragment must implement its callbacks.
         if (!(activity instanceof Callbacks)) {
@@ -435,7 +359,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         super.onListItemClick(listView, view, position, id);
 
         FullEvent event = mBundled.mEventList.get(position);
-        Crashlytics.log(Log.INFO, LOG_TAG, "onListItemClick: fb event id: " + event.getId());
+        Log("onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();
         // Prefetch Images

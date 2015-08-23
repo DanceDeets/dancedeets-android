@@ -5,7 +5,8 @@ import android.app.Fragment;
 import android.os.Bundle;
 
 /**
- * Created by lambert on 2014/11/02.
+ * A series of functions for managing Bundled (serialized) and Retained (saved in memory) state
+ * during UI tear-down/construction
  */
 public class StateUtil {
 
@@ -38,6 +39,12 @@ public class StateUtil {
             if (fragment.isRemoving()) {
                 fragment.getActivity().getFragmentManager().beginTransaction().remove(retained).commitAllowingStateLoss();
             }
+        }
+    }
+
+    public static<Retained extends RetainedState> void destroyRetained(Retained retained, Activity activity) {
+        if (!activity.isChangingConfigurations()) {
+            activity.getFragmentManager().beginTransaction().remove(retained).commitAllowingStateLoss();
         }
     }
 

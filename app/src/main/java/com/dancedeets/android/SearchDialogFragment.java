@@ -1,6 +1,5 @@
 package com.dancedeets.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -19,23 +18,18 @@ import com.dancedeets.android.uistate.StateDialogFragment;
 /**
  * A dialog for searching events on the list view.
  */
-public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragment.MyBundledState, SearchDialogFragment.MyRetainedState> {
+public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragment.MyBundledState, RetainedState> {
 
     static protected class MyBundledState extends BundledState {
         SearchOptions mSearchOptions;
     }
 
-    static public class MyRetainedState extends RetainedState {
-        OnSearchListener mOnSearchListener;
-    }
     private static final String LOG_TAG = "SearchDialogFragment";
 
     public static final String ARG_SEARCH_OPTIONS = "SEARCH_OPTIONS";
 
     public static final String ARG_MESSAGE = "MESSAGE";
 
-    // This is temporary for the constructor to save state. When onAttach is called, it can be copied into MyRetainedState.
-    private OnSearchListener mTempOnSearchListener;
 
     @Override
     public MyBundledState buildBundledState() {
@@ -43,23 +37,13 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
     }
 
     @Override
-    public MyRetainedState buildRetainedState() {
-        return new MyRetainedState();
+    public RetainedState buildRetainedState() {
+        return new RetainedState();
     }
 
     @Override
     public String getUniqueTag() {
         return LOG_TAG;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Don't overwrite the retainedstate's searchlistener with our empty one, if we're being recreated
-        if (mTempOnSearchListener != null) {
-            mRetained.mOnSearchListener = mTempOnSearchListener;
-        }
-        Log.i(LOG_TAG, "get retained state " + mRetained + ", searchlistener " + mRetained.mOnSearchListener);
     }
 
     @Override
@@ -106,7 +90,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
                         EditText searchLocation = ((EditText) d.findViewById(R.id.search_location));
                         EditText searchKeywords = ((EditText) d.findViewById(R.id.search_keywords));
 
-                        mRetained.mOnSearchListener.onSearch(
+                        ((OnSearchListener)getActivity()).onSearch(
                                 searchLocation.getText().toString(),
                                 searchKeywords.getText().toString());
                     }
@@ -118,15 +102,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         return builder.create();
     }
 
-    public void setOnClickHandler(OnSearchListener onSearchListener) {
-        if (mRetained != null) {
-            mRetained.mOnSearchListener = onSearchListener;
-        } else {
-            mTempOnSearchListener = onSearchListener;
-        }
-    }
-
-    public static interface OnSearchListener {
-        public void onSearch(String location, String keywords);
+    public interface OnSearchListener {
+        void onSearch(String location, String keywords);
     }
 }

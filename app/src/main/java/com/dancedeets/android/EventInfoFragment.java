@@ -99,8 +99,7 @@ public class EventInfoFragment extends StateFragment<
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Set up Event
-        FullEvent event = FullEvent.parse(getArguments());
-        mBundled.mEvent = event;
+        mBundled.mEvent = FullEvent.parse(getArguments());
         AnalyticsUtil.trackEvent("View Event", mBundled.mEvent);
         mCallbackManager = CallbackManager.Factory.create();
 
@@ -213,7 +212,6 @@ public class EventInfoFragment extends StateFragment<
     protected GraphRequest fetchRsvpRequest(String rsvp) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
-        Crashlytics.log(Log.INFO, LOG_TAG, "AccessToken is " + accessToken + ", profile is " + profile + ", mBundle is " + mBundled);
         return new GraphRequest(
                 accessToken,
                 "/" + mBundled.mEvent.getId() + "/" + rsvp + "/" + profile.getId(),

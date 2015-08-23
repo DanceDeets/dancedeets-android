@@ -4,6 +4,8 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -12,17 +14,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.uistate.BundledState;
+import com.dancedeets.android.uistate.RetainedState;
+import com.dancedeets.android.uistate.StateFacebookActivity;
 import com.facebook.login.LoginManager;
 
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends FacebookActivity implements EventListFragment.Callbacks {
+public class SearchListActivity extends StateFacebookActivity<SearchListActivity.MyBundledState, SearchListActivity.MyRetainedState> implements EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.AddressListener, SearchPagerAdapter.SearchOptionsManager {
 
-    private static final String LOG_TAG = "EventListActivity";
+    private static final String LOG_TAG = "SearchListActivity";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -31,6 +37,37 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
     private boolean mTwoPane;
 
     private ViewPager mViewPager;
+
+    // These are exposed as member variables for the sake of testing.
+    SearchDialogFragment mSearchDialog;
+
+    @Override
+    public MyBundledState buildBundledState() {
+        return new MyBundledState();
+    }
+
+    @Override
+    public MyRetainedState buildRetainedState() {
+        return new MyRetainedState();
+    }
+
+    @Override
+    public String getUniqueTag() {
+        return LOG_TAG;
+    }
+
+    static protected class MyBundledState extends BundledState {
+        SearchOptions mSearchOptions = new SearchOptions();
+    }
+    static public class MyRetainedState extends RetainedState {
+        private FetchLocation mFetchLocation;
+    }
+
+    @Override
+    public SearchOptions getSearchOptions() {
+        return mBundled.mSearchOptions;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +100,113 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
         }
 
         // Set the ViewPagerAdapter into ViewPager
-        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), getResources(), mTwoPane));
+        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane));
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            public void onPageSelected(int position) {
+                SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
+                Crashlytics.log(Log.INFO, LOG_TAG, "New page selection index " + position + ": " + adapter.getSearchTarget(position));
+                adapter.getSearchTarget(position).loadSearchTab();
+            }
+        });
 
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
     }
 
+
+    public void onStart() {
+        super.onStart();
+        if (mBundled.mSearchOptions.isEmpty()) {
+            mRetained.mFetchLocation = new FetchLocation();
+            mRetained.mFetchLocation.onStart(this, this);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mRetained.mFetchLocation != null) {
+            mRetained.mFetchLocation.onStop();
+        }
+    }
+
+    public void startSearchFor(SearchOptions newSearchOptions) {
+        Log.i(LOG_TAG, "startSearchFor " + newSearchOptions);
+        // Can't perform fully-empty searches, so let's prompt the user
+        if (newSearchOptions.location.isEmpty() && newSearchOptions.keywords.isEmpty()) {
+            showSearchDialog(getString(R.string.couldnt_detect_location));
+            return;
+        }
+        mBundled.mSearchOptions = newSearchOptions;
+        SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
+        for (int i = 0; i < adapter.getCount(); i++) {
+            // We only want to grab targets that are non-empty, not create missing ones
+            SearchTarget searchTarget = adapter.getSearchTarget(i);
+            if (searchTarget == null) {
+                continue;
+            }
+            Log.i(LOG_TAG, "SearchTarget is " + searchTarget);
+            searchTarget.prepareForSearchOptions(mBundled.mSearchOptions);
+            if (i == mViewPager.getCurrentItem()) {
+                Log.i(LOG_TAG, "Initiating startSearch() on index " + i + ": " + searchTarget);
+                searchTarget.loadSearchTab();
+            }
+        }
+        AnalyticsUtil.track("Search Events",
+                "Location", mBundled.mSearchOptions.location,
+                "Keywords", mBundled.mSearchOptions.keywords);
+    }
+
+
+        @Override
+    public void onAddressFound(Location location, Address address) {
+        String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
+        Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
+        if (address != null) {
+            String addressString = FetchLocation.formatAddress(address);
+            startSearchFor(new SearchOptions(addressString));
+        } else {
+            if (location == null) {
+                // Both are null. No GPS, but perhaps there still is network connectivity...
+                // Perhaps we can return a list of selected cities/locations?
+                startSearchFor(null);
+            } else {
+                // We have GPS, but our reverse geocode from the GMaps API failed.
+                // Could be without network connectivity, or just a transient failure.
+                // Is their cached data we can use? Or just use the lat/long directly?
+                Toast.makeText(this, "Google Geocoder Request failed.", Toast.LENGTH_LONG).show();
+                Crashlytics.log(Log.ERROR, LOG_TAG, "No address returned from FetchCityTask, fetching with empty location.");
+                startSearchFor(null);
+            }
+        }
+    }
+
+
+
+    @Override
+    public void onSearch(String location, String keywords) {
+        // Search dialog submitted!
+        Crashlytics.log(Log.INFO, LOG_TAG, "Search: " + location + ", " + keywords);
+        startSearchFor(new SearchOptions(location, keywords));
+    }
+
+    public void showSearchDialog(String message) {
+        Crashlytics.log(Log.INFO, LOG_TAG, "Opening search dialog: " + message);
+        Crashlytics.log(Log.INFO, LOG_TAG, "mSearchDialog is " + mSearchDialog);
+        mSearchDialog = new SearchDialogFragment();
+        Bundle b = new Bundle();
+        b.putSerializable(SearchDialogFragment.ARG_SEARCH_OPTIONS, mBundled.mSearchOptions);
+        b.putString(SearchDialogFragment.ARG_MESSAGE, message);
+        mSearchDialog.setArguments(b);
+        mSearchDialog.show(getFragmentManager(), "search");
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.general_menu, menu);
+        inflater.inflate(R.menu.events_list, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -82,6 +215,14 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
         switch (item.getItemId()) {
             case R.id.action_feedback:
                 SendFeedback.sendFeedback(this);
+                return true;
+            case R.id.action_search:
+                showSearchDialog("");
+                //SEARCH
+                return true;
+            case R.id.action_refresh:
+                //SEARCH
+                startSearchFor(mBundled.mSearchOptions);
                 return true;
             case R.id.action_add_event:
                 HelpSystem.openAddEvent(this);
@@ -108,14 +249,7 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
     private void handleIntent(Intent intent) {
         Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            // TODO: Search tab 0 each time??
-            EventListFragment upcomingFragment = (EventListFragment)mViewPager.getAdapter().instantiateItem(mViewPager, 0);
-            //EventListFragment fragment = (EventListFragment) getFragmentManager().findFragmentById(
-            //        R.id.event_list_fragment);
-            upcomingFragment.startSearchFor("", intent.getStringExtra(SearchManager.QUERY));
-            //TODO: Switch to tab??
-            //Update all tabs?
-            // Fix search routing procedures!
+            startSearchFor(new SearchOptions("", intent.getStringExtra(SearchManager.QUERY)));
         }
     }
 
@@ -141,7 +275,7 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
 
             // Make the view visible, if it was still collapsed from initialization.
             View v = findViewById(R.id.event_info_fragment);
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)v.getLayoutParams();
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
             if (params.weight != 1.2) {
                 params.weight = 1.2f;
                 v.setLayoutParams(params);
@@ -155,5 +289,4 @@ public class SearchListActivity extends FacebookActivity implements EventListFra
             startActivity(intent);
         }
     }
-
 }

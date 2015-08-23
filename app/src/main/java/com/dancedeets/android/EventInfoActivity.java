@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.IntentCompat;
@@ -180,7 +181,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         });
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(getUniqueTag(), mBundled);
     }
@@ -218,8 +219,6 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
                 String eventId = pathSegments.get(1);
                 // Add Event requests
-                // TODO(lambert): I think if we leave/relaunch before this event is completed,
-                // then we reload without an eventlist, and trigger a crash loading the zero'th index.
                 DanceDeetsApi.getEvent(eventId, new EventHandler(mRetained));
             }
             Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: Loading " + url);
