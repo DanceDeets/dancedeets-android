@@ -46,13 +46,6 @@ public class StateUtil {
         }
     }
 
-    public static<Retained extends RetainedState> void destroyRetained(Retained retained, Activity activity) {
-        if (retained != null && !activity.isChangingConfigurations()) {
-            activity.getFragmentManager().beginTransaction().remove(retained).commitAllowingStateLoss();
-        }
-    }
-
-
     public static<Bundled extends BundledState> Bundled createBundled(StateHolder<Bundled, ?> stateHolder, Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             return (Bundled) savedInstanceState.getSerializable(BUNDLED_STATE);

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -20,13 +21,14 @@ import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
-import com.dancedeets.android.uistate.StateFacebookActivity;
+import com.dancedeets.android.uistate.StateHolder;
+import com.dancedeets.android.uistate.StateUtil;
 import com.facebook.login.LoginManager;
 
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends StateFacebookActivity<SearchListActivity.MyBundledState, SearchListActivity.MyRetainedState> implements EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.AddressListener, SearchPagerAdapter.SearchOptionsManager {
+public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.AddressListener, SearchPagerAdapter.SearchOptionsManager {
 
     private static final String LOG_TAG = "SearchListActivity";
 
@@ -38,8 +40,13 @@ public class SearchListActivity extends StateFacebookActivity<SearchListActivity
 
     private ViewPager mViewPager;
 
+    private FetchLocation mFetchLocation;
+
     // These are exposed as member variables for the sake of testing.
     SearchDialogFragment mSearchDialog;
+
+
+    private MyBundledState mBundled;
 
     @Override
     public MyBundledState buildBundledState() {
@@ -47,8 +54,8 @@ public class SearchListActivity extends StateFacebookActivity<SearchListActivity
     }
 
     @Override
-    public MyRetainedState buildRetainedState() {
-        return new MyRetainedState();
+    public RetainedState buildRetainedState() {
+        return null;
     }
 
     @Override
@@ -58,9 +65,6 @@ public class SearchListActivity extends StateFacebookActivity<SearchListActivity
 
     static protected class MyBundledState extends BundledState {
         SearchOptions mSearchOptions = new SearchOptions();
-    }
-    static public class MyRetainedState extends RetainedState {
-        private FetchLocation mFetchLocation;
     }
 
     @Override
@@ -73,6 +77,7 @@ public class SearchListActivity extends StateFacebookActivity<SearchListActivity
     protected void onCreate(Bundle savedInstanceState) {
         VolleySingleton.createInstance(getApplicationContext());
         super.onCreate(savedInstanceState);
+        mBundled = StateUtil.createBundled(this, savedInstanceState);
 
         // Set (DEBUG) title
         try {
@@ -115,19 +120,25 @@ public class SearchListActivity extends StateFacebookActivity<SearchListActivity
     }
 
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        StateUtil.saveBundled(this, mBundled, outState);
+    }
+
     public void onStart() {
         super.onStart();
         if (mBundled.mSearchOptions.isEmpty()) {
-            mRetained.mFetchLocation = new FetchLocation();
-            mRetained.mFetchLocation.onStart(this, this);
+            mFetchLocation = new FetchLocation();
+            mFetchLocation.onStart(this, this);
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mRetained.mFetchLocation != null) {
-            mRetained.mFetchLocation.onStop();
+        if (mFetchLocation != null) {
+            mFetchLocation.onStop();
         }
     }
 
