@@ -20,22 +20,26 @@ public class StateUtil {
         Retained retained = (Retained) fragment;
         if (retained == null) {
             retained = stateHolder.buildRetainedState();
-            retained.setRetainInstance(true);
-            activity.getFragmentManager().beginTransaction()
-                    .add(retained, fragmentTag)
-                    .commit();
+            if (retained != null) {
+                retained.setRetainInstance(true);
+                activity.getFragmentManager().beginTransaction()
+                        .add(retained, fragmentTag)
+                        .commit();
+            }
         }
         return retained;
     }
 
     public static<Retained extends RetainedState> Retained createRetained(StateHolder<?, Retained> stateHolder, Fragment fragment) {
         Retained retained = createRetained(stateHolder, fragment.getActivity());
-        retained.setTargetFragment(fragment, 0);
+        if (retained != null) {
+            retained.setTargetFragment(fragment, 0);
+        }
         return retained;
     }
 
     public static<Retained extends RetainedState> void destroyRetained(Retained retained, Fragment fragment) {
-        if (!fragment.getActivity().isChangingConfigurations()) {
+        if (retained != null && !fragment.getActivity().isChangingConfigurations()) {
             if (fragment.isRemoving()) {
                 fragment.getActivity().getFragmentManager().beginTransaction().remove(retained).commitAllowingStateLoss();
             }
@@ -43,7 +47,7 @@ public class StateUtil {
     }
 
     public static<Retained extends RetainedState> void destroyRetained(Retained retained, Activity activity) {
-        if (!activity.isChangingConfigurations()) {
+        if (retained != null && !activity.isChangingConfigurations()) {
             activity.getFragmentManager().beginTransaction().remove(retained).commitAllowingStateLoss();
         }
     }

@@ -38,7 +38,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
 
     @Override
     public RetainedState buildRetainedState() {
-        return new RetainedState();
+        return null;
     }
 
     @Override

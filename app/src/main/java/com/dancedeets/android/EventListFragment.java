@@ -130,7 +130,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     @Override
     public RetainedState buildRetainedState() {
-        return new RetainedState(); //TODO: replace with null support
+        return new RetainedState();
     }
 
     protected void handleEventList(List<FullEvent> eventList) {
