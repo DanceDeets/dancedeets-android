@@ -145,7 +145,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     public void startSearchFor(SearchOptions newSearchOptions) {
         Log.i(LOG_TAG, "startSearchFor " + newSearchOptions);
         // Can't perform fully-empty searches, so let's prompt the user
-        if (newSearchOptions.location.isEmpty() && newSearchOptions.keywords.isEmpty()) {
+        if (newSearchOptions == null || (newSearchOptions.location.isEmpty() && newSearchOptions.keywords.isEmpty())) {
             showSearchDialog(getString(R.string.couldnt_detect_location));
             return;
         }
