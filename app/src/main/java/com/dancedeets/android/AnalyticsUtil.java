@@ -3,6 +3,7 @@ package com.dancedeets.android;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -63,6 +64,8 @@ public class AnalyticsUtil {
         mMixPanel.identify(user.getString("id"));
         // Register for notifications
         mMixPanel.getPeople().initPushHandling(GOOGLE_PROJECT_ID);
+
+        Crashlytics.log(Log.INFO, LOG_TAG, "User " + user.getString("id") + ": " + user.getString("name"));
 
         MixpanelAPI.People people = mMixPanel.getPeople();
         people.identify(user.getString("id"));
