@@ -1,7 +1,6 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -45,6 +44,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         boolean mTwoPane;
 
         SearchOptions mSearchOptions;
+        public boolean mWaitingForSearch;
 
         MyBundledState(boolean twoPane, SearchOptions searchOptions) {
             mTwoPane = twoPane;
@@ -82,9 +82,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
     GoogleApiClient mGoogleApiClient;
 
-    // These are exposed as member variables for the sake of testing.
-    LocationManager mLocationManager;
-
     public EventListFragment() {
     }
 
@@ -111,7 +108,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     @Override
     public MyBundledState buildBundledState() {
         /**
-         *
          * Before this function is called, we read/set mTwoPane/mSearchOptions directly on this class.
          * This allows us to initialize this class with its identity and index as a tab.
          * This is used by getUniqueTag to construct an correctly named Retained fragment onAttach.
@@ -119,7 +115,6 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          * After this function is called, we use the fields on the persistable mBundled object directly.
          * Then we rely on persisting through the Bundled object.
          */
-
         return new MyBundledState(mTwoPane, mSearchOptions);
     }
 
@@ -134,6 +129,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     }
 
     protected void handleEventList(List<FullEvent> eventList) {
+        mBundled.mWaitingForSearch = false;
         mBundled.mEventList.clear();
         mBundled.mEventList.addAll(eventList);
         onEventListFilled();
@@ -220,7 +216,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && !mBundled.mWaitingForSearch) {
             onEventListFilled();
         }
 
@@ -297,6 +293,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
          */
         setListShown(false);
         mBundled.mEventList.clear();
+        mBundled.mWaitingForSearch = true;
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
     }
 
