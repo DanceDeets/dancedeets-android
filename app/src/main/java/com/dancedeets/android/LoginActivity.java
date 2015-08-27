@@ -159,7 +159,7 @@ public class LoginActivity extends FacebookActivity {
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
         Crashlytics.log(Log.INFO, LOG_TAG, "currentAccessToken is " + currentAccessToken);
         if (currentAccessToken == null) {
-            AnalyticsUtil.track("Login - Not Crashlytics.log(Log.ERROR, d In");
+            AnalyticsUtil.track("Login - Not Logged In");
         } else {
             handleLogin(currentAccessToken);
         }
