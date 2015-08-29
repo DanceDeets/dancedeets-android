@@ -39,6 +39,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     private static final String LOG_TAG = "EventInfoActivity";
 
+    public static final String ARG_EVENT_DATA = "EVENT_DATA";
     public static final String ARG_EVENT_LIST_FILENAME = "EVENT_ID_LIST_FILENAME";
     public static final String ARG_EVENT_INDEX = "EVENT_INDEX";
 
@@ -94,8 +95,12 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
         try {
             writeFile(eventListFile, eventList);
         } catch (IOException e) {
-            Crashlytics.log(Log.ERROR, LOG_TAG, "Error writing event list cache file: " + e);
-            return null;
+            //Instead of a file of all events, give up and pass in one event as a last-case resort.
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Using single-event fail-safe, due to error writing event list cache file: " + e);
+            bundle.putParcelable(ARG_EVENT_DATA, eventList.get(positionSelected));
+            Intent intent = new Intent(context, EventInfoActivity.class);
+            intent.putExtras(bundle);
+            return intent;
         }
         String eventListFilename = eventListFile.getAbsolutePath();
         bundle.putString(ARG_EVENT_LIST_FILENAME, eventListFilename);
@@ -226,15 +231,23 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             return true;
         } else if (intent.getExtras() != null) {
             Bundle b = intent.getExtras();
-            try {
-                mBundled.mEventList = readFile(new File(b.getString(ARG_EVENT_LIST_FILENAME)));
-            } catch (IOException | ClassNotFoundException e) {
-                mBundled.mEventList = null;
-                Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading event list cache file: " + e);
+            if (b.containsKey(ARG_EVENT_DATA)) {
+                FullEvent event = b.getParcelable(ARG_EVENT_DATA);
+                Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: Got single event fail-safe: " + event);
+                mBundled.mEventIndex = 0;
+                mBundled.mEventList = new ArrayList<>(1);
+                mBundled.mEventList.add(event);
+            } else {
+                try {
+                    mBundled.mEventList = readFile(new File(b.getString(ARG_EVENT_LIST_FILENAME)));
+                } catch (IOException | ClassNotFoundException e) {
+                    mBundled.mEventList = null;
+                    Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading event list cache file: " + e);
+                }
+                mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
+                Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: List size is " + mBundled.mEventList.size());
+                Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: Event index is " + mBundled.mEventIndex);
             }
-            mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
-            Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: List size is " + mBundled.mEventList.size());
-            Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: Event index is " + mBundled.mEventIndex);
 
             initializeViewPagerWithBundledState();
             return true;
