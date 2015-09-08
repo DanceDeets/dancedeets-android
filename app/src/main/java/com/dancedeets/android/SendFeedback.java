@@ -45,12 +45,15 @@ public class SendFeedback {
     }
 
     private static String getUserInformation(com.facebook.Profile user) {
-        StringBuilder userInfoBuilder = new StringBuilder();
-        userInfoBuilder.append("\nUID: ").append(user.getId());
-        userInfoBuilder.append("\nName: ").append(user.getName());
-        userInfoBuilder.append("\n");
-        return userInfoBuilder.toString();
-
+        if (user == null) {
+            return "Logged Out User";
+        } else {
+            StringBuilder userInfoBuilder = new StringBuilder();
+            userInfoBuilder.append("\nUID: ").append(user.getId());
+            userInfoBuilder.append("\nName: ").append(user.getName());
+            userInfoBuilder.append("\n");
+            return userInfoBuilder.toString();
+        }
     }
 
 
