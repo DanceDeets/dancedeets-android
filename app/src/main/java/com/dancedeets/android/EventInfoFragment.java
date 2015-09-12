@@ -492,6 +492,8 @@ public class EventInfoFragment extends StateFragment<
         startTime.setText(event.getFullTimeString());
         TextView description = (TextView) rootView.findViewById(R.id.description);
         description.setText(event.getDescription());
+        TextView categories = (TextView) rootView.findViewById(R.id.categories);
+        categories.setText("(" + event.getCategoriesAsString() + ")");
 
         mRsvpButton = (TextView) rootView.findViewById(R.id.rsvp);
         if (AccessToken.getCurrentAccessToken() != null) {

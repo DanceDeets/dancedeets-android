@@ -55,5 +55,17 @@
         android:text="Event Date/Time"
         android:textSize="12sp" />
 
+    <TextView
+        android:id="@+id/event_list_categories"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_list_start_time"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="Event Categories"
+        android:textSize="12sp" />
+
 
 </RelativeLayout>

@@ -25,6 +25,7 @@ public class EventUIAdapter extends BaseAdapter {
         TextView title;
         TextView location;
         TextView startTime;
+        TextView categories;
     }
     private LayoutInflater mInflater;
     private List<FullEvent> mEventList;
@@ -81,6 +82,7 @@ public class EventUIAdapter extends BaseAdapter {
             viewBinder.location.setText("");
         }
         viewBinder.startTime.setText(event.getStartTimeString());
+        viewBinder.categories.setText("(" + event.getCategoriesAsString() + ")");
     }
 
     @Override
@@ -99,6 +101,7 @@ public class EventUIAdapter extends BaseAdapter {
             viewBinder.title = (TextView)view.findViewById(R.id.event_list_title);
             viewBinder.location = (TextView)view.findViewById(R.id.event_list_location);
             viewBinder.startTime = (TextView)view.findViewById(R.id.event_list_start_time);
+            viewBinder.categories = (TextView)view.findViewById(R.id.event_list_categories);
             view.setTag(viewBinder);
         } else {
             view = convertView;

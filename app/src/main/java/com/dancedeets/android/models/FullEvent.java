@@ -13,6 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +46,7 @@ public class FullEvent implements Parcelable, Serializable {
     protected CoverData mCoverData;
     protected Venue mVenue;
     protected List<NamedPerson> mAdminList;
+    protected List<String> mCategories;
 
     protected FullEvent() {
     }
@@ -114,6 +116,16 @@ public class FullEvent implements Parcelable, Serializable {
                 NamedPerson admin = NamedPerson.parse(jsonAdmin);
 
                 event.mAdminList.add(admin);
+            }
+        }
+
+        if (jsonEvent.isNull("annotations") || jsonEvent.getJSONObject("annotations").isNull("categories")) {
+            event.mCategories = new ArrayList<>();
+        } else {
+            JSONArray jsonCategories = jsonEvent.getJSONObject("annotations").getJSONArray("categories");
+            event.mCategories = new ArrayList<>(jsonCategories.length());
+            for (int i = 0; i < jsonCategories.length(); i++) {
+                event.mCategories.add(jsonCategories.getString(i));
             }
         }
         return event;
@@ -223,9 +235,32 @@ public class FullEvent implements Parcelable, Serializable {
         return mVenue;
     }
 
-    // TODO: this is returning a mutable list, and violates our immutability guarantees.
     public List<NamedPerson> getAdmins() {
-        return mAdminList;
+        return Collections.unmodifiableList(mAdminList);
+    }
+
+    public List<String> getCategories() {
+        return Collections.unmodifiableList(mCategories);
+    }
+
+    public String getCategoriesAsString() {
+        return join(mCategories, ", ");
+    }
+
+    static public String join(List<String> list, String conjunction)
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String item : list)
+        {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(conjunction);
+            }
+            sb.append(item);
+        }
+        return sb.toString();
     }
 
     public boolean equals(Object o) {
@@ -243,7 +278,8 @@ public class FullEvent implements Parcelable, Serializable {
                 mAllDayEvent == other.mAllDayEvent &&
                 (mCoverData == null ? other.mCoverData == null : mCoverData.equals(other.mCoverData)) &&
                 mVenue.equals(other.mVenue) &&
-                mAdminList.equals(other.mAdminList)
+                mAdminList.equals(other.mAdminList) &&
+                mCategories.equals(other.mCategories)
         );
     }
 
@@ -266,6 +302,7 @@ public class FullEvent implements Parcelable, Serializable {
         dest.writeParcelable(mCoverData, 0);
         dest.writeParcelable(mVenue, 0);
         dest.writeList(mAdminList);
+        dest.writeList(mCategories);
     }
 
     public static final Parcelable.Creator<FullEvent> CREATOR
@@ -305,4 +342,5 @@ public class FullEvent implements Parcelable, Serializable {
         mCoverData = in.readParcelable(CoverData.class.getClassLoader());
         mVenue = in.readParcelable(Venue.class.getClassLoader());
         mAdminList = in.readArrayList(NamedPerson.class.getClassLoader());
+        mCategories = in.readArrayList(String.class.getClassLoader());
     }}
