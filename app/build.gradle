@@ -53,17 +53,17 @@ dependencies {
     compile 'com.android.support:support-v13:21.0.0'
     // Don't want version 5.2.08, as it's not yet available on devices
     compile 'com.google.android.gms:play-services:5.0.+'
-    compile 'com.mcxiaoke.volley:library:1.0.6'
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.1.0'
-    compile 'com.mixpanel.android:mixpanel-android:4.5.0@aar'
-    compile 'com.facebook.android:facebook-android-sdk:4.1.0'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
+    compile 'com.mixpanel.android:mixpanel-android:4.6.+@aar'
+    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     // Even if we want the advanced features of junit, we can't import it here, or it conflicts with android's junit
     //androidTestCompile('junit:junit:4.11+') {
     //    exclude group: 'org.hamcrest'
     //}
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
-    androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.+@aar') {
         transitive = true;
     }
 }
