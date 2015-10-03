@@ -45,7 +45,6 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
@@ -211,10 +210,9 @@ public class EventInfoFragment extends StateFragment<
 
     protected GraphRequest fetchRsvpRequest(String rsvp) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        Profile profile = Profile.getCurrentProfile();
         return new GraphRequest(
                 accessToken,
-                "/" + mBundled.mEvent.getId() + "/" + rsvp + "/" + profile.getId(),
+                "/" + mBundled.mEvent.getId() + "/" + rsvp + "/" + accessToken.getUserId(),
                 null,
                 HttpMethod.GET,
                 new RsvpReturnedCallback(mRetained, rsvp)
