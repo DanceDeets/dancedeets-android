@@ -36,8 +36,8 @@ public class FullEvent implements Parcelable, Serializable {
 
     protected String mTitle;
     protected String mDescription;
-    protected long mStartTime;
-    protected long mEndTime;
+    protected Date mStartTime;
+    protected Date mEndTime;
     protected boolean mAllDayEvent;
 
     protected String mImageUrl;
@@ -60,16 +60,13 @@ public class FullEvent implements Parcelable, Serializable {
 
         String startTimeString = jsonEvent.getString("start_time");
         try {
-            Date date = isoDateTimeFormatWithTZ.parse(startTimeString);
-            event.mStartTime = date.getTime();
+            event.mStartTime = isoDateTimeFormatWithTZ.parse(startTimeString);
         } catch (ParseException e1) {
             try {
-                Date date = isoDateTimeFormat.parse(startTimeString);
-                event.mStartTime = date.getTime();
+                event.mStartTime = isoDateTimeFormat.parse(startTimeString);
             } catch (ParseException e2) {
                 try {
-                    Date date = isoDateFormat.parse(startTimeString);
-                    event.mStartTime = date.getTime();
+                    event.mStartTime = isoDateFormat.parse(startTimeString);
                     event.mAllDayEvent = true;
                 } catch (ParseException e3) {
                     throw new JSONException("ParseException on start_time string: " + startTimeString);
@@ -79,16 +76,13 @@ public class FullEvent implements Parcelable, Serializable {
         if (!jsonEvent.isNull("end_time")) {
             String endTimeString = jsonEvent.getString("end_time");
             try {
-                Date date = isoDateTimeFormatWithTZ.parse(endTimeString);
-                event.mEndTime = date.getTime();
+                event.mEndTime = isoDateTimeFormatWithTZ.parse(endTimeString);
             } catch (ParseException e) {
                 try {
-                    Date date = isoDateTimeFormat.parse(endTimeString);
-                    event.mEndTime = date.getTime();
+                    event.mEndTime = isoDateTimeFormat.parse(endTimeString);
                 } catch (ParseException e2) {
                     try {
-                        Date date = isoDateFormat.parse(endTimeString);
-                        event.mEndTime = date.getTime();
+                        event.mEndTime = isoDateFormat.parse(endTimeString);
                     } catch (ParseException e3) {
                         throw new JSONException("ParseException on end_time string: " + endTimeString);
                     }
@@ -155,8 +149,12 @@ public class FullEvent implements Parcelable, Serializable {
         return mImageUrl;
     }
 
-    public long getStartTimeLong() {
+    public Date getStartTime() {
         return mStartTime;
+    }
+
+    public long getStartTimeLong() {
+        return mStartTime.getTime();
     }
 
     public String getStartTimeString() {
@@ -183,13 +181,17 @@ public class FullEvent implements Parcelable, Serializable {
         }
     }
 
+    public Date getEndTime() {
+        return mStartTime;
+    }
+
     public long getEndTimeLong() {
-        return mEndTime;
+        return mEndTime.getTime();
     }
 
     public String getEndTimeString() {
-        if (getEndTimeLong() != 0) {
-            if (mEndTime - mStartTime < 1000*60*60*12) {
+        if (mEndTime != null) {
+            if (mEndTime.getTime() - mStartTime.getTime() < 1000*60*60*12) {
                 return localizedTimeFormat.format(getEndTimeLong());
             } else if (mAllDayEvent) {
                 return localizedDateFormat.format(getEndTimeLong());
@@ -202,8 +204,8 @@ public class FullEvent implements Parcelable, Serializable {
     }
 
     public String getEndTimeString(Locale locale) {
-        if (getEndTimeLong() != 0) {
-            if (mEndTime - mStartTime < 1000*60*60*12) {
+        if (mEndTime != null) {
+            if (mEndTime.getTime() - mStartTime.getTime() < 1000*60*60*12) {
                 return localizedTimeFormat.format(getEndTimeLong());
             } else if (mAllDayEvent) {
                 return DateFormat.getDateInstance(DateFormat.MEDIUM, locale).format(getEndTimeLong());
@@ -217,7 +219,7 @@ public class FullEvent implements Parcelable, Serializable {
 
     public String getFullTimeString() {
         String fullTime = getStartTimeString();
-        if (mEndTime != 0) {
+        if (mEndTime != null) {
             fullTime += " - " + getEndTimeString();
         }
         return fullTime;
@@ -294,8 +296,8 @@ public class FullEvent implements Parcelable, Serializable {
         dest.writeString(mId);
         dest.writeString(mTitle);
         dest.writeString(mDescription);
-        dest.writeLong(mStartTime);
-        dest.writeLong(mEndTime);
+        dest.writeLong(mStartTime != null ? mStartTime.getTime() : 0);
+        dest.writeLong(mEndTime != null ? mEndTime.getTime() : 0);
         dest.writeByte((byte) (mAllDayEvent ? 1 : 0));
         dest.writeString(mImageUrl);
         dest.writeString(mCoverUrl);
@@ -332,8 +334,8 @@ public class FullEvent implements Parcelable, Serializable {
 
         mTitle = in.readString();
         mDescription = in.readString();
-        mStartTime = in.readLong();
-        mEndTime = in.readLong();
+        mStartTime = new Date(in.readLong());
+        mEndTime = new Date(in.readLong());
         mAllDayEvent = in.readByte() != 0;
 
         mImageUrl = in.readString();
