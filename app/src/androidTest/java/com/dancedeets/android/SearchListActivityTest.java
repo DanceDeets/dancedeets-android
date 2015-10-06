@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.text.StringContains.containsString;
+import static org.hamcrest.core.StringContains.containsString;
 
 /**
  * Created by lambert on 2014/10/28.
