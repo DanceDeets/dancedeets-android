@@ -216,8 +216,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
         eventAdapter = new EventUIAdapter(inflater.getContext());
+        setListAdapter(null);
 
-        if (savedInstanceState != null && !mBundled.mWaitingForSearch) {
+        if (mBundled.mEventList.size() > 0 && !mBundled.mWaitingForSearch) {
             onEventListFilled();
         }
 
@@ -357,6 +358,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         super.onListItemClick(listView, view, position, id);
 
         int translatedPosition = eventAdapter.translatePosition(position);
+        if (translatedPosition < 0) {
+            return;
+        }
         FullEvent event = mBundled.mEventList.get(translatedPosition);
 
         Log("onListItemClick: fb event id: " + event.getId());
