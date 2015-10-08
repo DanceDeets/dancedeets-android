@@ -24,6 +24,10 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
 
@@ -92,6 +96,26 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
 
         setContentView(R.layout.activity_event_list);
 
+
+        // Set up bottom banner ad
+        final PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
+        PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("F92F46CF903B1E0BD86D386FC9813E7F")
+                .build();
+        mPublisherAdView.loadAd(adRequest);
+        mPublisherAdView.setVisibility(View.GONE);
+        mPublisherAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                mPublisherAdView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                mPublisherAdView.setVisibility(View.GONE);
+            }
+        });
 
         // Locate the viewpager in activity_main.xml
         mViewPager = (ViewPager) findViewById(R.id.pager);
