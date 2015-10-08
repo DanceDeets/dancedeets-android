@@ -57,20 +57,16 @@ public class LoginActivity extends FacebookActivity {
         }
     }
 
-    private static class SendAuthRequest implements FetchLocation.AddressListener {
+    private static class SendAuthRequest implements FetchAddress.AddressListener {
         private static final String LOG_TAG = "SendAuthRequest";
 
         private final AccessToken mAccessToken;
-        private final FetchLocation mFetchLocation;
+        private final FetchAddress mFetchAddress;
 
-        SendAuthRequest(AccessToken accessToken, FetchLocation fetchLocation) {
-            Crashlytics.log(Log.INFO, LOG_TAG, "Received access token " + accessToken + ", with " + fetchLocation);
+        SendAuthRequest(AccessToken accessToken, FetchAddress fetchAddress) {
+            Crashlytics.log(Log.INFO, LOG_TAG, "Received access token " + accessToken + ", with " + fetchAddress);
             mAccessToken = accessToken;
-            mFetchLocation = fetchLocation;
-        }
-
-        @Override
-        public void onLocationFound(Location location) {
+            mFetchAddress = fetchAddress;
         }
 
         @Override
@@ -81,7 +77,7 @@ public class LoginActivity extends FacebookActivity {
 
             String addressString = null;
             if (address != null) {
-                addressString = FetchLocation.formatAddress(address);
+                addressString = FetchAddress.formatAddress(address);
 
                 // Only do this if we have an address, so future events get tagged with the user's location
                 try {
@@ -96,7 +92,7 @@ public class LoginActivity extends FacebookActivity {
             }
             DanceDeetsApi.sendAuth(mAccessToken, addressString);
 
-            mFetchLocation.onStop();
+            mFetchAddress.onStop();
         }
     }
 
@@ -134,8 +130,8 @@ public class LoginActivity extends FacebookActivity {
         request.setParameters(parameters);
         request.executeAsync();
 
-        FetchLocation fetchLocation = new FetchLocation();
-        fetchLocation.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchLocation));
+        FetchAddress fetchAddress = new FetchAddress();
+        fetchAddress.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchAddress));
 
         Intent intent = new Intent(LoginActivity.this, SearchListActivity.class);
         intent.setAction(Intent.ACTION_DEFAULT);

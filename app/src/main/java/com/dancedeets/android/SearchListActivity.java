@@ -30,7 +30,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.AddressListener, SearchPagerAdapter.SearchOptionsManager {
+public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchPagerAdapter.SearchOptionsManager {
 
     private static final String LOG_TAG = "SearchListActivity";
 
@@ -43,6 +43,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     private ViewPager mViewPager;
 
     private FetchLocation mFetchLocation;
+    private FetchAddress mFetchAddress;
 
     // These are exposed as member variables for the sake of testing.
     SearchDialogFragment mSearchDialog;
@@ -147,17 +148,20 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     public void onStart() {
         super.onStart();
         if (mBundled.mSearchOptions.isEmpty()) {
-            mFetchLocation = new FetchLocation();
-            mFetchLocation.onStart(this, this);
+            mFetchAddress = new FetchAddress();
+            mFetchAddress.onStart(this, this);
         }
+        mFetchLocation = new FetchLocation();
+        mFetchLocation.onStart(this, this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mFetchLocation != null) {
-            mFetchLocation.onStop();
+        if (mFetchAddress != null) {
+            mFetchAddress.onStop();
         }
+        mFetchLocation.onStop();
     }
 
     public void startSearchFor(SearchOptions newSearchOptions) {
@@ -198,7 +202,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
         Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
         if (address != null) {
-            String addressString = FetchLocation.formatAddress(address);
+            String addressString = FetchAddress.formatAddress(address);
             startSearchFor(new SearchOptions(addressString));
         } else {
             if (location == null) {
