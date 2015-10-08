@@ -70,6 +70,10 @@ public class LoginActivity extends FacebookActivity {
         }
 
         @Override
+        public void onLocationFound(Location location) {
+        }
+
+        @Override
         public void onAddressFound(Location location, Address address) {
             // We special-case this because the address.toString() omits SubLocality for some reason, and it's useful to us.
             String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";

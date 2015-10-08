@@ -34,7 +34,8 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
     private AddressListener mAddressListener;
 
     public interface AddressListener {
-        public void onAddressFound(Location location, Address address);
+        void onLocationFound(Location location );
+        void onAddressFound(Location location, Address address);
     }
 
     public FetchLocation() {
@@ -151,6 +152,9 @@ public class FetchLocation implements GoogleApiClient.ConnectionCallbacks {
         mLocation = mLocationProviderApi.getLastLocation(mGoogleApiClient);
         Log.i(LOG_TAG, "Reverse geocoding: " + mLocation);
         if (mLocation != null) {
+            if (mAddressListener != null) {
+                mAddressListener.onLocationFound(mLocation);
+            }
             // It's okay that this has an implicit reference to this parent class.
             // This class will be around as long as the underlying geocode task is running,
             // and when this class is destroyed via onStop, we cancel this task.
