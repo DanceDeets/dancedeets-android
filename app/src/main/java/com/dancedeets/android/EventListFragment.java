@@ -142,6 +142,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
             mEmptyText.setVisibility(View.GONE);
         }
         mRetryButton.setVisibility(View.GONE);
+        eventAdapter.rebuildList(mBundled.mEventList);
         setListAdapter(eventAdapter);
     }
 
@@ -214,9 +215,10 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
-        eventAdapter = new EventUIAdapter(inflater.getContext(), mBundled.mEventList, R.layout.event_row);
+        eventAdapter = new EventUIAdapter(inflater.getContext());
+        setListAdapter(null);
 
-        if (savedInstanceState != null && !mBundled.mWaitingForSearch) {
+        if (mBundled.mEventList.size() > 0 && !mBundled.mWaitingForSearch) {
             onEventListFilled();
         }
 
@@ -355,7 +357,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
                                 long id) {
         super.onListItemClick(listView, view, position, id);
 
-        FullEvent event = mBundled.mEventList.get(position);
+        int translatedPosition = eventAdapter.translatePosition(position);
+        if (translatedPosition < 0) {
+            return;
+        }
+        FullEvent event = mBundled.mEventList.get(translatedPosition);
+
         Log("onListItemClick: fb event id: " + event.getId());
 
         VolleySingleton volley = VolleySingleton.getInstance();
@@ -369,7 +376,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         if (mCallbacks != null) {
-            mCallbacks.onEventSelected(mBundled.mEventList, position);
+            mCallbacks.onEventSelected(mBundled.mEventList, translatedPosition);
         }
     }
 

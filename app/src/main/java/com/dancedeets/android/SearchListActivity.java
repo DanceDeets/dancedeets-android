@@ -24,11 +24,13 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.AddressListener, SearchPagerAdapter.SearchOptionsManager {
+public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchPagerAdapter.SearchOptionsManager {
 
     private static final String LOG_TAG = "SearchListActivity";
 
@@ -41,12 +43,15 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     private ViewPager mViewPager;
 
     private FetchLocation mFetchLocation;
+    private FetchAddress mFetchAddress;
 
     // These are exposed as member variables for the sake of testing.
     SearchDialogFragment mSearchDialog;
 
 
     private MyBundledState mBundled;
+
+    private PublisherAdView mPublisherAdView;
 
     @Override
     public MyBundledState buildBundledState() {
@@ -93,6 +98,21 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         setContentView(R.layout.activity_event_list);
 
 
+        // Set up bottom banner ad
+        mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
+        mPublisherAdView.setVisibility(View.GONE);
+        mPublisherAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                mPublisherAdView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                mPublisherAdView.setVisibility(View.GONE);
+            }
+        });
+
         // Locate the viewpager in activity_main.xml
         mViewPager = (ViewPager) findViewById(R.id.pager);
 
@@ -119,7 +139,6 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -129,17 +148,20 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     public void onStart() {
         super.onStart();
         if (mBundled.mSearchOptions.isEmpty()) {
-            mFetchLocation = new FetchLocation();
-            mFetchLocation.onStart(this, this);
+            mFetchAddress = new FetchAddress();
+            mFetchAddress.onStart(this, this);
         }
+        mFetchLocation = new FetchLocation();
+        mFetchLocation.onStart(this, this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mFetchLocation != null) {
-            mFetchLocation.onStop();
+        if (mFetchAddress != null) {
+            mFetchAddress.onStop();
         }
+        mFetchLocation.onStop();
     }
 
     public void startSearchFor(SearchOptions newSearchOptions) {
@@ -169,13 +191,18 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
                 "Keywords", mBundled.mSearchOptions.keywords);
     }
 
+    @Override
+    public void onLocationFound(Location location) {
+        // As soon as we get the geo coordinates, load the ad request
+        mPublisherAdView.loadAd(AdManager.getAdRequest(location));
+    }
 
-        @Override
+    @Override
     public void onAddressFound(Location location, Address address) {
         String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
         Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
         if (address != null) {
-            String addressString = FetchLocation.formatAddress(address);
+            String addressString = FetchAddress.formatAddress(address);
             startSearchFor(new SearchOptions(addressString));
         } else {
             if (location == null) {

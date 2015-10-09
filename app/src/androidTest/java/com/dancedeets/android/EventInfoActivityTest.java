@@ -3,11 +3,11 @@ package com.dancedeets.android;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.internal.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.espresso.core.deps.guava.base.Charsets;
+import android.support.test.espresso.core.deps.guava.io.Resources;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.util.Log;
 
-import com.android.support.test.deps.guava.base.Charsets;
-import com.android.support.test.deps.guava.io.Resources;
 import com.dancedeets.android.models.FullEvent;
 
 import org.json.JSONArray;

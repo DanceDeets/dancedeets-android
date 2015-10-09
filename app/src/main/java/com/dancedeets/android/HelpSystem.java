@@ -26,36 +26,13 @@ public class HelpSystem {
         }
     }
 
-    public static final String md5(final String s) {
-        final String MD5 = "MD5";
-        try {
-            // Create MD5 Hash
-            MessageDigest digest = java.security.MessageDigest.getInstance(MD5);
-            digest.update(s.getBytes());
-            byte messageDigest[] = digest.digest();
-
-            // Create Hex String
-            StringBuilder hexString = new StringBuilder();
-            for (byte aMessageDigest : messageDigest) {
-                String h = Integer.toHexString(0xFF & aMessageDigest);
-                while (h.length() < 2)
-                    h = "0" + h;
-                hexString.append(h);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     public static void openAddEvent(SearchListActivity activity) {
         AnalyticsUtil.track("Add Event");
         String url = "http://www.dancedeets.com/events_add?hl=" + Locale.getDefault().getLanguage();
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
             String uid = accessToken.getUserId();
-            String accessTokenMD5 = md5(accessToken.getToken());
+            String accessTokenMD5 = Hashing.md5(accessToken.getToken());
             url += "&uid=" + uid + "&access_token_md5=" + accessTokenMD5;
         }
         Crashlytics.log(Log.INFO, LOG_TAG, "Opening URL: " + url);

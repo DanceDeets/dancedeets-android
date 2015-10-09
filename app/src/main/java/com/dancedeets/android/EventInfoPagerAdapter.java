@@ -53,14 +53,6 @@ public class EventInfoPagerAdapter extends FragmentStatePagerAdapter {
         return fragment;
     }
 
-    public EventInfoFragment getExistingItem(int i) {
-        if (i < mFragments.size()) {
-            return mFragments.get(i);
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public Fragment getItem(int i) {
         FullEvent event = mEventList.get(i);
