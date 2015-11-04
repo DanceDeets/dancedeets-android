@@ -8,8 +8,6 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 /**
@@ -28,17 +26,19 @@ public class HelpSystem {
 
     public static void openAddEvent(SearchListActivity activity) {
         AnalyticsUtil.track("Add Event");
-        String url = "http://www.dancedeets.com/events_add?hl=" + Locale.getDefault().getLanguage();
+        Uri.Builder builder = Uri.parse("http://www.dancedeets.com/events_add?hl=" + Locale.getDefault().getLanguage()).buildUpon();
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
             String uid = accessToken.getUserId();
             String accessTokenMD5 = Hashing.md5(accessToken.getToken());
-            url += "&uid=" + uid + "&access_token_md5=" + accessTokenMD5;
+            builder.appendQueryParameter("uid", uid);
+            builder.appendQueryParameter("access_token_md5", accessTokenMD5);
         }
+        Uri url = builder.build();
         Crashlytics.log(Log.INFO, LOG_TAG, "Opening URL: " + url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        if (intent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivity(intent);
-        }
+
+        Intent intent = new Intent(activity, WebViewActivity.class);
+        intent.setData(url);
+        activity.startActivity(intent);
     }
 }
