@@ -21,12 +21,22 @@ public class WebViewActivity extends Activity {
     private WebView mWebView;
 
     @Override
+    public boolean onNavigateUp() {
+        finish();
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.webview_activity);
-        mWebView = (WebView)findViewById(R.id.webview);
 
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        mWebView = (WebView) findViewById(R.id.webview);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -39,7 +49,6 @@ public class WebViewActivity extends Activity {
                 }
             }
         });
-
 
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
