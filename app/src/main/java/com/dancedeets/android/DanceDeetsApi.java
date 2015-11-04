@@ -9,6 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.OneboxLink;
 import com.facebook.AccessToken;
 
 import org.json.JSONArray;
@@ -126,7 +127,7 @@ public class DanceDeetsApi {
 
 
     public interface OnResultsReceivedListener {
-        public void onResultsReceived(List<FullEvent> eventList);
+        public void onResultsReceived(List<FullEvent> eventList, List<OneboxLink> oneboxList);
         public void onError(Exception exception);
     }
 
@@ -169,9 +170,35 @@ public class DanceDeetsApi {
                 }
                 eventList.add(event);
             }
+
+            List<OneboxLink> oneboxList = new ArrayList<OneboxLink>();
+            JSONArray jsonOneboxList;
+            try {
+                jsonOneboxList = response.getJSONArray("onebox_links");
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "JSONException: " + e);
+                mOnResultsReceivedListener.onError(e);
+                return;
+            }
+            for (int i = 0; i < jsonOneboxList.length(); i++) {
+                OneboxLink link = null;
+                try {
+                    JSONObject jsonObject = jsonOneboxList.getJSONObject(i);
+                    link = OneboxLink.parse(jsonObject);
+                } catch (JSONException e) {
+                    String data = "";
+                    try {
+                        data = jsonOneboxList.getJSONObject(i).toString();
+                    } catch (JSONException e2) {
+                    }
+                    Log.e(LOG_TAG, "JSONException on object " + data + ": " + e);
+                }
+                oneboxList.add(link);
+            }
+
             if (mOnResultsReceivedListener != null) {
                 Log.i(LOG_TAG, "Received " + eventList.size() + " results from server");
-                mOnResultsReceivedListener.onResultsReceived(eventList);
+                mOnResultsReceivedListener.onResultsReceived(eventList, oneboxList);
             }
         }
 

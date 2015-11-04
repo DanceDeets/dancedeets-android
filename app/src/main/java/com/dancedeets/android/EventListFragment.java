@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateListFragment;
@@ -38,6 +39,8 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         int mActivatedPosition = ListView.INVALID_POSITION;
 
         ArrayList<FullEvent> mEventList = new ArrayList<>();
+
+        ArrayList<OneboxLink> mOneboxList = new ArrayList<>();
 
         boolean mDirty = true; // Start out dirty
 
@@ -128,10 +131,12 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         return new RetainedState();
     }
 
-    protected void handleEventList(List<FullEvent> eventList) {
+    protected void handleEventList(List<FullEvent> eventList, List<OneboxLink> oneboxList) {
         mBundled.mWaitingForSearch = false;
         mBundled.mEventList.clear();
         mBundled.mEventList.addAll(eventList);
+        mBundled.mOneboxList.clear();
+        mBundled.mOneboxList.addAll(oneboxList);
         onEventListFilled();
     }
 
@@ -307,9 +312,9 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         }
 
         @Override
-        public void onResultsReceived(List<FullEvent> eventList) {
+        public void onResultsReceived(List<FullEvent> eventList, List<OneboxLink> oneboxList) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
-            listFragment.handleEventList(eventList);
+            listFragment.handleEventList(eventList, oneboxList);
         }
 
         @Override
