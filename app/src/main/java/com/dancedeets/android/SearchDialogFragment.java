@@ -52,7 +52,7 @@ public class SearchDialogFragment extends StateDialogFragment<SearchDialogFragme
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View view = inflater.inflate(R.layout.event_search_options, null);
+        View view = inflater.inflate(R.layout.search_options, null);
         AutoCompleteTextView searchLocation = (AutoCompleteTextView) view.findViewById(R.id.search_location);
         EditText searchKeywords = (EditText) view.findViewById(R.id.search_keywords);
 

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     >
 
-    <include layout="@layout/fragment_pager" />
+    <include layout="@layout/search_list_pager" />
 
     <com.google.android.gms.ads.doubleclick.PublisherAdView
         android:id="@+id/publisherAdView"

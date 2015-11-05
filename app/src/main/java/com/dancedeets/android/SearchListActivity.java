@@ -95,7 +95,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
             e.printStackTrace();
         }
 
-        setContentView(R.layout.activity_event_list);
+        setContentView(R.layout.search_activity);
 
 
         // Set up bottom banner ad

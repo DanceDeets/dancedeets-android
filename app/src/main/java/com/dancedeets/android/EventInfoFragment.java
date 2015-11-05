@@ -446,7 +446,7 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_event_info,
+        View rootView = inflater.inflate(R.layout.event_info_pager,
                 container, false);
         fillOutView(rootView, getEvent());
         return rootView;

@@ -37,7 +37,7 @@ public class EventUIAdapter extends BaseAdapter {
     private List<Object> mSectionedEventList;
     private List<Integer> mMapping;
     private static int mSectionResource = 0;
-    private static int mResource = R.layout.event_row;
+    private static int mResource = R.layout.search_event_item;
 
     public enum ItemType {
         HEADER(0),

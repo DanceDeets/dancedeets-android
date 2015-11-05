@@ -187,7 +187,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log("onCreateView, mBundled is " + mBundled);
-        ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.event_list_layout, container, false);
+        ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.search_list, container, false);
 
         // Construct the ListFragment's UI objects in super, and stick them inside our rootView in the appropriate place.
         View listRootView = super.onCreateView(inflater, rootView, savedInstanceState);
@@ -197,7 +197,7 @@ public class EventListFragment extends StateListFragment<EventListFragment.MyBun
         rootView.removeView(eventListMagicView);
         rootView.addView(listRootView, eventListMagicIndex, eventListMagicParams);
 
-        mEmptyListView = inflater.inflate(R.layout.event_list_empty_view,
+        mEmptyListView = inflater.inflate(R.layout.search_empty_list,
                 container, false);
         mEmptyText = mEmptyListView.findViewById(R.id.empty_events_list_text);
         mRetryButton = (Button) mEmptyListView.findViewById(R.id.retry_button);
