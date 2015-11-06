@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -23,7 +22,6 @@ import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +39,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     final private AdapterView.OnItemClickListener mOnClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-            onListItemClick((ListView)parent, v, position, id);
+            onListItemClick((ListView) parent, v, position, id);
         }
     };
 
@@ -53,11 +51,12 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
     ListAdapter mAdapter;
     ListView mList;
-    View mEmptyView;
-    TextView mStandardEmptyView;
+
+    View mEmptyContainer;
     View mProgressContainer;
     View mListContainer;
-    CharSequence mEmptyText;
+    View mRetryContainer;
+
     boolean mListShown;
 
     static protected class MyBundledState extends BundledState {
@@ -105,13 +104,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
 
     EventUIAdapter eventAdapter;
-
-    View mEmptyListView;
-    View mEmptyTextView;
-    Button mRetryButton;
     TextView mListDescription;
-
-    GoogleApiClient mGoogleApiClient;
 
     public EventListFragment() {
     }
@@ -170,11 +163,11 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
     protected void onEventListFilled() {
         if (mBundled.mEventList.isEmpty()) {
-            mEmptyTextView.setVisibility(View.VISIBLE);
+            mEmptyContainer.setVisibility(View.VISIBLE);
         } else {
-            mEmptyTextView.setVisibility(View.GONE);
+            mEmptyContainer.setVisibility(View.GONE);
         }
-        mRetryButton.setVisibility(View.GONE);
+        mRetryContainer.setVisibility(View.GONE);
         eventAdapter.rebuildList(mBundled.mEventList);
         setListAdapter(eventAdapter);
     }
@@ -191,52 +184,29 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         } // If mBundled is empty (for instantiation), then when it is constructed, it will default to true anyway
     }
 
-    //TODO: Add caching to the new code:
-    /*
-    SharedPreferences pref = getActivity().getSharedPreferences(DanceDeetsApp.SAVED_DATA_FILENAME, Context.MODE_PRIVATE);
-    if (location != null) {
-        pref.edit()
-                .putFloat("latitude", (float)location.getLatitude())
-                .putFloat("longitude", (float)location.getLongitude())
-                .apply();
-    } else if (pref.getFloat("latitude", -1) != -1) {
-        location = new Location("Saved Preference File");
-        location.setLatitude(pref.getFloat("latitude", -1));
-        location.setLongitude(pref.getFloat("longitude", -1));
-    }
-    Log("Final location is " + location);
-    if (location != null) {
-        // TODO: Location: Sometimes this times out too, just randomly.
-        // Should we store prefs for the final geocoded location too?
-    }
-    */
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log("onCreateView, mBundled is " + mBundled);
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.search_list, container, false);
 
-        mEmptyListView = inflater.inflate(R.layout.search_empty_list,
-                container, false);
-        mEmptyTextView = mEmptyListView.findViewById(R.id.empty_events_list_text);
-        mRetryButton = (Button) mEmptyListView.findViewById(R.id.retry_button);
+        mProgressContainer = rootView.findViewById(R.id.searchProgressContainer);
+        mListContainer = rootView.findViewById(R.id.searchListContainer);
+        mEmptyContainer = rootView.findViewById(R.id.searchEmptyContainer);
+        mRetryContainer = rootView.findViewById(R.id.searchRetryContainer);
+
+        mProgressContainer.setVisibility(View.GONE);
+        mEmptyContainer.setVisibility(View.GONE);
+        mRetryContainer.setVisibility(View.GONE);
+
+
+        Button mRetryButton = (Button) mRetryContainer.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startSearch();
             }
         });
-
-        /* We need to add the emptyListView as a sibling to the List,
-         * as suggested by ListFragment.onCreateView documentation.
-         * Then setting/unsetting the ListFragment's Adapter triggers
-         * the ProgressBar and ListContainer(List+EmptyView) to alternate.
-         * And within the List, it will then alternate with the EmptyView.
-         */
-        ListView listView = (ListView)rootView.findViewById(android.R.id.list);
-        ViewParent listContainerView = listView.getParent();
-        ((ViewGroup) listContainerView).addView(mEmptyListView);
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
@@ -247,6 +217,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
             onEventListFilled();
         }
 
+        ListView listView = (ListView)rootView.findViewById(android.R.id.list);
         // In two-pane mode, list items should be given the
         // 'activated' state when touched.
         if (mBundled.mTwoPane) {
@@ -267,6 +238,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         setListShown(shown, false);
     }
 
+    // BEGIN Derived from ListFragment
     private void setListShown(boolean shown, boolean animate) {
         ensureList();
         if (mProgressContainer == null) {
@@ -303,10 +275,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         }
     }
 
-    public ListAdapter getListAdapter() {
-        return mAdapter;
-    }
-
     private void ensureList() {
         if (mList != null) {
             return;
@@ -315,37 +283,9 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         if (root == null) {
             throw new IllegalStateException("Content view not yet created");
         }
-        if (root instanceof ListView) {
-            mList = (ListView)root;
-        } else {
-            mStandardEmptyView = (TextView)root.findViewById(
-                    R.id.emptyList);
-            if (mStandardEmptyView == null) {
-                mEmptyView = root.findViewById(android.R.id.empty);
-            } else {
-                mStandardEmptyView.setVisibility(View.GONE);
-            }
-            mProgressContainer = root.findViewById(R.id.progressContainer);
-            mListContainer = root.findViewById(R.id.listContainer);
-            View rawListView = root.findViewById(android.R.id.list);
-            if (!(rawListView instanceof ListView)) {
-                throw new RuntimeException(
-                        "Content has view with id attribute 'android.R.id.list' "
-                                + "that is not a ListView class");
-            }
-            mList = (ListView)rawListView;
-            if (mList == null) {
-                throw new RuntimeException(
-                        "Your content must have a ListView whose id attribute is " +
-                                "'android.R.id.list'");
-            }
-            if (mEmptyView != null) {
-                mList.setEmptyView(mEmptyView);
-            } else if (mEmptyText != null) {
-                mStandardEmptyView.setText(mEmptyText);
-                mList.setEmptyView(mStandardEmptyView);
-            }
-        }
+
+        mList = (ListView)root.findViewById(android.R.id.list);
+
         mListShown = true;
         mList.setOnItemClickListener(mOnClickListener);
         if (mAdapter != null) {
@@ -367,10 +307,12 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         return mList;
     }
 
+    // END Derived from ListFragment
+
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ensureList();
-        getListView().setEmptyView(mEmptyListView);
+        getListView().setEmptyView(mEmptyContainer);
 
         // Reload scroll state
         if (savedInstanceState != null) {
@@ -461,8 +403,9 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         public void onError(Exception exception) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
-            listFragment.mEmptyTextView.setVisibility(View.GONE);
-            listFragment.mRetryButton.setVisibility(View.VISIBLE);
+            listFragment.mEmptyContainer.setVisibility(View.GONE);
+            listFragment.mRetryContainer.setVisibility(View.VISIBLE);
+            //TODO: This crashes! Because eventAdapter's sectionedEventList is null when we call size() on it. Why?
             listFragment.setListAdapter(listFragment.eventAdapter);
         }
     }
@@ -470,6 +413,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     protected void Log(String log) {
         Crashlytics.log(Log.INFO, LOG_TAG, getSearchOptions().timePeriod.toString() +  ": " + log);
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -520,15 +464,5 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         if (mCallbacks != null) {
             mCallbacks.onEventSelected(mBundled.mEventList, translatedPosition);
         }
-    }
-
-    private void setActivatedPosition(int position) {
-        if (position == ListView.INVALID_POSITION) {
-            getListView().setItemChecked(mBundled.mActivatedPosition, false);
-        } else {
-            getListView().setItemChecked(position, true);
-        }
-
-        mBundled.mActivatedPosition = position;
     }
 }
