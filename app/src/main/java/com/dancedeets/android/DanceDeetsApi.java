@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
 import com.facebook.AccessToken;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by lambert on 2014/12/24.
+ * Wrapper for all API calls to the DanceDeets server.
  */
 public class DanceDeetsApi {
 
@@ -62,7 +63,8 @@ public class DanceDeetsApi {
             jsonPayload.put("location", location);
             jsonPayload.put("client", "android");
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error constructing request: " + e);
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Error constructing request: " + e);
+            Crashlytics.logException(e);
             return;
         }
         JsonObjectRequest request = new JsonObjectRequest(
@@ -72,13 +74,13 @@ public class DanceDeetsApi {
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i(LOG_TAG, "Successfully called /api/auth: " + response);
+                        Crashlytics.log(Log.INFO, LOG_TAG, "Successfully called /api/auth: " + response);
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Error calling /api/auth: " + error);
+                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error calling /api/auth: " + error);
                     }
                 });
         VolleySingleton.getInstance().getRequestQueue().add(request);
@@ -86,8 +88,8 @@ public class DanceDeetsApi {
 
 
     public interface OnEventReceivedListener {
-        public void onEventReceived(FullEvent event);
-        public void onError(Exception exception);
+        void onEventReceived(FullEvent event);
+        void onError(Exception exception);
     }
 
     public static void getEvent(String id, final OnEventReceivedListener onEventReceivedListener) {
@@ -102,7 +104,8 @@ public class DanceDeetsApi {
                         try {
                             event = FullEvent.parse(response);
                         } catch (JSONException e) {
-                            Log.e(LOG_TAG, "Error reading from event api: " + e + ": " + response);
+                            Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading from event api: " + e + ": " + response);
+                            Crashlytics.logException(e);
                             if (onEventReceivedListener != null) {
                                 onEventReceivedListener.onError(e);
                             }
@@ -116,7 +119,8 @@ public class DanceDeetsApi {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(LOG_TAG, "Error retrieving data: " + error);
+                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving data: " + error);
+                        Crashlytics.logException(error);
                         if (onEventReceivedListener != null) {
                             onEventReceivedListener.onError(error);
                         }
@@ -127,8 +131,8 @@ public class DanceDeetsApi {
 
 
     public interface OnResultsReceivedListener {
-        public void onResultsReceived(List<FullEvent> eventList, List<OneboxLink> oneboxList);
-        public void onError(Exception exception);
+        void onResultsReceived(List<FullEvent> eventList, List<OneboxLink> oneboxList);
+        void onError(Exception exception);
     }
 
     static class SearchProcessor implements Response.Listener<JSONObject>, Response.ErrorListener {
@@ -141,12 +145,13 @@ public class DanceDeetsApi {
         }
         @Override
         public void onResponse(JSONObject response) {
-            List<FullEvent> eventList = new ArrayList<FullEvent>();
+            List<FullEvent> eventList = new ArrayList<>();
             JSONArray jsonEventList;
             try {
                 jsonEventList = response.getJSONArray("results");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSONException: " + e);
+                Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException: " + e);
+                Crashlytics.logException(e);
                 mOnResultsReceivedListener.onError(e);
                 return;
             }
@@ -166,19 +171,22 @@ public class DanceDeetsApi {
                         eventId = " " + jsonEventList.getJSONObject(i).getString("id");
                     } catch (JSONException e2) {
                     }
-                    Log.e(LOG_TAG, "JSONException on event" + eventId + ": " + e);
+                    Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException on event" + eventId + ": " + e);
+                    Crashlytics.logException(e);
                 }
                 eventList.add(event);
             }
 
-            List<OneboxLink> oneboxList = new ArrayList<OneboxLink>();
+            //TODO: Return a full Results object containing events and oneboxes
+            List<OneboxLink> oneboxList = new ArrayList<>();
             JSONArray jsonOneboxList;
             try {
                 jsonOneboxList = response.getJSONArray("onebox_links");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSONException: " + e);
-                mOnResultsReceivedListener.onError(e);
-                return;
+                Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException: " + e);
+                Crashlytics.logException(e);
+                // The oneboxes are optional, report it to the server but let it proceed here...
+                jsonOneboxList = new JSONArray();
             }
             for (int i = 0; i < jsonOneboxList.length(); i++) {
                 OneboxLink link = null;
@@ -191,13 +199,14 @@ public class DanceDeetsApi {
                         data = jsonOneboxList.getJSONObject(i).toString();
                     } catch (JSONException e2) {
                     }
-                    Log.e(LOG_TAG, "JSONException on object " + data + ": " + e);
+                    Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException on object " + data + ": " + e);
+                    Crashlytics.logException(e);
                 }
                 oneboxList.add(link);
             }
 
             if (mOnResultsReceivedListener != null) {
-                Log.i(LOG_TAG, "Received " + eventList.size() + " results from server");
+                Crashlytics.log(Log.INFO, LOG_TAG, "Received " + eventList.size() + " results from server");
                 mOnResultsReceivedListener.onResultsReceived(eventList, oneboxList);
             }
         }
@@ -227,7 +236,7 @@ public class DanceDeetsApi {
                 searchProcessor,
                 searchProcessor);
 
-        Log.i(LOG_TAG, "Querying server feed: " + searchUri);
+        Crashlytics.log(Log.INFO, LOG_TAG, "Querying server feed: " + searchUri);
         request.setShouldCache(false);
         RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
         queue.add(request);

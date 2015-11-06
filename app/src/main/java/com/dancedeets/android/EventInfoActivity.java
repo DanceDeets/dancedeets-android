@@ -243,6 +243,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 } catch (IOException | ClassNotFoundException e) {
                     mBundled.mEventList = null;
                     Crashlytics.log(Log.ERROR, LOG_TAG, "Error reading event list cache file: " + e);
+                    Crashlytics.logException(e);
                 }
                 mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
                 Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: List size is " + mBundled.mEventList.size());

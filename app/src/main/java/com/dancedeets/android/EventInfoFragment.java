@@ -198,6 +198,7 @@ public class EventInfoFragment extends StateFragment<
                     }
                 } catch (JSONException e) {
                     Crashlytics.log(Log.ERROR, LOG_TAG, "JSON Error loading rsvp data: " + e);
+                    Crashlytics.logException(e);
                 }
             }
         }
@@ -381,6 +382,7 @@ public class EventInfoFragment extends StateFragment<
                 eventInfoFragment.swapTitleAndDescription();
             } catch (JSONException error) {
                 Crashlytics.log(Log.ERROR, LOG_TAG, "Translation failed: " + error);
+                Crashlytics.logException(error);
                 Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
             }
         }
