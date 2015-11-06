@@ -1,7 +1,6 @@
 package com.dancedeets.android;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +80,6 @@ public class EventUIAdapter extends BaseAdapter {
             lastCal.setTime(event.getStartTime());
             mMapping.add(i);
         }
-        Log.i(LOG_TAG, "  "+sectionedList);
         return sectionedList;
     }
 
