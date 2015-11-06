@@ -1,23 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/event_list_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Loading Events..."
-        android:freezesText="true"
-        android:background="@color/grey"
-        android:padding="5dp"
-        />
-
-    <!-- The ListView stuff gets added dynamically inside EventListFragment, replacing this magic token below. -->
-    <View
-        android:id="@+id/event_list_magic"
+    <LinearLayout android:id="@+id/progressContainer"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
-</LinearLayout>
+        android:visibility="gone"
+        android:gravity="center">
+
+        <ProgressBar style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/loading"
+            android:paddingTop="4dip"
+            android:singleLine="true" />
+
+    </LinearLayout>
+
+    <FrameLayout android:id="@+id/listContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/event_list_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading Events..."
+                android:freezesText="true"
+                android:background="@color/grey"
+                android:padding="5dp"
+                />
+            <ListView android:id="@android:id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawSelectorOnTop="false" />
+
+        </LinearLayout>
+
+        <TextView android:id="@+id/emptyList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </FrameLayout>
+
+</FrameLayout>
