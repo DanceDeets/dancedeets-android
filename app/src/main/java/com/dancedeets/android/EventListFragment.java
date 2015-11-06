@@ -2,7 +2,6 @@ package com.dancedeets.android;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -28,14 +27,6 @@ import java.util.List;
 
 public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> implements SearchTarget {
 
-    final private Handler mHandler = new Handler();
-
-    final private Runnable mRequestFocus = new Runnable() {
-        public void run() {
-            mList.focusableViewAvailable(mList);
-        }
-    };
-
     final private AdapterView.OnItemClickListener mOnClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -52,12 +43,17 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     ListAdapter mAdapter;
     ListView mList;
 
+    enum VisibleState {
+        PROGRESS, LIST, EMPTY, RETRY
+    }
+
     View mEmptyContainer;
     View mProgressContainer;
     View mListContainer;
     View mRetryContainer;
 
-    boolean mListShown;
+    // Currently visible Container
+    View mVisibleContainer;
 
     static protected class MyBundledState extends BundledState {
         /**
@@ -158,18 +154,17 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         mBundled.mEventList.addAll(eventList);
         mBundled.mOneboxList.clear();
         mBundled.mOneboxList.addAll(oneboxList);
-        onEventListFilled();
+        onEventListFilled(false);
     }
 
-    protected void onEventListFilled() {
-        if (mBundled.mEventList.isEmpty()) {
-            mEmptyContainer.setVisibility(View.VISIBLE);
-        } else {
-            mEmptyContainer.setVisibility(View.GONE);
-        }
-        mRetryContainer.setVisibility(View.GONE);
+    protected void onEventListFilled(boolean startup) {
         eventAdapter.rebuildList(mBundled.mEventList);
-        setListAdapter(eventAdapter);
+        mList.setAdapter(eventAdapter);
+        if (mBundled.mEventList.isEmpty()) {
+            setStateShown(VisibleState.EMPTY, !startup);
+        } else {
+            setStateShown(VisibleState.LIST, !startup);
+        }
     }
 
 
@@ -195,10 +190,12 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         mEmptyContainer = rootView.findViewById(R.id.searchEmptyContainer);
         mRetryContainer = rootView.findViewById(R.id.searchRetryContainer);
 
+        mListContainer.setVisibility(View.GONE);
         mProgressContainer.setVisibility(View.GONE);
         mEmptyContainer.setVisibility(View.GONE);
         mRetryContainer.setVisibility(View.GONE);
 
+        mList = (ListView)rootView.findViewById(android.R.id.list);
 
         Button mRetryButton = (Button) mRetryContainer.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -210,11 +207,15 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
+        mList.setOnItemClickListener(mOnClickListener);
+
         eventAdapter = new EventUIAdapter(inflater.getContext());
-        setListAdapter(null);
+        mList.setAdapter(null);
 
         if (mBundled.mEventList.size() > 0 && !mBundled.mWaitingForSearch) {
-            onEventListFilled();
+            onEventListFilled(true);
+        } else {
+            setStateShown(VisibleState.PROGRESS, false);
         }
 
         ListView listView = (ListView)rootView.findViewById(android.R.id.list);
@@ -231,107 +232,63 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         return rootView;
     }
 
-    public void setListShown(boolean shown) {
-        setListShown(shown, true);
-    }
-    public void setListShownNoAnimation(boolean shown) {
-        setListShown(shown, false);
+    private View getContainer(VisibleState state) {
+        switch (state) {
+            case PROGRESS:
+                return mProgressContainer;
+            case LIST:
+                return mListContainer;
+            case EMPTY:
+                return mEmptyContainer;
+            case RETRY:
+                return mRetryContainer;
+            default:
+                throw new IllegalArgumentException(state.toString());
+        }
     }
 
-    // BEGIN Derived from ListFragment
-    private void setListShown(boolean shown, boolean animate) {
-        ensureList();
-        if (mProgressContainer == null) {
-            throw new IllegalStateException("Can't be used with a custom content view");
-        }
-        if (mListShown == shown) {
+    private void setStateShown(VisibleState newVisibleState, boolean animate) {
+        View oldVisibleContainer = mVisibleContainer;
+        View newVisibleContainer = getContainer(newVisibleState);
+        mVisibleContainer = newVisibleContainer;
+
+        // Don't animate between our own state!
+        if (oldVisibleContainer == newVisibleContainer) {
             return;
         }
-        mListShown = shown;
-        if (shown) {
-            if (animate) {
-                mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-                        getActivity(), android.R.anim.fade_out));
-                mListContainer.startAnimation(AnimationUtils.loadAnimation(
-                        getActivity(), android.R.anim.fade_in));
-            } else {
-                mProgressContainer.clearAnimation();
-                mListContainer.clearAnimation();
-            }
-            mProgressContainer.setVisibility(View.GONE);
-            mListContainer.setVisibility(View.VISIBLE);
+
+        if (animate) {
+            newVisibleContainer.startAnimation(AnimationUtils.loadAnimation(
+                    getActivity(), android.R.anim.fade_in));
         } else {
+            newVisibleContainer.clearAnimation();
+        }
+        newVisibleContainer.setVisibility(View.VISIBLE);
+
+        if (oldVisibleContainer != null) {
             if (animate) {
-                mProgressContainer.startAnimation(AnimationUtils.loadAnimation(
-                        getActivity(), android.R.anim.fade_in));
-                mListContainer.startAnimation(AnimationUtils.loadAnimation(
+                oldVisibleContainer.startAnimation(AnimationUtils.loadAnimation(
                         getActivity(), android.R.anim.fade_out));
             } else {
-                mProgressContainer.clearAnimation();
-                mListContainer.clearAnimation();
+                oldVisibleContainer.clearAnimation();
             }
-            mProgressContainer.setVisibility(View.VISIBLE);
-            mListContainer.setVisibility(View.GONE);
+            oldVisibleContainer.setVisibility(View.GONE);
         }
-    }
-
-    private void ensureList() {
-        if (mList != null) {
-            return;
-        }
-        View root = getView();
-        if (root == null) {
-            throw new IllegalStateException("Content view not yet created");
-        }
-
-        mList = (ListView)root.findViewById(android.R.id.list);
-
-        mListShown = true;
-        mList.setOnItemClickListener(mOnClickListener);
-        if (mAdapter != null) {
-            ListAdapter adapter = mAdapter;
-            mAdapter = null;
-            setListAdapter(adapter);
-        } else {
-            // We are starting without an adapter, so assume we won't
-            // have our data right away and start with the progress indicator.
-            if (mProgressContainer != null) {
-                setListShown(false, false);
-            }
-        }
-        mHandler.post(mRequestFocus);
-    }
-
-    public ListView getListView() {
-        ensureList();
-        return mList;
     }
 
     // END Derived from ListFragment
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ensureList();
-        getListView().setEmptyView(mEmptyContainer);
+        // We don't use mList.setEmptyView(), since it will be used
+        // on all null-or-empty adapters (ie, in-progress, empty, retry)
+        // So instead we just handle it ourselves with our state management.
 
         // Reload scroll state
         if (savedInstanceState != null) {
             Parcelable savedState = savedInstanceState.getParcelable(LIST_STATE);
             if (savedState != null) {
-                getListView().onRestoreInstanceState(savedState);
-            }
-        }
-    }
-
-    public void setListAdapter(ListAdapter adapter) {
-        boolean hadAdapter = mAdapter != null;
-        mAdapter = adapter;
-        if (mList != null) {
-            mList.setAdapter(adapter);
-            if (!mListShown && !hadAdapter) {
-                // The list was hidden, and previously didn't have an
-                // adapter.  It is now time to show it.
-                setListShown(true, getView().getWindowToken() != null);
+                mList.onRestoreInstanceState(savedState);
             }
         }
     }
@@ -341,7 +298,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         super.onSaveInstanceState(state);
         // Save scroll state
         if (getView() != null) {
-            state.putParcelable(LIST_STATE, getListView().onSaveInstanceState());
+            state.putParcelable(LIST_STATE, mList.onSaveInstanceState());
         }
     }
 
@@ -373,14 +330,9 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         }
         mListDescription.setText(listDescription);
 
-        // Show the progress bar
-        setListAdapter(null);
-        /* We need to call setListShown after setListAdapter,
-         * because otherwise setListAdapter thinks it has an adapter
-         * and tries to show the un-initialized list view. Reported in:
-         * https://code.google.com/p/android/issues/detail?id=76779
-         */
-        setListShown(false);
+        mList.setAdapter(null);
+        setStateShown(VisibleState.PROGRESS, false);
+
         mBundled.mEventList.clear();
         mBundled.mWaitingForSearch = true;
         DanceDeetsApi.runSearch(mBundled.mSearchOptions, new ResultsReceivedHandler(mRetained));
@@ -403,10 +355,9 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         public void onError(Exception exception) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
-            listFragment.mEmptyContainer.setVisibility(View.GONE);
-            listFragment.mRetryContainer.setVisibility(View.VISIBLE);
             //TODO: This crashes! Because eventAdapter's sectionedEventList is null when we call size() on it. Why?
-            listFragment.setListAdapter(listFragment.eventAdapter);
+            listFragment.mList.setAdapter(listFragment.eventAdapter);
+            listFragment.setStateShown(VisibleState.RETRY, true);
         }
     }
 
