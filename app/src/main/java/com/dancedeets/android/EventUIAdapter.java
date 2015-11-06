@@ -34,7 +34,7 @@ public class EventUIAdapter extends BaseAdapter {
         TextView categories;
     }
     private LayoutInflater mInflater;
-    private List<Object> mSectionedEventList;
+    private List<Object> mSectionedEventList = new ArrayList();
     private List<Integer> mMapping;
     private static int mSectionResource = 0;
     private static int mResource = R.layout.search_event_item;
