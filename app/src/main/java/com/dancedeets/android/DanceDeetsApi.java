@@ -227,7 +227,7 @@ public class DanceDeetsApi {
                 searchProcessor,
                 searchProcessor);
 
-        Log.d(LOG_TAG, "Querying server feed: " + searchUri);
+        Log.i(LOG_TAG, "Querying server feed: " + searchUri);
         request.setShouldCache(false);
         RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
         queue.add(request);
