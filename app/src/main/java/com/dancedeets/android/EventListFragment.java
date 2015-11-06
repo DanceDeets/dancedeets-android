@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +26,16 @@ import java.util.List;
 
 public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> implements SearchTarget {
 
+    static final String LOG_TAG = "EventListFragment";
+
+    EventUIAdapter eventAdapter;
+    TextView mListDescription;
+    /**
+     * The fragment's current callback object, which is notified of list item
+     * clicks.
+     */
+    private Callbacks mCallbacks = null;
+
     final private AdapterView.OnItemClickListener mOnClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -40,7 +49,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
     private boolean mPendingSearch = false;
 
-    ListAdapter mAdapter;
     ListView mList;
 
     enum VisibleState {
@@ -79,12 +87,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     }
 
     /**
-     * The fragment's current callback object, which is notified of list item
-     * clicks.
-     */
-    private Callbacks mCallbacks = null;
-
-    /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
      * selections.
@@ -95,12 +97,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
          */
         void onEventSelected(ArrayList<FullEvent> allEvents, int positionSelected);
     }
-
-    static final String LOG_TAG = "EventListFragment";
-
-
-    EventUIAdapter eventAdapter;
-    TextView mListDescription;
 
     public EventListFragment() {
     }
@@ -195,8 +191,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         mEmptyContainer.setVisibility(View.GONE);
         mRetryContainer.setVisibility(View.GONE);
 
-        mList = (ListView)rootView.findViewById(android.R.id.list);
-
         Button mRetryButton = (Button) mRetryContainer.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,9 +201,9 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
-        mList.setOnItemClickListener(mOnClickListener);
-
         eventAdapter = new EventUIAdapter(inflater.getContext());
+        mList = (ListView)rootView.findViewById(android.R.id.list);
+        mList.setOnItemClickListener(mOnClickListener);
         mList.setAdapter(null);
 
         if (mBundled.mEventList.size() > 0 && !mBundled.mWaitingForSearch) {
@@ -355,7 +349,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         public void onError(Exception exception) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving search results, with error: " + exception.toString());
-            //TODO: This crashes! Because eventAdapter's sectionedEventList is null when we call size() on it. Why?
             listFragment.mList.setAdapter(listFragment.eventAdapter);
             listFragment.setStateShown(VisibleState.RETRY, true);
         }
