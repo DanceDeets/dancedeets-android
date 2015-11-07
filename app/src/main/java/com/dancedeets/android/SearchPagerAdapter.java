@@ -6,14 +6,13 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v13.app.FragmentCompat;
-import android.support.v13.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
 
 /**
  * A PagerAdapter for tracking the various search tabs we support.
  */
-public class SearchPagerAdapter extends FragmentPagerAdapter {
+public class SearchPagerAdapter extends SearchPagerAdapterParent {
     // Tab Titles
     private static final int tabTitles[] = new int[] { R.string.tab_upcoming_events, R.string.tab_ongoing_events, R.string.tab_past_events};
     private static final String LOG_TAG = "SearchPagerAdapter";
@@ -37,10 +36,6 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         mSearchOptionsManager = searchOptionsManager;
         mResources = resources;
         mTwoPane = twoPane;
-    }
-
-    public SearchOptions getSearchOptions() {
-        return mSearchOptions;
     }
 
     public SearchTarget getSearchTarget(int position) {
@@ -84,7 +79,7 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         super.destroyItem(container, position, object);
-        Log.i(LOG_TAG, "destroyItem(" + position + ") returns " + mFragments[position]);
+        Log.i(LOG_TAG, "destroyItem(" + position + ") passed " + object + ", deletes " + mFragments[position]);
         mFragments[position] = null;
     }
 

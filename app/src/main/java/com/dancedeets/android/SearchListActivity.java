@@ -126,6 +126,8 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
 
         // Set the ViewPagerAdapter into ViewPager
         mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane));
+        // Since we do lazy-loading ourselves, we can keep all tabs in our ViewPager loaded
+        mViewPager.setOffscreenPageLimit(mViewPager.getAdapter().getCount());
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             public void onPageSelected(int position) {
                 SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
@@ -172,20 +174,11 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
             return;
         }
         mBundled.mSearchOptions = newSearchOptions;
-        SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
-        for (int i = 0; i < adapter.getCount(); i++) {
-            // We only want to grab targets that are non-empty, not create missing ones
-            SearchTarget searchTarget = adapter.getSearchTarget(i);
-            if (searchTarget == null) {
-                continue;
-            }
-            Log.i(LOG_TAG, "SearchTarget is " + searchTarget);
-            searchTarget.prepareForSearchOptions(mBundled.mSearchOptions);
-            if (i == mViewPager.getCurrentItem()) {
-                Log.i(LOG_TAG, "Initiating startSearch() on index " + i + ": " + searchTarget);
-                searchTarget.loadSearchTab();
-            }
-        }
+        // We construct a new adapter and set it, which clears all the existing fragment state
+        SearchPagerAdapter adapter = new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane);
+        mViewPager.setAdapter(adapter);
+        EventListFragment f = (EventListFragment)adapter.getSearchTarget(mViewPager.getCurrentItem());
+        f.startSearch();
         AnalyticsUtil.track("Search Events",
                 "Location", mBundled.mSearchOptions.location,
                 "Keywords", mBundled.mSearchOptions.keywords);
