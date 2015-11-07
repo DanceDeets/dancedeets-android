@@ -300,7 +300,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         AnalyticsUtil.track("SearchTab Selected",
                 "Tab", mBundled.mSearchOptions.timePeriod.toString());
         if (mBundled.mDirty) {
-            mBundled.mDirty = false;
             startSearch();
         }
     }
@@ -311,6 +310,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
             mPendingSearch = true;
             return;
         }
+        mBundled.mDirty = false;
         SearchOptions searchOptions = getSearchOptions();
         Log("startSearch: " + searchOptions);
         // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.
