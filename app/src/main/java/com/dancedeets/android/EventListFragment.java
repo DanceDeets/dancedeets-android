@@ -28,7 +28,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
     static final String LOG_TAG = "EventListFragment";
 
-    EventUIAdapter eventAdapter;
+    EventListAdapter eventAdapter;
     TextView mListDescription;
     /**
      * The fragment's current callback object, which is notified of list item
@@ -73,7 +73,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
         ArrayList<OneboxLink> mOneboxList = new ArrayList<>();
 
-        boolean mDirty = true; // Start out dirty
+        boolean mInitiatedSearch = false;
 
         boolean mTwoPane;
 
@@ -196,7 +196,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
         mListDescription = (TextView) rootView.findViewById(R.id.event_list_description);
 
-        eventAdapter = new EventUIAdapter(inflater.getContext());
+        eventAdapter = new EventListAdapter(inflater.getContext());
         mList = (ListView)rootView.findViewById(android.R.id.list);
         mList.setOnItemClickListener(mOnClickListener);
         mList.setAdapter(null);
@@ -294,7 +294,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     public void loadSearchTab() {
         AnalyticsUtil.track("SearchTab Selected",
                 "Tab", mBundled.mSearchOptions.timePeriod.toString());
-        if (mBundled.mDirty) {
+        if (!mBundled.mInitiatedSearch) {
             startSearch();
         }
     }
@@ -305,7 +305,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
             mPendingSearch = true;
             return;
         }
-        mBundled.mDirty = false;
+        mBundled.mInitiatedSearch = true;
         SearchOptions searchOptions = getSearchOptions();
         Log("startSearch: " + searchOptions);
         // Our layout sets android:freezesText="true" , which ensures this is retained across device rotations.

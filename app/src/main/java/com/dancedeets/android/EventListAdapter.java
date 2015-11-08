@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * An Adapter for mapping Event objects to the Event ListView UI.
  */
-public class EventUIAdapter extends BaseAdapter {
+public class EventListAdapter extends BaseAdapter {
 
     private static String LOG_TAG = "EventUIAdapter";
 
@@ -53,7 +53,7 @@ public class EventUIAdapter extends BaseAdapter {
 
     static DateFormat localizedDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
-    public EventUIAdapter(Context context) {
+    public EventListAdapter(Context context) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

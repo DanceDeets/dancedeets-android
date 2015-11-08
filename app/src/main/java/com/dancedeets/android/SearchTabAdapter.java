@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 /**
  * A PagerAdapter for tracking the various search tabs we support.
  */
-public class SearchPagerAdapter extends PagerAdapter {
+public class SearchTabAdapter extends PagerAdapter {
     private static final boolean DEBUG = true;
 
     // Tab Titles
@@ -37,7 +37,7 @@ public class SearchPagerAdapter extends PagerAdapter {
         SearchOptions getSearchOptions();
     }
 
-    public SearchPagerAdapter(FragmentManager fm, SearchOptionsManager searchOptionsManager, Resources resources, boolean twoPane) {
+    public SearchTabAdapter(FragmentManager fm, SearchOptionsManager searchOptionsManager, Resources resources, boolean twoPane) {
         super();
         mFragmentManager = fm;
         mSearchOptionsManager = searchOptionsManager;

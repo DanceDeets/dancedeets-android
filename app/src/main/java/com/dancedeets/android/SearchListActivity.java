@@ -30,7 +30,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchPagerAdapter.SearchOptionsManager {
+public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchTabAdapter.SearchOptionsManager {
 
     private static final String LOG_TAG = "SearchListActivity";
 
@@ -125,12 +125,12 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         }
 
         // Set the ViewPagerAdapter into ViewPager
-        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane));
+        mViewPager.setAdapter(new SearchTabAdapter(getFragmentManager(), this, getResources(), mTwoPane));
         // Since we do lazy-loading ourselves, we can keep all tabs in our ViewPager loaded
         mViewPager.setOffscreenPageLimit(mViewPager.getAdapter().getCount());
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             public void onPageSelected(int position) {
-                SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
+                SearchTabAdapter adapter = ((SearchTabAdapter)mViewPager.getAdapter());
                 EventListFragment target = (EventListFragment)adapter.getExistingItem(mViewPager, position);
                 Crashlytics.log(Log.INFO, LOG_TAG, "New page selection index " + position + ": " + target);
                 target.loadSearchTab();
@@ -176,7 +176,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         }
         mBundled.mSearchOptions = newSearchOptions;
         // We construct a new adapter and set it, which clears all the existing fragment state
-        SearchPagerAdapter adapter = new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane);
+        SearchTabAdapter adapter = new SearchTabAdapter(getFragmentManager(), this, getResources(), mTwoPane);
         mViewPager.setAdapter(adapter);
         EventListFragment f = (EventListFragment)adapter.getExistingItem(mViewPager, mViewPager.getCurrentItem());
         f.startSearch();
