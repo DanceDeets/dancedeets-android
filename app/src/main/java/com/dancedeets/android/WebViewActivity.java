@@ -43,9 +43,9 @@ public class WebViewActivity extends Activity {
                 Log.i(LOG_TAG, url);
                 if (url.contains("webview=1")) {
                     view.loadUrl(url);
-                    return false;
-                } else {
                     return true;
+                } else {
+                    return false;
                 }
             }
         });
