@@ -168,9 +168,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         SearchOptions searchOptions = getSearchOptions();
         searchOptions.location = newSearchOptions.location;
         searchOptions.keywords = newSearchOptions.keywords;
-        if (mBundled != null) {
-            mBundled.mDirty = true;
-        } // If mBundled is empty (for instantiation), then when it is constructed, it will default to true anyway
     }
 
     @Override
