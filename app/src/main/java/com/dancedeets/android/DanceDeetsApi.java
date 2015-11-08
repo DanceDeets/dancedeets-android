@@ -161,7 +161,7 @@ public class DanceDeetsApi {
                     JSONObject jsonEvent = jsonEventList.getJSONObject(i);
                     event = FullEvent.parse(jsonEvent);
                     // Prefetch the first few images, so scrolling "just works"
-                    if (i < 100) {
+                    if (i < 20) {
                         VolleySingleton volley = VolleySingleton.getInstance();
                         volley.prefetchThumbnail(event.getThumbnailUrl());
                     }
