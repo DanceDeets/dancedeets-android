@@ -45,32 +45,22 @@ public class SearchPagerAdapter extends PagerAdapter {
         mTwoPane = twoPane;
     }
 
-    public SearchTarget getSearchTarget(ViewGroup container, int position) {
-        return (SearchTarget)getExistingItem(container, position);
-    }
-
-    private Fragment getExistingItem(ViewGroup container, int position) {
-        // Do we already have this fragment?
+    public Fragment getExistingItem(ViewGroup container, int position) {
         String name = makeFragmentName(container.getId(), position);
-        // Yes, it finds a fragment. Let's find out why it's still there in the fragment manager.
-        Fragment fragment = mFragmentManager.findFragmentByTag(name);
-        return fragment;
+        return mFragmentManager.findFragmentByTag(name);
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        if (mCurTransaction == null) {
-            mCurTransaction = mFragmentManager.beginTransaction();
-        }
         Fragment fragment = getExistingItem(container, position);
         if (fragment != null) {
             if (DEBUG) Log.i(LOG_TAG, "Attaching item #" + position + ": f=" + fragment);
-            mCurTransaction.attach(fragment);
+            getCurrentTransaction().attach(fragment);
         } else {
             fragment = instantiateItem(position);
             if (DEBUG) Log.i(LOG_TAG, "Adding item #" + position + ": f=" + fragment);
             String name = makeFragmentName(container.getId(), position);
-            mCurTransaction.add(container.getId(), fragment, name);
+            getCurrentTransaction().add(container.getId(), fragment, name);
         }
         if (fragment != mCurrentPrimaryItem) {
             FragmentCompat.setMenuVisibility(fragment, false);
@@ -107,12 +97,9 @@ public class SearchPagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        if (mCurTransaction == null) {
-            mCurTransaction = mFragmentManager.beginTransaction();
-        }
         if (DEBUG) Log.i(LOG_TAG, "Detaching item #" + position + ": f=" + object
                 + " v=" + ((Fragment)object).getView());
-        mCurTransaction.remove((Fragment)object);
+        getCurrentTransaction().remove((Fragment)object);
     }
 
     @Override
@@ -129,6 +116,14 @@ public class SearchPagerAdapter extends PagerAdapter {
             }
             mCurrentPrimaryItem = fragment;
         }
+    }
+
+
+    private FragmentTransaction getCurrentTransaction() {
+        if (mCurTransaction == null) {
+            mCurTransaction = mFragmentManager.beginTransaction();
+        }
+        return mCurTransaction;
     }
 
     @Override

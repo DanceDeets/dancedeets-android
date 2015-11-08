@@ -24,7 +24,7 @@ import com.dancedeets.android.uistate.StateFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> implements SearchTarget {
+public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> {
 
     static final String LOG_TAG = "EventListFragment";
 

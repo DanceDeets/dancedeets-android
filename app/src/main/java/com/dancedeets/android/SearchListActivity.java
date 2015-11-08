@@ -131,7 +131,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             public void onPageSelected(int position) {
                 SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
-                SearchTarget target = adapter.getSearchTarget(mViewPager, position);
+                EventListFragment target = (EventListFragment)adapter.getExistingItem(mViewPager, position);
                 Crashlytics.log(Log.INFO, LOG_TAG, "New page selection index " + position + ": " + target);
                 target.loadSearchTab();
             }
@@ -178,7 +178,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         // We construct a new adapter and set it, which clears all the existing fragment state
         SearchPagerAdapter adapter = new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane);
         mViewPager.setAdapter(adapter);
-        EventListFragment f = (EventListFragment)adapter.getSearchTarget(mViewPager, mViewPager.getCurrentItem());
+        EventListFragment f = (EventListFragment)adapter.getExistingItem(mViewPager, mViewPager.getCurrentItem());
         f.startSearch();
         AnalyticsUtil.track("Search Events",
                 "Location", mBundled.mSearchOptions.location,
