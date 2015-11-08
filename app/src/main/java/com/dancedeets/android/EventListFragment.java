@@ -1,6 +1,8 @@
 package com.dancedeets.android;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.eventlist.EventListItem;
 import com.dancedeets.android.eventlist.ListItem;
+import com.dancedeets.android.eventlist.OneboxListItem;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
@@ -149,7 +152,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     }
 
     protected void onEventListFilled(boolean startup) {
-        eventAdapter.rebuildList(mBundled.mEventList);
+        eventAdapter.rebuildList(mBundled.mEventList, mBundled.mOneboxList);
         mList.setAdapter(eventAdapter);
         if (mBundled.mEventList.isEmpty()) {
             setStateShown(VisibleState.EMPTY, !startup);
@@ -399,6 +402,16 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
                 int eventListPosition = mBundled.mEventList.indexOf(event);
                 mCallbacks.onEventSelected(mBundled.mEventList, eventListPosition);
             }
+        } else if (item instanceof OneboxListItem) {
+            AnalyticsUtil.track("Onebox");
+            OneboxLink onebox = ((OneboxListItem)item).getOnebox();
+            Uri url = Uri.parse(onebox.getUrl());
+
+            Crashlytics.log(Log.INFO, LOG_TAG, "Opening URL: " + url);
+
+            Intent intent = new Intent(getActivity(), WebViewActivity.class);
+            intent.setData(url);
+            getActivity().startActivity(intent);
         }
     }
 }

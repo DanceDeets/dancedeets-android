@@ -9,7 +9,9 @@ import android.widget.BaseAdapter;
 import com.dancedeets.android.eventlist.EventListItem;
 import com.dancedeets.android.eventlist.HeaderListItem;
 import com.dancedeets.android.eventlist.ListItem;
+import com.dancedeets.android.eventlist.OneboxListItem;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.models.OneboxLink;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,14 +31,14 @@ public class EventListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void rebuildList(List<FullEvent> eventBundleList) {
-        mList = fillSectionedList(eventBundleList);
-    }
-
-    private List<ListItem> fillSectionedList(List<FullEvent> eventList) {
+    public void rebuildList(List<FullEvent> eventList, List<OneboxLink> oneboxLinkList) {
+        mList.clear();
+        for (int i = 0; i < oneboxLinkList.size(); i++) {
+            OneboxLink onebox = oneboxLinkList.get(i);
+            mList.add(new OneboxListItem(mInflater, onebox));
+        }
         Calendar lastCal = Calendar.getInstance();
         Calendar curCal = Calendar.getInstance();
-        List<ListItem> sectionedList = new ArrayList<>();
         for (int i = 0; i < eventList.size(); i++) {
             FullEvent event = eventList.get(i);
             curCal.setTime(event.getStartTime());
@@ -44,12 +46,11 @@ public class EventListAdapter extends BaseAdapter {
                     curCal.get(Calendar.YEAR) != lastCal.get(Calendar.YEAR) ||
                     curCal.get(Calendar.DAY_OF_YEAR) != lastCal.get(Calendar.DAY_OF_YEAR)
                     ) {
-                sectionedList.add(new HeaderListItem(mInflater, event));
+                mList.add(new HeaderListItem(mInflater, event));
             }
-            sectionedList.add(new EventListItem(mInflater, event));
+            mList.add(new EventListItem(mInflater, event));
             lastCal.setTime(event.getStartTime());
         }
-        return sectionedList;
     }
 
     public int getCount() {
