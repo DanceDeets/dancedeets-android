@@ -163,8 +163,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         }
     }
 
-
-    @Override
     public void prepareForSearchOptions(SearchOptions newSearchOptions) {
         Log("prepareForSearchOptions: " + newSearchOptions);
         SearchOptions searchOptions = getSearchOptions();
