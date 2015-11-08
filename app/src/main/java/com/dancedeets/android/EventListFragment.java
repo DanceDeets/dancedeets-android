@@ -15,6 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.eventlist.EventListItem;
+import com.dancedeets.android.eventlist.ListItem;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
@@ -24,11 +26,13 @@ import com.dancedeets.android.uistate.StateFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> {
+public class EventListFragment extends StateFragment<EventListFragment.MyBundledState, RetainedState> implements AdapterView.OnItemClickListener {
 
     static final String LOG_TAG = "EventListFragment";
 
     EventListAdapter eventAdapter;
+    ListView mList;
+
     TextView mListDescription;
     /**
      * The fragment's current callback object, which is notified of list item
@@ -36,20 +40,11 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
      */
     private Callbacks mCallbacks = null;
 
-    final private AdapterView.OnItemClickListener mOnClickListener
-            = new AdapterView.OnItemClickListener() {
-        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-            onListItemClick((ListView) parent, v, position, id);
-        }
-    };
-
     private static final String LIST_STATE = "LIST_STATE";
     private SearchOptions mSearchOptions = new SearchOptions();
     private boolean mTwoPane;
 
     private boolean mPendingSearch = false;
-
-    ListView mList;
 
     enum VisibleState {
         PROGRESS, LIST, EMPTY, RETRY
@@ -198,7 +193,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
 
         eventAdapter = new EventListAdapter(inflater.getContext());
         mList = (ListView)rootView.findViewById(android.R.id.list);
-        mList.setOnItemClickListener(mOnClickListener);
+        mList.setOnItemClickListener(this);
         mList.setAdapter(null);
 
         if (mBundled.mEventList.size() > 0 && !mBundled.mWaitingForSearch) {
@@ -380,28 +375,30 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         mCallbacks = null;
     }
 
-    public void onListItemClick(ListView listView, View view, int position,
-                                long id) {
-        int translatedPosition = eventAdapter.translatePosition(position);
-        if (translatedPosition < 0) {
-            return;
-        }
-        FullEvent event = mBundled.mEventList.get(translatedPosition);
 
-        Log("onListItemClick: fb event id: " + event.getId());
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ListItem item = eventAdapter.getItem(position);
+        if (item instanceof EventListItem) {
+            FullEvent event = ((EventListItem)item).getEvent();
 
-        VolleySingleton volley = VolleySingleton.getInstance();
-        // Prefetch Images
-        if (event.getCoverUrl() != null) {
-            volley.prefetchPhoto(event.getCoverUrl());
-        }
-        // Prefetch API data too
-        DanceDeetsApi.getEvent(event.getId(), null);
+            Log("onListItemClick: fb event id: " + event.getId());
 
-        // Notify the active callbacks interface (the activity, if the
-        // fragment is attached to one) that an item has been selected.
-        if (mCallbacks != null) {
-            mCallbacks.onEventSelected(mBundled.mEventList, translatedPosition);
+            VolleySingleton volley = VolleySingleton.getInstance();
+            // Prefetch Images
+            if (event.getCoverUrl() != null) {
+                volley.prefetchPhoto(event.getCoverUrl());
+            }
+            // Prefetch API data too
+            DanceDeetsApi.getEvent(event.getId(), null);
+
+
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            if (mCallbacks != null) {
+                int eventListPosition = mBundled.mEventList.indexOf(event);
+                mCallbacks.onEventSelected(mBundled.mEventList, eventListPosition);
+            }
         }
     }
 }
