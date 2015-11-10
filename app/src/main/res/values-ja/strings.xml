@@ -6,9 +6,9 @@
     <string name="action_search">検索</string>
     <string name="menu_add_to_calendar">カレンダーに予定が追加</string>
     <string name="retry_button">再読込みする</string>
-    <string name="no_events">イベントを見つけられません.\n\nMaybe we just don\'t have enough dancers signed up in this area. If you invite your friends, we promise to add more events!</string>
+    <string name="no_events">イベントを見つけられません</string>
     <string name="action_refresh">再読込みする</string>
-    <string name="search_location">場所:</string>
+    <string name="search_location">場所：</string>
     <string name="search_keywords">キーワード：</string>
     <string name="hint_enter_location">場所を入力します</string>
     <string name="hint_enter_keywords">キーワードを入力します</string>

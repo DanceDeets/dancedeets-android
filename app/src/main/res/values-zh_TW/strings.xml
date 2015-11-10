@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_share">分享…</string>
+    <string name="menu_view_map">檢視地圖</string>
+    <string name="menu_view_facebook">開啟Facebook活動</string>
+    <string name="action_search">搜尋</string>
+    <string name="menu_add_to_calendar">新增到行事曆</string>
+    <string name="retry_button">重試</string>
+    <string name="no_events">查無結果</string>
+    <string name="action_refresh">重新整理</string>
+    <string name="search_location">位置:</string>
+    <string name="search_keywords">關鍵字:</string>
+    <string name="hint_enter_location">位置</string>
+    <string name="hint_enter_keywords">關鍵字</string>
+    <string name="cancel">取消</string>
+    <string name="menu_translate">翻譯</string>
+    <string name="filter_title_viewevent">DanceDeets 活動</string>
+    <string name="loading">載入中…</string>
+    <string name="login_bubble">想跳舞嗎? We got the \'deets!\n\nClick Login below, and let\'s check out the world of dance events, both near and far!\n\nAnd of course, we promise not to spam or hack your Facebook account, just help you find and share dance events.</string>
+    <string name="login_explain_why_login">Curious why we ask you to login with Facebook?</string>
+    <string name="login_use_without_fblogin">Want to use DanceDeets without Facebook login?</string>
+    <string name="action_help">說明</string>
+    <string name="action_logout">登出</string>
+    <string name="action_add_event">新增活動</string>
+    <string name="action_feedback">傳送意見</string>
+    <string name="explain_why_login">Why does DanceDeets require Facebook login?\n\nDanceDeets is built on the Facebook platform, and all the DanceDeets events are pulled from Facebook. To find and collect the dance events, DanceDeets depends on dancers signing up with their Facebook accounts and sharing their dance events with DanceDeets. For this reason, the DanceDeets mobile apps use Facebook login.</string>
+    <string name="login_use_website">開啟www.dancedeets.com</string>
+    <string name="use_without_fblogin">Want to use DanceDeets without Facebook login?\n\nThe mobile apps currently require Facebook login to use. However, if you wish to search and view events without logging in, you can use the mobile website available at www.dancedeets.com .</string>
+    <string name="login_or">或</string>
+    <string name="enter_feedback_here">Enter feedback here:</string>
+    <string name="flyer_title">%1$s的傳單</string>
+    <string name="couldnt_detect_location">找不到位置。請輸入位置。</string>
+    <string name="events_near">%1$s附近活動</string>
+    <string name="events_near_with_keyword">%1$s附近活動: %2$s</string>
+    <string name="events_with_keyword">活動: %1$s</string>
+    <string name="tab_upcoming_events">近期活動</string>
+    <string name="tab_ongoing_events">正在發生的活動</string>
+    <string name="tab_past_events">過去的活動</string>
+</resources>
