@@ -183,7 +183,8 @@ public class ViewFlyerFragment extends StateFragment<
             }
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to write flyer to disk for sharing: " + e);
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Failed to write flyer to disk for sharing: " + e);
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
     }

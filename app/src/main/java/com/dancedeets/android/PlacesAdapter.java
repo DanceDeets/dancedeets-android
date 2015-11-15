@@ -11,6 +11,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -130,7 +132,8 @@ public class PlacesAdapter extends BaseAdapter implements Filterable {
                 resultList.add(predsJsonArray.getJSONObject(i).getString("description"));
             }
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Cannot process JSON results", e);
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Cannot process JSON results: " + e);
+            Crashlytics.logException(e);
         }
         return resultList;
     }

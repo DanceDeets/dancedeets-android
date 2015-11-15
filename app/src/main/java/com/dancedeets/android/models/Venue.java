@@ -28,24 +28,25 @@ public class Venue implements Parcelable, Serializable {
     protected String mCountry;
 
 
-    public String getAddress() {
+    public String getAddress(String delimiter) {
         List<String> addressParts = new ArrayList<>();
         if (mStreet != null) {
             addressParts.add(mStreet);
         }
-        if (mCity != null) {
-            addressParts.add(mCity);
-        }
-        if (mState != null) {
-            addressParts.add(mState);
-        }
-        if (mZip != null) {
-            addressParts.add(mZip);
+        if (mCity != null || mState != null) {
+            List<String> cityStateParts = new ArrayList<>();
+            if (mCity != null) {
+                cityStateParts.add(mCity);
+            }
+            if (mState != null) {
+                cityStateParts.add(mState);
+            }
+            addressParts.add(TextUtils.join(", ", cityStateParts));
         }
         if (mCountry != null) {
             addressParts.add(mCountry);
         }
-        return TextUtils.join(", ", addressParts);
+        return TextUtils.join(delimiter, addressParts);
     }
 
     protected Venue() {

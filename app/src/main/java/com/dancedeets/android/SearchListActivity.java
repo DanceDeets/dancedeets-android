@@ -30,7 +30,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import java.util.ArrayList;
 
 
-public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchPagerAdapter.SearchOptionsManager {
+public class SearchListActivity extends FacebookActivity implements StateHolder<SearchListActivity.MyBundledState, RetainedState>, EventListFragment.Callbacks, SearchDialogFragment.OnSearchListener, FetchLocation.LocationListener, FetchAddress.AddressListener, SearchTabAdapter.SearchOptionsManager {
 
     private static final String LOG_TAG = "SearchListActivity";
 
@@ -95,7 +95,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
             e.printStackTrace();
         }
 
-        setContentView(R.layout.activity_event_list);
+        setContentView(R.layout.search_activity);
 
 
         // Set up bottom banner ad
@@ -125,12 +125,15 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         }
 
         // Set the ViewPagerAdapter into ViewPager
-        mViewPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), this, getResources(), mTwoPane));
+        mViewPager.setAdapter(new SearchTabAdapter(getFragmentManager(), this, getResources(), mTwoPane));
+        // Since we do lazy-loading ourselves, we can keep all tabs in our ViewPager loaded
+        mViewPager.setOffscreenPageLimit(mViewPager.getAdapter().getCount());
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             public void onPageSelected(int position) {
-                SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
-                Crashlytics.log(Log.INFO, LOG_TAG, "New page selection index " + position + ": " + adapter.getSearchTarget(position));
-                adapter.getSearchTarget(position).loadSearchTab();
+                SearchTabAdapter adapter = ((SearchTabAdapter)mViewPager.getAdapter());
+                EventListFragment target = (EventListFragment)adapter.getExistingItem(mViewPager, position);
+                Crashlytics.log(Log.INFO, LOG_TAG, "New page selection index " + position + ": " + target);
+                target.loadSearchTab();
             }
         });
 
@@ -172,20 +175,11 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
             return;
         }
         mBundled.mSearchOptions = newSearchOptions;
-        SearchPagerAdapter adapter = ((SearchPagerAdapter)mViewPager.getAdapter());
-        for (int i = 0; i < adapter.getCount(); i++) {
-            // We only want to grab targets that are non-empty, not create missing ones
-            SearchTarget searchTarget = adapter.getSearchTarget(i);
-            if (searchTarget == null) {
-                continue;
-            }
-            Log.i(LOG_TAG, "SearchTarget is " + searchTarget);
-            searchTarget.prepareForSearchOptions(mBundled.mSearchOptions);
-            if (i == mViewPager.getCurrentItem()) {
-                Log.i(LOG_TAG, "Initiating startSearch() on index " + i + ": " + searchTarget);
-                searchTarget.loadSearchTab();
-            }
-        }
+        // We construct a new adapter and set it, which clears all the existing fragment state
+        SearchTabAdapter adapter = new SearchTabAdapter(getFragmentManager(), this, getResources(), mTwoPane);
+        mViewPager.setAdapter(adapter);
+        EventListFragment f = (EventListFragment)adapter.getExistingItem(mViewPager, mViewPager.getCurrentItem());
+        f.startSearch();
         AnalyticsUtil.track("Search Events",
                 "Location", mBundled.mSearchOptions.location,
                 "Keywords", mBundled.mSearchOptions.keywords);

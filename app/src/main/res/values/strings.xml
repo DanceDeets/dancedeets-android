@@ -40,4 +40,5 @@
     <string name="tab_ongoing_events">Ongoing Events</string>
     <string name="tab_past_events">Past Events</string>
     <string name="banner_ad_unit_id">/26589588/mobile-bottom-banner</string>
+    <string name="interstitial_ad_unit_id">/26589588/mobile-interstitial</string>
 </resources>

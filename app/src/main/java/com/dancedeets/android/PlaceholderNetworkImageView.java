@@ -3,7 +3,6 @@ package com.dancedeets.android;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -104,7 +103,6 @@ public class PlaceholderNetworkImageView extends ImageView {
             if (image == null) {
                 image = mCoverData.getLargestCover();
             }
-            Log.i(VIEW_LOG_TAG, "Largest cover has width " + mCoverData.getLargestCover().getWidth() + ", using cover with width " + image.getWidth());
             return image.getSourceUrl();
         } else {
             return null;

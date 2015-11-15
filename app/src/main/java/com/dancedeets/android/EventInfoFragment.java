@@ -7,9 +7,6 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -198,6 +195,7 @@ public class EventInfoFragment extends StateFragment<
                     }
                 } catch (JSONException e) {
                     Crashlytics.log(Log.ERROR, LOG_TAG, "JSON Error loading rsvp data: " + e);
+                    Crashlytics.logException(e);
                 }
             }
         }
@@ -331,7 +329,7 @@ public class EventInfoFragment extends StateFragment<
                 AnalyticsUtil.trackEvent("Add to Calendar", mBundled.mEvent);
                 intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
 
-                String address = getEvent().getVenue().getAddress();
+                String address = getEvent().getVenue().getAddress(", ");
                 if (getEvent().getVenue().hasName()) {
                     address = getEvent().getVenue().getName() + ", " + address;
                 }
@@ -381,6 +379,7 @@ public class EventInfoFragment extends StateFragment<
                 eventInfoFragment.swapTitleAndDescription();
             } catch (JSONException error) {
                 Crashlytics.log(Log.ERROR, LOG_TAG, "Translation failed: " + error);
+                Crashlytics.logException(error);
                 Toast.makeText(mRetainedState.getActivity().getBaseContext(), "Failed to translate! " + error, Toast.LENGTH_LONG).show();
             }
         }
@@ -446,7 +445,7 @@ public class EventInfoFragment extends StateFragment<
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_event_info,
+        View rootView = inflater.inflate(R.layout.event_info,
                 container, false);
         fillOutView(rootView, getEvent());
         return rootView;
@@ -472,14 +471,13 @@ public class EventInfoFragment extends StateFragment<
         title.setText(event.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
 
+
+        String locationText = "";
         if (event.getVenue().hasName()) {
             // Set location View to be linkable text
-            SpannableString ss = new SpannableString(event.getVenue().getName() + ", " + event.getVenue().getAddress());
-            ss.setSpan(new URLSpan("#"), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            location.setText(ss, TextView.BufferType.SPANNABLE);
-        } else {
-            location.setText("");
+            locationText = event.getVenue().getName() + "\n" + event.getVenue().getAddress("\n");
         }
+        location.setText(locationText);
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

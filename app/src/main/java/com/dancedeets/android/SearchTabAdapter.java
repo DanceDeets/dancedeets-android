@@ -2,25 +2,31 @@ package com.dancedeets.android;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v13.app.FragmentCompat;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * A PagerAdapter for tracking the various search tabs we support.
  */
-public class SearchPagerAdapter extends FragmentPagerAdapter {
+public class SearchTabAdapter extends PagerAdapter {
+    private static final boolean DEBUG = true;
+
     // Tab Titles
     private static final int tabTitles[] = new int[] { R.string.tab_upcoming_events, R.string.tab_ongoing_events, R.string.tab_past_events};
     private static final String LOG_TAG = "SearchPagerAdapter";
-    private Fragment[] mFragments = new Fragment[tabTitles.length];
     private static final int PAGE_COUNT = tabTitles.length;
 
     private FragmentManager mFragmentManager;
+    private FragmentTransaction mCurTransaction = null;
+    private Fragment mCurrentPrimaryItem = null;
+
     private final Resources mResources;
     private final SearchOptionsManager mSearchOptionsManager;
 
@@ -31,32 +37,40 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         SearchOptions getSearchOptions();
     }
 
-    public SearchPagerAdapter(FragmentManager fm, SearchOptionsManager searchOptionsManager, Resources resources, boolean twoPane) {
-        super(fm);
+    public SearchTabAdapter(FragmentManager fm, SearchOptionsManager searchOptionsManager, Resources resources, boolean twoPane) {
+        super();
         mFragmentManager = fm;
         mSearchOptionsManager = searchOptionsManager;
         mResources = resources;
         mTwoPane = twoPane;
     }
 
-    public SearchOptions getSearchOptions() {
-        return mSearchOptions;
-    }
-
-    public SearchTarget getSearchTarget(int position) {
-        return (SearchTarget)mFragments[position];
+    public Fragment getExistingItem(ViewGroup container, int position) {
+        String name = makeFragmentName(container.getId(), position);
+        return mFragmentManager.findFragmentByTag(name);
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        Fragment f = (Fragment)super.instantiateItem(container, position);
-        mFragments[position] = f;
-        Log.i(LOG_TAG, "instantiateItem(" + position + ") returns " + mFragments[position]);
-        return f;
+        Fragment fragment = getExistingItem(container, position);
+        if (fragment != null) {
+            if (DEBUG) Log.i(LOG_TAG, "Attaching item #" + position + ": f=" + fragment);
+            getCurrentTransaction().attach(fragment);
+        } else {
+            fragment = instantiateItem(position);
+            if (DEBUG) Log.i(LOG_TAG, "Adding item #" + position + ": f=" + fragment);
+            String name = makeFragmentName(container.getId(), position);
+            getCurrentTransaction().add(container.getId(), fragment, name);
+        }
+        if (fragment != mCurrentPrimaryItem) {
+            FragmentCompat.setMenuVisibility(fragment, false);
+            FragmentCompat.setUserVisibleHint(fragment, false);
+        }
+
+        return fragment;
     }
 
-    @Override
-    public Fragment getItem(int position) {
+    private Fragment instantiateItem(int position) {
         EventListFragment eventListFragment = null;
         switch (position) {
             case 0:
@@ -83,13 +97,50 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        super.destroyItem(container, position, object);
-        Log.i(LOG_TAG, "destroyItem(" + position + ") returns " + mFragments[position]);
-        mFragments[position] = null;
+        if (DEBUG) Log.i(LOG_TAG, "Detaching item #" + position + ": f=" + object
+                + " v=" + ((Fragment)object).getView());
+        getCurrentTransaction().remove((Fragment)object);
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        Fragment fragment = (Fragment)object;
+        if (fragment != mCurrentPrimaryItem) {
+            if (mCurrentPrimaryItem != null) {
+                FragmentCompat.setMenuVisibility(mCurrentPrimaryItem, false);
+                FragmentCompat.setUserVisibleHint(mCurrentPrimaryItem, false);
+            }
+            if (fragment != null) {
+                FragmentCompat.setMenuVisibility(fragment, true);
+                FragmentCompat.setUserVisibleHint(fragment, true);
+            }
+            mCurrentPrimaryItem = fragment;
+        }
+    }
+
+
+    private FragmentTransaction getCurrentTransaction() {
+        if (mCurTransaction == null) {
+            mCurTransaction = mFragmentManager.beginTransaction();
+        }
+        return mCurTransaction;
+    }
+
+    @Override
+    public void finishUpdate(ViewGroup container) {
+        if (mCurTransaction != null) {
+            mCurTransaction.commitAllowingStateLoss();
+            mCurTransaction = null;
+            mFragmentManager.executePendingTransactions();
+        }
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return ((Fragment)object).getView() == view;
     }
 
     private static String STATE_SUPERCLASS = "STATE_SUPERCLASS";
-    private static String STATE_FRAGMENT_IDS = "STATE_FRAGMENT_IDS";
     private static String STATE_SEARCH_OPTIONS = "STATE_SEARCH_OPTIONS";
 
     @Override
@@ -97,15 +148,6 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         Parcelable p = super.saveState();
         Bundle bundle = new Bundle();
         bundle.putParcelable(STATE_SUPERCLASS, p);
-
-        Bundle fragmentsBundle = new Bundle();
-        for (int i=0; i<mFragments.length; i++) {
-            Fragment f = mFragments[i];
-            if (f != null) {
-                mFragmentManager.putFragment(fragmentsBundle, Integer.toString(i), f);
-            }
-        }
-        bundle.putBundle(STATE_FRAGMENT_IDS, fragmentsBundle);
         bundle.putSerializable(STATE_SEARCH_OPTIONS, mSearchOptions);
         return bundle;
     }
@@ -116,20 +158,6 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
         if (bundle != null) {
             super.restoreState(bundle.getParcelable(STATE_SUPERCLASS), loader);
             mSearchOptions = (SearchOptions)bundle.getSerializable(STATE_SEARCH_OPTIONS);
-            Bundle fragmentsBundle = bundle.getBundle(STATE_FRAGMENT_IDS);
-            Iterable<String> keys = fragmentsBundle.keySet();
-            for (String key: keys) {
-                int index = Integer.parseInt(key);
-                Fragment f = mFragmentManager.getFragment(fragmentsBundle, key);
-                if (f != null) {
-                    FragmentCompat.setMenuVisibility(f, false);
-                    mFragments[index] = f;
-                } else {
-                    mFragments[index] = null;
-                    Log.w(LOG_TAG, "Bad fragment at key " + key);
-                }
-
-            }
         }
     }
 
@@ -142,5 +170,9 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
+    }
+
+    private static String makeFragmentName(int viewId, long id) {
+        return "android:switcher:" + viewId + ":" + id;
     }
 }

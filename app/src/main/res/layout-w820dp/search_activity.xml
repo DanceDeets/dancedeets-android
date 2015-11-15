@@ -18,7 +18,7 @@
             android:layout_width="320dp"
             android:layout_weight="0"
             >
-            <include layout="@layout/fragment_pager" />
+            <include layout="@layout/search_list_pager" />
         </FrameLayout>
 
         <FrameLayout
