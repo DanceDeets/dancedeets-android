@@ -3,6 +3,7 @@ package com.dancedeets.android;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 
 import org.json.JSONException;
 
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState> {
+public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState>, FetchLocation.LocationListener {
 
     private static final String LOG_TAG = "EventInfoActivity";
 
@@ -46,6 +48,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
     protected ViewPager mViewPager;
     protected EventInfoPagerAdapter mEventInfoPagerAdapter;
     protected RetainedState mRetained;
+
+    private FetchLocation mFetchLocation;
+    private PublisherInterstitialAd mInterstitialAd;
 
     static class MyBundledState extends BundledState {
         public List<FullEvent> mEventList = new ArrayList<>();
@@ -141,6 +146,29 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 initializeViewPagerWithBundledState();
             }
         }
+
+        mInterstitialAd = new PublisherInterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+    }
+
+
+    public void onStart() {
+        super.onStart();
+        mFetchLocation = new FetchLocation();
+        mFetchLocation.onStart(this, this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mFetchLocation.onStop();
+    }
+
+
+    @Override
+    public void onLocationFound(Location location) {
+        // As soon as we get the geo coordinates, load the ad request
+        mInterstitialAd.loadAd(AdManager.getAdRequest(location));
     }
 
     @Override
@@ -182,6 +210,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 setTitle(mBundled.mEventList.get(position).getTitle());
                 Crashlytics.log(Log.INFO, LOG_TAG, "onPageSelected: List size is " + mBundled.mEventList.size());
                 Crashlytics.log(Log.INFO, LOG_TAG, "onPageSelected: Event index is " + mBundled.mEventIndex);
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                }
             }
         });
     }
