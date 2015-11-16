@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.dancedeets.android.R;
 import com.dancedeets.android.models.FullEvent;
 
 import java.text.DateFormat;
@@ -16,7 +17,7 @@ public class HeaderListItem implements ListItem {
     private final LayoutInflater mInflater;
     private String mTitle;
 
-    static DateFormat localizedDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+    static DateFormat localizedDateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
     public HeaderListItem(LayoutInflater inflater, FullEvent event) {
         mInflater = inflater;
@@ -33,14 +34,14 @@ public class HeaderListItem implements ListItem {
 
     @Override
     public View createView(View convertView, ViewGroup parent) {
-        TextView view;
+        View view;
         if (convertView == null) {
-            view = (TextView) mInflater.inflate(parent.getResources().getLayout(android.R.layout.simple_list_item_1), null);
-            view.setTag("sticky");
+            view = mInflater.inflate(R.layout.search_item_header, parent, false);
         } else {
-            view = (TextView) convertView;
+            view = convertView;
         }
-        view.setText(mTitle);
+        TextView textView = (TextView) view.findViewById(R.id.item_header);
+        textView.setText(mTitle);
         return view;
     }
 }

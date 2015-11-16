@@ -78,7 +78,7 @@ public class EventListItem implements ListItem {
     public View createView(View convertView, ViewGroup parent) {
         View view;
         if (convertView == null) {
-            view = mInflater.inflate(R.layout.search_event_item, parent, false);
+            view = mInflater.inflate(R.layout.search_item_event, parent, false);
             ViewBinder viewBinder = new ViewBinder();
             //viewBinder.icon = (NetworkImageView)view.findViewById(R.id.event_list_icon);
             viewBinder.cover = (PlaceholderNetworkImageView)view.findViewById(R.id.event_list_cover);

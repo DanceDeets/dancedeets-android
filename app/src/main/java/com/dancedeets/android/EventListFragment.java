@@ -62,11 +62,6 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
     View mVisibleContainer;
 
     static protected class MyBundledState extends BundledState {
-        /**
-         * The current activated item position. Only used on tablets.
-         */
-        int mActivatedPosition = ListView.INVALID_POSITION;
-
         ArrayList<FullEvent> mEventList = new ArrayList<>();
 
         ArrayList<OneboxLink> mOneboxList = new ArrayList<>();
