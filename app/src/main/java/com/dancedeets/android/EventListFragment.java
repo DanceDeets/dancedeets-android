@@ -234,6 +234,11 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         View newVisibleContainer = getContainer(newVisibleState);
         mVisibleContainer = newVisibleContainer;
 
+        // If this fragment is no longer shown, skip the animation
+        if (getActivity() == null) {
+            animate = false;
+        }
+
         // Don't animate between our own state!
         if (oldVisibleContainer == newVisibleContainer) {
             return;
