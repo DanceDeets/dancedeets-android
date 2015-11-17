@@ -398,8 +398,8 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
                 mCallbacks.onEventSelected(mBundled.mEventList, eventListPosition);
             }
         } else if (item instanceof OneboxListItem) {
-            AnalyticsUtil.track("Onebox");
             OneboxLink onebox = ((OneboxListItem)item).getOnebox();
+            AnalyticsUtil.track("Onebox", "URL", onebox.getUrl());
             Uri url = Uri.parse(onebox.getUrl());
 
             Crashlytics.log(Log.INFO, LOG_TAG, "Opening URL: " + url);
