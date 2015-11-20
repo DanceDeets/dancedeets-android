@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -147,6 +148,18 @@ public class DanceDeetsApi {
         public void onResponse(JSONObject response) {
             List<FullEvent> eventList = new ArrayList<>();
             JSONArray jsonEventList;
+            if (response.has("errors")) {
+                Exception exception = null;
+                try {
+                    JSONArray errors = response.getJSONArray("errors");
+                    if (errors.length() > 0) {
+                        exception = new IOException("Errors with request: " + errors.getString(0));
+                    }
+                } catch (JSONException e) {
+                }
+                mOnResultsReceivedListener.onError(exception);
+                return;
+            }
             try {
                 jsonEventList = response.getJSONArray("results");
             } catch (JSONException e) {
