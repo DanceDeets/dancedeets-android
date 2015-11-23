@@ -1,5 +1,7 @@
 package com.dancedeets.android.eventlist;
 
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +43,9 @@ public class OneboxListItem implements ListItem {
             view = convertView;
         }
         TextView textView = (TextView) view.findViewById(R.id.item_header);
-        textView.setText(mOnebox.getTitle());
+        SpannableString spannedText = new SpannableString(mOnebox.getTitle());
+        spannedText.setSpan(new UnderlineSpan(), 0, spannedText.length(), 0);
+        textView.setText(spannedText);
         return view;
     }
 }

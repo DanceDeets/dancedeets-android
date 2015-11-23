@@ -1,5 +1,7 @@
 package com.dancedeets.android.eventlist;
 
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

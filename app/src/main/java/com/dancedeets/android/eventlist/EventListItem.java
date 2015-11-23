@@ -1,5 +1,7 @@
 package com.dancedeets.android.eventlist;
 
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +67,11 @@ public class EventListItem implements ListItem {
                 viewBinder.cover.setImageDrawable(null);
             }
         }
-        viewBinder.title.setText(mEvent.getTitle());
+
+        SpannableString spannedText = new SpannableString(mEvent.getTitle());
+        spannedText.setSpan(new UnderlineSpan(), 0, spannedText.length(), 0);
+        viewBinder.title.setText(spannedText);
+
         if (mEvent.getVenue().hasName()) {
             viewBinder.location.setText(mEvent.getVenue().getName() + ", " + mEvent.getVenue().getCityStateCountry());
         } else {
