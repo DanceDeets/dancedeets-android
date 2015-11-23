@@ -92,6 +92,16 @@
             android:clickable="true"
             />
 
+        <com.facebook.share.widget.ShareButton
+            android:id="@+id/fb_share_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/rsvp_label"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:clickable="true"
+            />
+
         <TextView
             android:id="@+id/description"
             android:layout_width="fill_parent"

@@ -44,6 +44,8 @@ import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -504,6 +506,12 @@ public class EventInfoFragment extends StateFragment<
             mRsvpButton.setVisibility(View.GONE);
             rootView.findViewById(R.id.rsvp_label).setVisibility(View.GONE);
         }
+
+        ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse(event.getUrl()))
+                .build();
+        ShareButton shareButton = (ShareButton)rootView.findViewById(R.id.fb_share_button);
+        shareButton.setShareContent(linkContent);
     }
 
     /* check if intent is available */
