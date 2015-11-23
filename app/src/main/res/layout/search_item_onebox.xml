@@ -16,5 +16,6 @@
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
         android:layout_alignWithParentIfMissing="true"
+        android:textColor="@color/link_blue"
         android:textSize="16sp" />
 </RelativeLayout>
