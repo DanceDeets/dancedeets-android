@@ -36,6 +36,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import bolts.AppLinks;
+
 
 public class EventInfoActivity extends FacebookActivity implements StateHolder<BundledState, RetainedState>, FetchLocation.LocationListener {
 
@@ -249,7 +251,10 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
 
     public boolean handleIntent(Intent intent) {
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
-            Uri url = intent.getData();
+            Uri url = AppLinks.getTargetUrlFromInboundIntent(this, getIntent());
+            if (url == null) {
+                url = intent.getData();
+            }
             Crashlytics.log(Log.INFO, LOG_TAG, "Viewing URL: " + url);
             List<String> pathSegments = url.getPathSegments();
             if (pathSegments.size() == 2 && pathSegments.get(0).equals("events")) {
