@@ -87,5 +87,6 @@
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_classes_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_dependency_cache_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="android" level="project" />
+    <orderEntry type="library" exported="" name="robolectric-tests.robolectric-tests" level="project" />
   </component>
 </module>
