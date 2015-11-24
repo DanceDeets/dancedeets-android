@@ -177,6 +177,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.general_menu, menu);
+        HelpSystem.setupShareAppItem(menu);
         return super.onCreateOptionsMenu(menu);
     }
 

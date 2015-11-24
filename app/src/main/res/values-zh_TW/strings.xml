@@ -36,4 +36,5 @@
     <string name="tab_upcoming_events">近期活動</string>
     <string name="tab_ongoing_events">正在發生的活動</string>
     <string name="tab_past_events">過去的活動</string>
+    <string name="action_share_app">分享DanceDeets</string>
 </resources>

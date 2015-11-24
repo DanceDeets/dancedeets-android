@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ShareActionProvider;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
@@ -22,6 +25,36 @@ public class HelpSystem {
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivity(intent);
         }
+    }
+
+    public static void setupShareAppItem(Menu menu) {
+        Log.i(LOG_TAG, ""+menu);
+        MenuItem shareItem = menu.findItem(R.id.action_share_app);
+        Log.i(LOG_TAG, ""+shareItem);
+
+        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        // Track share item clicks
+        shareActionProvider.setOnShareTargetSelectedListener(
+                new ShareActionProvider.OnShareTargetSelectedListener() {
+                    @Override
+                    public boolean onShareTargetSelected(ShareActionProvider shareActionProvider,
+                                                         Intent intent) {
+                        AnalyticsUtil.track("Share DanceDeets");
+                        return false;
+                    }
+                });
+
+        // Set up ShareActionProvider shareIntent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        // We need to keep this as text/plain, not text/html, so we get the full set of apps to share to.
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Check out DanceDeets, with every street dance event!");
+        intent.putExtra(Intent.EXTRA_TEXT,
+                "DanceDeets is your ticket to finding street dance events near you:\n" +
+                        "competitions, workshops, parties, and more!\n" +
+                        "http://www.dancedeets.com/");
+        shareActionProvider.setShareIntent(intent);
+
     }
 
     public static void openAddEvent(SearchListActivity activity) {

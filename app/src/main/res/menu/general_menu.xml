@@ -13,6 +13,13 @@
         android:orderInCategory="100"
         android:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_share_app"
+        android:title="@string/action_share_app"
+        android:orderInCategory="100"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="never" />
+
     <item android:id="@+id/action_logout"
         android:title="@string/action_logout"
         android:orderInCategory="100"

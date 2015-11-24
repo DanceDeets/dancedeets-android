@@ -239,6 +239,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.general_menu, menu);
         inflater.inflate(R.menu.events_list, menu);
+        HelpSystem.setupShareAppItem(menu);
         return super.onCreateOptionsMenu(menu);
     }
 

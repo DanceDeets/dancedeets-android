@@ -41,4 +41,5 @@
     <string name="tab_past_events">Past Events</string>
     <string name="banner_ad_unit_id" translatable="false">/26589588/mobile-bottom-banner</string>
     <string name="interstitial_ad_unit_id" translatable="false">/26589588/mobile-interstitial</string>
+    <string name="action_share_app">Share DanceDeets…</string>
 </resources>
