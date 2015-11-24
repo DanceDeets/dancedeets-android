@@ -28,9 +28,7 @@ public class HelpSystem {
     }
 
     public static void setupShareAppItem(Menu menu) {
-        Log.i(LOG_TAG, ""+menu);
         MenuItem shareItem = menu.findItem(R.id.action_share_app);
-        Log.i(LOG_TAG, ""+shareItem);
 
         ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         // Track share item clicks
