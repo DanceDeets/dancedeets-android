@@ -186,7 +186,11 @@ public class FullEvent implements Parcelable, Serializable {
     }
 
     public long getEndTimeLong() {
-        return mEndTime.getTime();
+        if (mEndTime != null) {
+            return mEndTime.getTime();
+        } else {
+            return 0;
+        }
     }
 
     public String getEndTimeString() {
