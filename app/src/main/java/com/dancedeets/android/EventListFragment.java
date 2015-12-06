@@ -342,6 +342,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         public void onError(Exception exception) {
             EventListFragment listFragment = (EventListFragment)mRetained.getTargetFragment();
             Crashlytics.log(Log.ERROR, LOG_TAG, "Error retrieving search results, with error: " + exception);
+            Crashlytics.logException(exception);
             listFragment.mList.setAdapter(listFragment.eventAdapter);
             listFragment.setStateShown(VisibleState.RETRY, true);
         }
