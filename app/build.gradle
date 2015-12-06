@@ -11,17 +11,19 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 android {
-    signingConfigs {
-    }
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId "com.dancedeets.android"
         minSdkVersion 15
-        targetSdkVersion 21
+        // TODO: When we change this to 23, we need to support runtime permission checks:
+        // http://developer.android.com/intl/ja/training/permissions/requesting.html
+        targetSdkVersion 22
 
         testApplicationId "com.dancedeets.android.tests"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
     }
     buildTypes {
         debug {
@@ -49,19 +51,20 @@ repositories {
 
 dependencies {
     // You must install or update the Support Repository through the SDK manager to use this dependency.
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'com.android.support:support-v13:21.0.0'
+    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:support-v13:22.2.1'
     //compile 'com.google.android.gms:play-services-ads:8.0.+'
     //compile 'com.google.android.gms:play-services-analytics:5.0.+'
-    compile 'com.google.android.gms:play-services:5.0.+'
+    compile 'com.google.android.gms:play-services:8.1.+'
     compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
-    compile 'com.mixpanel.android:mixpanel-android:4.6.+@aar'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
+    compile 'com.mixpanel.android:mixpanel-android:4.6.4@aar'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     // Even if we want the advanced features of junit, we can't import it here, or it conflicts with android's junit
     //androidTestCompile('junit:junit:4.11+') {
     //    exclude group: 'org.hamcrest'
     //}
+    //androidTestCompile 'org.apache.httpcomponents:httpclient:4.3.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
     androidTestCompile 'com.android.support.test:runner:0.3'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.+@aar') {
