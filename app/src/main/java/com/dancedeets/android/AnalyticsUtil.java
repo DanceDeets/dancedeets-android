@@ -26,7 +26,6 @@ public class AnalyticsUtil {
 
     private static final String PROD_MIXPANEL_TOKEN = "f5d9d18ed1bbe3b190f9c7c7388df243";
     private static final String DEV_MIXPANEL_TOKEN = "668941ad91e251d2ae9408b1ea80f67b";
-    private static final String GOOGLE_PROJECT_ID = "911140565156";
 
     private static MixpanelAPI mMixPanel;
     private static GoogleAnalytics mGoogleAnalytics;
@@ -60,14 +59,25 @@ public class AnalyticsUtil {
         mGoogleAnalytics.dispatchLocalHits();
     }
 
+    // We must call identify *first*, before calling setDeviceToken() or login().
+    // This ensures the latter functions operate against the correct user.
+    public static void identify(String id) {
+        mMixPanel.identify(id);
+    }
+
+    public static void setDeviceToken(String deviceToken) {
+        MixpanelAPI.People people = mMixPanel.getPeople();
+        people.setPushRegistrationId(deviceToken);
+    }
+
     public static void login(JSONObject user) throws JSONException {
-        mMixPanel.identify(user.getString("id"));
         // Register for notifications
-        mMixPanel.getPeople().initPushHandling(GOOGLE_PROJECT_ID);
+        MixpanelAPI.People people = mMixPanel.getPeople();
+        // Instead of this, we now call setPushRegistrationId in setDeviceToken
+        //mMixPanel.getPeople().initPushHandling(getString(R.string.gcm_defaultSenderId));
 
         Crashlytics.log(Log.INFO, LOG_TAG, "User " + user.getString("id") + ": " + user.getString("name"));
 
-        MixpanelAPI.People people = mMixPanel.getPeople();
         people.identify(user.getString("id"));
         people.set("$first_name", user.getString("first_name"));
         people.set("$last_name", user.getString("last_name"));

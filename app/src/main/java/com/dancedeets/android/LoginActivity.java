@@ -17,10 +17,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.gcm.RegistrationIntentService;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +34,8 @@ import java.security.NoSuchAlgorithmException;
 public class LoginActivity extends FacebookActivity {
 
     private static final String LOG_TAG = "LoginActivity";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
     private boolean mClickedLogin;
 
     public void clickedExplainWhyLogin(View view) {
@@ -118,10 +123,40 @@ public class LoginActivity extends FacebookActivity {
         }
     }
 
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(LOG_TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
     public void handleLogin(AccessToken accessToken) {
         // Set the access token using
         // currentAccessToken when it's loaded or set.
         Crashlytics.log(Log.INFO, LOG_TAG, "Activity " + this + " is logged in: " + accessToken);
+
+        AnalyticsUtil.identify(accessToken.getUserId());
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM, and send it to MixPanel.
+            // Make sure we load this after calling AnalyticsUtil.identify up above.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
 
         GraphRequest request = GraphRequest.newMeRequest(
                 accessToken, new MeCompleted());
