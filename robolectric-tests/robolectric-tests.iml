@@ -67,51 +67,48 @@
     <orderEntry type="library" exported="" scope="TEST" name="wagon-http-shared-1.0-beta-6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="xercesMinimal-1.9.6.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="nekohtml-1.9.6.2" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="internal_impl-22.2.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_ads_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_android_support_mediarouter_v7_22_2_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_analytics_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_measurement_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_basement_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_games_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_safetynet_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_crashlytics_sdk_android_answers_1_3_6_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_cast_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_panorama_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_wallet_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_plus_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_io_fabric_sdk_android_fabric_1_3_10_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_identity_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_android_support_appcompat_v7_22_2_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_appstate_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_crashlytics_sdk_android_beta_1_1_4_jars_classes_jar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-annotations-22.2.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_location_8_1_0_jars_classes_jar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="library-1.0.19" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_android_support_support_v13_22_2_1_classes_jar" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_8_1_0_classes_jar" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_android_support_support_v4_22_2_1_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_fitness_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_base_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_gcm_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_wearable_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_crashlytics_sdk_android_crashlytics_core_2_3_8_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_appindexing_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_maps_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_facebook_android_facebook_android_sdk_4_6_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_crashlytics_sdk_android_crashlytics_2_5_5_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_appinvite_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_nearby_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_vision_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_android_support_support_v13_22_2_1_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_it_sephiroth_android_library_imagezoom_imagezoom_2_2_2_jars_classes_jar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="library-2.4.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="classes" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_google_android_gms_play_services_drive_8_1_0_jars_classes_jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_exploded_aar_com_mixpanel_android_mixpanel_android_4_6_4_jars_classes_jar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="bolts-android-1.2.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="internal_impl-22.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_classes_debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="_Users_lambert_Projects_dancedeets_newdroid_app_build_intermediates_dependency_cache_debug" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="android" level="project" />
     <orderEntry type="library" exported="" name="robolectric-tests.robolectric-tests" level="project" />
   </component>
 </module>
