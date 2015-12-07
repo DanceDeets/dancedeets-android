@@ -9,6 +9,7 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 22
@@ -55,7 +56,7 @@ dependencies {
     compile 'com.android.support:support-v13:22.2.1'
     //compile 'com.google.android.gms:play-services-ads:8.0.+'
     //compile 'com.google.android.gms:play-services-analytics:5.0.+'
-    compile 'com.google.android.gms:play-services:8.1.+'
+    compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
     compile 'com.mixpanel.android:mixpanel-android:4.6.4@aar'
