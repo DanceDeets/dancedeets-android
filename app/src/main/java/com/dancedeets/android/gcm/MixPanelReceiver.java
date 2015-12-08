@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.dancedeets.android.R;
 import com.mixpanel.android.mpmetrics.MPConfig;
 import com.mixpanel.android.mpmetrics.ResourceIds;
 import com.mixpanel.android.mpmetrics.ResourceReader;
@@ -76,11 +77,7 @@ public class MixPanelReceiver {
         }
 
         if (notificationIcon == -1 && null != appInfo) {
-            notificationIcon = appInfo.icon;
-        }
-
-        if (notificationIcon == -1) {
-            notificationIcon = android.R.drawable.sym_def_app_icon;
+            notificationIcon = R.drawable.ic_penguin_head_outline;
         }
 
         if (null == notificationTitle && null != appInfo) {
