@@ -32,7 +32,7 @@ public class DanceDeetsApi {
 
     private static String LOG_TAG = "DanceDeetsApi";
 
-    private static String VERSION = "v1.1";
+    private static String VERSION = "v1.2";
 
     private static DateFormat isoDateTimeFormatWithTZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
@@ -46,58 +46,23 @@ public class DanceDeetsApi {
         return builder;
     }
 
-    public static void sendDeviceToken(String accessToken, String deviceToken) {
-        Uri.Builder builder = generateApiBuilderFor("device_token");
-        JSONObject jsonPayload = new JSONObject();
-        try {
-            jsonPayload.put("access_token", accessToken);
-            jsonPayload.put("device_token", deviceToken);
-        } catch (JSONException e) {
-            Crashlytics.log(Log.ERROR, LOG_TAG, "Error constructing request: " + e);
-            Crashlytics.logException(e);
-            return;
-        }
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                builder.toString(),
-                jsonPayload,
-                new com.android.volley.Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Crashlytics.log(Log.INFO, LOG_TAG, "Successfully called /api/device_token: " + response);
-                    }
-                },
-                new com.android.volley.Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error calling /api/device_token: " + error);
-                    }
-                });
-        VolleySingleton.getInstance().getRequestQueue().add(request);
+    protected static interface PayloadModifier {
+        void setupPayload(JSONObject payload) throws JSONException;
     }
 
-    public static void sendAuth(AccessToken accessToken, String location) {
-        Log.i(LOG_TAG, "sendAuth with location: " + location);
-        Uri.Builder builder = generateApiBuilderFor("auth");
+    protected static void sendAuthenticatedApiRequest(String endpoint, AccessToken accessToken, PayloadModifier modifier) {
+        Log.i(LOG_TAG, "Sending auth'ed API request to " + endpoint);
+        Uri.Builder builder = generateApiBuilderFor(endpoint);
         JSONObject jsonPayload = new JSONObject();
         try {
             jsonPayload.put("access_token", accessToken.getToken());
-            // Sometimes the cached payload has a far-future expiration date. Not really sure why...
-            // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
-            // must somehow have gotten cached to disk with that large value for the expiration.
-            // Alternately, these may represent infinite-duration tokens that never expire.
-            if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
-                jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
-            } else {
-                Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
-            }
-            jsonPayload.put("location", location);
-            jsonPayload.put("client", "android");
+            modifier.setupPayload(jsonPayload);
         } catch (JSONException e) {
             Crashlytics.log(Log.ERROR, LOG_TAG, "Error constructing request: " + e);
             Crashlytics.logException(e);
             return;
         }
+        final String path = "/api/" + endpoint;
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
                 builder.toString(),
@@ -105,18 +70,66 @@ public class DanceDeetsApi {
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Crashlytics.log(Log.INFO, LOG_TAG, "Successfully called /api/auth: " + response);
+                        Crashlytics.log(Log.INFO, LOG_TAG, "Successfully called " + path + ": " + response);
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error calling /api/auth: " + error);
+                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error calling " + path + ": " + error);
                     }
                 });
         VolleySingleton.getInstance().getRequestQueue().add(request);
     }
 
+    public static void sendDeviceToken(AccessToken accessToken, final String deviceToken) {
+        sendAuthenticatedApiRequest("auth_device_token", accessToken, new PayloadModifier() {
+            @Override
+            public void setupPayload(JSONObject jsonPayload) throws JSONException {
+                jsonPayload.put("device_token", deviceToken);
+            }
+        });
+    }
+
+    public static void sendLocation(final AccessToken accessToken, final String location) {
+        Log.i(LOG_TAG, "sendLocation: " + location);
+        //TODO(auth2): temporarily set this to /auth to verify things work as-expected
+        sendAuthenticatedApiRequest("auth", accessToken, new PayloadModifier() {
+            @Override
+            public void setupPayload(JSONObject jsonPayload) throws JSONException {
+                jsonPayload.put("location", location);
+                //TODO(auth2): temporarily keep this code
+                jsonPayload.put("client", "android");
+                // Sometimes the cached payload has a far-future expiration date. Not really sure why...
+                // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
+                // must somehow have gotten cached to disk with that large value for the expiration.
+                // Alternately, these may represent infinite-duration tokens that never expire.
+                if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
+                    jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
+                } else {
+                    Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
+                }
+            }
+        });
+    }
+
+    public static void sendAuth(final AccessToken accessToken) {
+        // TODO(auth2): temporarily set this to /auth_old while maintaining backwards compatibility
+        sendAuthenticatedApiRequest("auth_old", accessToken, new PayloadModifier() {
+            @Override
+            public void setupPayload(JSONObject jsonPayload) throws JSONException {
+                // Sometimes the cached payload has a far-future expiration date. Not really sure why...
+                // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
+                // must somehow have gotten cached to disk with that large value for the expiration.
+                // Alternately, these may represent infinite-duration tokens that never expire.
+                if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
+                    jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
+                } else {
+                    Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
+                }
+            }
+        });
+    }
 
     public interface OnEventReceivedListener {
         void onEventReceived(FullEvent event);

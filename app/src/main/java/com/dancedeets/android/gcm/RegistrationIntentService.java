@@ -26,6 +26,7 @@ import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.AnalyticsUtil;
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
+import com.facebook.AccessToken;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -50,7 +51,7 @@ public class RegistrationIntentService extends IntentService {
             // return;
         }
 
-        String accessToken = intent.getStringExtra(FB_ACCESS_TOKEN);
+        AccessToken accessToken = intent.getParcelableExtra(FB_ACCESS_TOKEN);
 
         try {
             // Initially this call goes out to the network to retrieve the token, subsequent calls
@@ -67,7 +68,7 @@ public class RegistrationIntentService extends IntentService {
         }
     }
 
-    protected void sendRegistrationToServer(String accessToken, String deviceToken) {
+    protected void sendRegistrationToServer(AccessToken accessToken, String deviceToken) {
         AnalyticsUtil.setDeviceToken(deviceToken);
         DanceDeetsApi.sendDeviceToken(accessToken, deviceToken);
     }

@@ -95,7 +95,7 @@ public class LoginActivity extends FacebookActivity {
             } else {
                 Crashlytics.log(Log.ERROR, LOG_TAG, "Failed to get address from server, sending update with empty location.");
             }
-            DanceDeetsApi.sendAuth(mAccessToken, addressString);
+            DanceDeetsApi.sendLocation(mAccessToken, addressString);
 
             mFetchAddress.onStop();
         }
@@ -145,19 +145,8 @@ public class LoginActivity extends FacebookActivity {
     }
 
     public void handleLogin(AccessToken accessToken) {
-        // Set the access token using
-        // currentAccessToken when it's loaded or set.
+        // Set the access token using currentAccessToken when it's loaded or set.
         Crashlytics.log(Log.INFO, LOG_TAG, "Activity " + this + " is logged in: " + accessToken);
-
-        AnalyticsUtil.identify(accessToken.getUserId());
-
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM, and send it to MixPanel.
-            // Make sure we load this after calling AnalyticsUtil.identify up above.
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            intent.putExtra(RegistrationIntentService.FB_ACCESS_TOKEN, accessToken.getToken());
-            startService(intent);
-        }
 
         GraphRequest request = GraphRequest.newMeRequest(
                 accessToken, new MeCompleted());
@@ -166,8 +155,10 @@ public class LoginActivity extends FacebookActivity {
         request.setParameters(parameters);
         request.executeAsync();
 
-        FetchAddress fetchAddress = new FetchAddress();
-        fetchAddress.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchAddress));
+        // Registers the user, and/or records "last login" data and the like.
+        recordUser(accessToken);
+        recordDeviceToken(accessToken);
+        recordLocation(accessToken);
 
         Intent intent = new Intent(LoginActivity.this, SearchListActivity.class);
         intent.setAction(Intent.ACTION_DEFAULT);
@@ -178,6 +169,25 @@ public class LoginActivity extends FacebookActivity {
         startActivity(intent);
     }
 
+    protected void recordUser(AccessToken accessToken) {
+        DanceDeetsApi.sendAuth(accessToken);
+        AnalyticsUtil.identify(accessToken.getUserId());
+    }
+
+    protected void recordDeviceToken(AccessToken accessToken) {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM, and send it to MixPanel.
+            // Make sure we load this after calling AnalyticsUtil.identify up above.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.putExtra(RegistrationIntentService.FB_ACCESS_TOKEN, accessToken);
+            startService(intent);
+        }
+    }
+
+    protected void recordLocation(AccessToken accessToken) {
+        FetchAddress fetchAddress = new FetchAddress();
+        fetchAddress.onStart(LoginActivity.this, new SendAuthRequest(accessToken, fetchAddress));
+    }
     protected void logIn(AccessToken newAccessToken) {
         Crashlytics.log(Log.INFO, LOG_TAG, "onCurrentAccessTokenChanged: " + newAccessToken);
         // Only post Complete! events for people who clicked login (no autologin!)
