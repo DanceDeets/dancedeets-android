@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.AnalyticsUtil;
+import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -33,7 +34,7 @@ public class RegistrationIntentService extends IntentService {
     private static final String TAG = "RegIntentService";
     private static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
 
-    public static final String USER_ID = "userId";
+    public static final String FB_ACCESS_TOKEN = "fbAccessToken";
 
     public RegistrationIntentService() {
         super(TAG);
@@ -44,8 +45,12 @@ public class RegistrationIntentService extends IntentService {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false)) {
-            return;
+            // Disabled, as we currently don't verify that the servers received our tokens.
+            // (Both MixPanel and DanceDeets need to receive and store the token.)
+            // return;
         }
+
+        String accessToken = intent.getStringExtra(FB_ACCESS_TOKEN);
 
         try {
             // Initially this call goes out to the network to retrieve the token, subsequent calls
@@ -53,16 +58,17 @@ public class RegistrationIntentService extends IntentService {
             // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
             // See https://developers.google.com/cloud-messaging/android/start for details on this file.
             InstanceID instanceID = InstanceID.getInstance(this);
-            String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
+            String deviceToken = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            sendRegistrationToServer(token);
+            sendRegistrationToServer(accessToken, deviceToken);
         } catch (Exception e) {
             Crashlytics.log(Log.ERROR, TAG, "Failed to complete token refresh");
             Crashlytics.logException(e);
         }
     }
 
-    protected void sendRegistrationToServer(String token) {
-        AnalyticsUtil.setDeviceToken(token);
+    protected void sendRegistrationToServer(String accessToken, String deviceToken) {
+        AnalyticsUtil.setDeviceToken(deviceToken);
+        DanceDeetsApi.sendDeviceToken(accessToken, deviceToken);
     }
 }

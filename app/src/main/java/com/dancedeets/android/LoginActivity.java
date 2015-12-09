@@ -155,6 +155,7 @@ public class LoginActivity extends FacebookActivity {
             // Start IntentService to register this application with GCM, and send it to MixPanel.
             // Make sure we load this after calling AnalyticsUtil.identify up above.
             Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.putExtra(RegistrationIntentService.FB_ACCESS_TOKEN, accessToken.getToken());
             startService(intent);
         }
 

@@ -46,6 +46,36 @@ public class DanceDeetsApi {
         return builder;
     }
 
+    public static void sendDeviceToken(String accessToken, String deviceToken) {
+        Uri.Builder builder = generateApiBuilderFor("device_token");
+        JSONObject jsonPayload = new JSONObject();
+        try {
+            jsonPayload.put("access_token", accessToken);
+            jsonPayload.put("device_token", deviceToken);
+        } catch (JSONException e) {
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Error constructing request: " + e);
+            Crashlytics.logException(e);
+            return;
+        }
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                builder.toString(),
+                jsonPayload,
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Crashlytics.log(Log.INFO, LOG_TAG, "Successfully called /api/device_token: " + response);
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Crashlytics.log(Log.ERROR, LOG_TAG, "Error calling /api/device_token: " + error);
+                    }
+                });
+        VolleySingleton.getInstance().getRequestQueue().add(request);
+    }
+
     public static void sendAuth(AccessToken accessToken, String location) {
         Log.i(LOG_TAG, "sendAuth with location: " + location);
         Uri.Builder builder = generateApiBuilderFor("auth");
