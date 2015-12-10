@@ -143,6 +143,14 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         mBundled.mEventList.addAll(eventList);
         mBundled.mOneboxList.clear();
         mBundled.mOneboxList.addAll(oneboxList);
+        AnalyticsUtil.track("Searched Results",
+                "Location", mBundled.mSearchOptions.location,
+                "Keywords", mBundled.mSearchOptions.keywords,
+                "Tab", mBundled.mSearchOptions.timePeriod.toString(),
+                "Result Count", Integer.toString(mBundled.mEventList.size()),
+                "Onebox Count", Integer.toString(mBundled.mOneboxList.size())
+                );
+
         onEventListFilled(false);
     }
 
