@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -83,50 +82,30 @@ public class DanceDeetsApi {
     }
 
     public static void sendDeviceToken(AccessToken accessToken, final String deviceToken) {
-        sendAuthenticatedApiRequest("auth_device_token", accessToken, new PayloadModifier() {
+        sendAuthenticatedApiRequest("user", accessToken, new PayloadModifier() {
             @Override
             public void setupPayload(JSONObject jsonPayload) throws JSONException {
-                jsonPayload.put("device_token", deviceToken);
+                jsonPayload.put("android_device_token", deviceToken);
             }
         });
     }
 
     public static void sendLocation(final AccessToken accessToken, final String location) {
         Log.i(LOG_TAG, "sendLocation: " + location);
-        //TODO(auth2): temporarily set this to /auth to verify things work as-expected
-        sendAuthenticatedApiRequest("auth", accessToken, new PayloadModifier() {
+        sendAuthenticatedApiRequest("user", accessToken, new PayloadModifier() {
             @Override
             public void setupPayload(JSONObject jsonPayload) throws JSONException {
                 jsonPayload.put("location", location);
-                //TODO(auth2): temporarily keep this code
-                jsonPayload.put("client", "android");
-                // Sometimes the cached payload has a far-future expiration date. Not really sure why...
-                // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
-                // must somehow have gotten cached to disk with that large value for the expiration.
-                // Alternately, these may represent infinite-duration tokens that never expire.
-                if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
-                    jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
-                } else {
-                    Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
-                }
             }
         });
     }
 
     public static void sendAuth(final AccessToken accessToken) {
-        // TODO(auth2): temporarily set this to /auth_old while maintaining backwards compatibility
-        sendAuthenticatedApiRequest("auth_old", accessToken, new PayloadModifier() {
+        // so we need to be careful either how these requests get processed server-side, or sent client-side
+        sendAuthenticatedApiRequest("auth", accessToken, new PayloadModifier() {
             @Override
             public void setupPayload(JSONObject jsonPayload) throws JSONException {
-                // Sometimes the cached payload has a far-future expiration date. Not really sure why...
-                // Best I can come up with is AccessToken.getBundleLongAsDate()'s Long.MAX_VALUE result
-                // must somehow have gotten cached to disk with that large value for the expiration.
-                // Alternately, these may represent infinite-duration tokens that never expire.
-                if (!accessToken.getExpires().equals(new Date(Long.MAX_VALUE))) {
-                    jsonPayload.put("access_token_expires", isoDateTimeFormatWithTZ.format(accessToken.getExpires()));
-                } else {
-                    Log.e(LOG_TAG, "Somehow had far-future expiration date, ignoring: " + accessToken.getExpires());
-                }
+                jsonPayload.put("client", "android");
             }
         });
     }
