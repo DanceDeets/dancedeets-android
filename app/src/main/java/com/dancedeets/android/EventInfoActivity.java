@@ -274,7 +274,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 mBundled.mEventIndex = 0;
                 mBundled.mEventList = new ArrayList<>(1);
                 mBundled.mEventList.add(event);
-            } else {
+            } else if (b.containsKey(ARG_EVENT_LIST_FILENAME)) {
                 try {
                     mBundled.mEventList = readFile(new File(b.getString(ARG_EVENT_LIST_FILENAME)));
                 } catch (IOException | ClassNotFoundException e) {
@@ -285,6 +285,10 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 mBundled.mEventIndex = b.getInt(ARG_EVENT_INDEX);
                 Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: List size is " + mBundled.mEventList.size());
                 Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras: Event index is " + mBundled.mEventIndex);
+            } else {
+                Crashlytics.log(Log.INFO, LOG_TAG, "Intent.getExtras unexpected, value is " + b);
+                mBundled.mEventList = null;
+                mBundled.mEventIndex = 0;
             }
 
             initializeViewPagerWithBundledState();
