@@ -105,14 +105,6 @@ public class ListenerService extends GcmListenerService {
      * @param data GCM data received.
      */
     private void sendNotification(final Bundle data) {
-        final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        final Thread listenerThread = Thread.currentThread();
-
         final String eventId = data.getString("event_id");
         // Grab all the relevant Event information in a way that lets us use our OOP FullEvent accessors.
         DanceDeetsApi.getEvent(eventId, new DanceDeetsApi.OnEventReceivedListener() {
@@ -122,6 +114,11 @@ public class ListenerService extends GcmListenerService {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
+                        PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
+                                PendingIntent.FLAG_ONE_SHOT);
 
                         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -160,6 +157,12 @@ public class ListenerService extends GcmListenerService {
                         NotificationManager notificationManager =
                                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+                        Uri mapUrl = event.getOpenMapUrl();
+                        Log.i(LOG_TAG, ""+mapUrl);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUrl);
+                        PendingIntent mapPendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, mapIntent,
+                                PendingIntent.FLAG_ONE_SHOT);
+                        notificationBuilder.addAction(R.drawable.ic_menu_map, "Get Directions", mapPendingIntent);
                         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
                     }
                 }).start();
