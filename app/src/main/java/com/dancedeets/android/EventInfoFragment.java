@@ -27,9 +27,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
-import com.dancedeets.android.models.LatLong;
 import com.dancedeets.android.models.NamedPerson;
-import com.dancedeets.android.models.Venue;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
@@ -136,34 +134,7 @@ public class EventInfoFragment extends StateFragment<
     }
 
     public void openLocationOnMap() {
-        // "geo:lat,lng?q=query
-        // "geo:0,0?q=lat,lng(label)"
-        // "geo:0,0?q=my+street+address"
-        Venue venue = getEvent().getVenue();
-        LatLong latLong = venue.getLatLong();
-        /**
-         * We must support a few use cases:
-         * 1) Venue Name: Each One Teach One
-         * Street/City/State/Zip/Country: Lehman College 250 Bedford Prk Blvd Speech & Theatre Bldg the SET Room B20, Bronx, NY, 10468, United States
-         * Lat, Long: 40.8713753364, -73.8879763323
-         * 2) Venue Name: Queens Theatre in the Park
-         * Street/City/State/Zip/Country: New York, NY, 11368, United States
-         * Lat, Long: 40.7441611111, -73.8444222222
-         * 3) Venue Name: "Hamburg"
-         * Street/City/State/Zip/Country: null
-         * Lat, Long: null
-         * 4) More normal scenarios, like a good venue and street address
-         *
-         * Given this, our most reliable source is lat/long.
-         * We don't want to do a search around it because of #1 and #2 will search for the wrong things.
-         * So instead, the best we can do is to label the lat/long point
-         **/
-        Uri mapUrl;
-        if (latLong != null) {
-            mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + "(" + Uri.encode(getEvent().getVenue().getName()) + ")");
-        } else {
-            mapUrl = Uri.parse("geo:0,0?q=" + Uri.encode(getEvent().getVenue().getName()));
-        }
+        Uri mapUrl = getEvent().getOpenMapUrl();
         Intent intent = new Intent(Intent.ACTION_VIEW, mapUrl);
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);

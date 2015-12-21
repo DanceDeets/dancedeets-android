@@ -20,16 +20,36 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
+import com.dancedeets.android.models.FullEvent;
 import com.google.android.gms.gcm.GcmListenerService;
 
+import java.io.InputStream;
+
 public class ListenerService extends GcmListenerService {
+
+    private static String LOG_TAG = "ListenerService";
+
+    public enum NotificationType {
+        EVENT_REMINDER("EVENT_REMINDER");
+
+        private String value;
+        NotificationType(String value) {
+            this.value = value;
+        }
+        String getValue() {
+            return value;
+        }
+    };
 
     private static final String TAG = "ListenerService";
 
@@ -69,7 +89,11 @@ public class ListenerService extends GcmListenerService {
              * In some cases it may be useful to show a notification indicating to the user
              * that a message was received.
              */
-            sendNotification(data);
+            switch(NotificationType.valueOf((String) data.get("notification_type"))) {
+                case EVENT_REMINDER:
+                    sendNotification(data);
+                    break;
+            }
             // [END_EXCLUDE]
         }
     }
@@ -80,25 +104,71 @@ public class ListenerService extends GcmListenerService {
      *
      * @param data GCM data received.
      */
-    private void sendNotification(Bundle data) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
+    private void sendNotification(final Bundle data) {
+        final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_penguin_head_outline)
-                .setContentTitle(data.getString("title"))
-                .setContentText(data.getString("text"))
-                .setSubText(data.getString("subtext"))
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+        final Thread listenerThread = Thread.currentThread();
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final String eventId = data.getString("event_id");
+        // Grab all the relevant Event information in a way that lets us use our OOP FullEvent accessors.
+        DanceDeetsApi.getEvent(eventId, new DanceDeetsApi.OnEventReceivedListener() {
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+            @Override
+            public void onEventReceived(final FullEvent event) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                        String startTime = event.getStartTimeStringTimeOnly();
+                        String location = event.getVenue().getName();
+                        notificationBuilder.setSmallIcon(R.drawable.ic_penguin_head_outline)
+                                .setContentTitle(event.getTitle())
+                                .setContentText(startTime + ": " + location)
+                                .setSubText(ListenerService.this.getString(R.string.open_event))
+                                .setAutoCancel(true)
+                                .setSound(defaultSoundUri)
+                                .setCategory(NotificationCompat.CATEGORY_EVENT)
+                                .setStyle(new NotificationCompat.BigTextStyle()
+                                        .bigText(event.getDescription()))
+                                .setContentIntent(pendingIntent);
+
+                        // Sadly, most flyers are not amenable to viewing in the 2:1 ratio wide image views
+                        // used for BigImageStyle notifications.
+                        // So instead, we load a small cover image for use for notification thumbnails.
+                        String imageUrl = event.getThumbnailUrl();
+                        if (imageUrl != null) {
+                            Bitmap bitmap = null;
+                            try {
+                                // Download Image from URL
+                                InputStream input = new java.net.URL(imageUrl).openStream();
+                                // Decode Bitmap
+                                bitmap = BitmapFactory.decodeStream(input);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Log.e(LOG_TAG, "" + bitmap);
+                            notificationBuilder.setLargeIcon(bitmap);
+                        }
+
+
+                        NotificationManager notificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e(LOG_TAG, "Silently ignoring error retrieving event id " + eventId);
+            }
+        });
     }
 }

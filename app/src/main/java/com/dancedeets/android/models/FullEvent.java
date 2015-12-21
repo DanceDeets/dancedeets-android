@@ -1,5 +1,6 @@
 package com.dancedeets.android.models;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -169,6 +170,14 @@ public class FullEvent implements Parcelable, Serializable {
         }
     }
 
+    public String getStartTimeStringTimeOnly() {
+        if (getStartTimeLong() != 0) {
+            return localizedTimeFormat.format(getStartTimeLong());
+        } else {
+            return null;
+        }
+    }
+
     public String getStartTimeString(Locale locale) {
         if (getStartTimeLong() != 0) {
             if (mAllDayEvent) {
@@ -251,6 +260,38 @@ public class FullEvent implements Parcelable, Serializable {
 
     public String getCategoriesAsString() {
         return join(mCategories, ", ");
+    }
+
+    public Uri getOpenMapUrl() {
+        // "geo:lat,lng?q=query
+        // "geo:0,0?q=lat,lng(label)"
+        // "geo:0,0?q=my+street+address"
+        Venue venue = getVenue();
+        LatLong latLong = venue.getLatLong();
+        /**
+         * We must support a few use cases:
+         * 1) Venue Name: Each One Teach One
+         * Street/City/State/Zip/Country: Lehman College 250 Bedford Prk Blvd Speech & Theatre Bldg the SET Room B20, Bronx, NY, 10468, United States
+         * Lat, Long: 40.8713753364, -73.8879763323
+         * 2) Venue Name: Queens Theatre in the Park
+         * Street/City/State/Zip/Country: New York, NY, 11368, United States
+         * Lat, Long: 40.7441611111, -73.8444222222
+         * 3) Venue Name: "Hamburg"
+         * Street/City/State/Zip/Country: null
+         * Lat, Long: null
+         * 4) More normal scenarios, like a good venue and street address
+         *
+         * Given this, our most reliable source is lat/long.
+         * We don't want to do a search around it because of #1 and #2 will search for the wrong things.
+         * So instead, the best we can do is to label the lat/long point
+         **/
+        Uri mapUrl;
+        if (latLong != null) {
+            mapUrl = Uri.parse("geo:0,0?q=" + latLong.getLatitude() + "," + latLong.getLongitude() + "(" + Uri.encode(getVenue().getName()) + ")");
+        } else {
+            mapUrl = Uri.parse("geo:0,0?q=" + Uri.encode(getVenue().getName()));
+        }
+        return mapUrl;
     }
 
     static public String join(List<String> list, String conjunction)
