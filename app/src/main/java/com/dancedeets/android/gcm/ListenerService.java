@@ -106,6 +106,10 @@ public class ListenerService extends GcmListenerService {
      */
     private void sendNotification(final Bundle data) {
         final String eventId = data.getString("event_id");
+        if (eventId == null) {
+            Log.e(LOG_TAG, "Got empty event_id from server.");
+            return;
+        }
         // Grab all the relevant Event information in a way that lets us use our OOP FullEvent accessors.
         DanceDeetsApi.getEvent(eventId, new DanceDeetsApi.OnEventReceivedListener() {
 
@@ -158,12 +162,14 @@ public class ListenerService extends GcmListenerService {
                                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                         Uri mapUrl = event.getOpenMapUrl();
-                        Log.i(LOG_TAG, ""+mapUrl);
                         Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUrl);
                         PendingIntent mapPendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, mapIntent,
                                 PendingIntent.FLAG_ONE_SHOT);
                         notificationBuilder.addAction(R.drawable.ic_menu_map, "Get Directions", mapPendingIntent);
-                        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+                        // The notificationId is used for overwriting existing notifications,
+                        // or ensuring separate notifications for separate events.
+                        int notificationId = eventId.hashCode();
+                        notificationManager.notify(notificationId, notificationBuilder.build());
                     }
                 }).start();
             }
