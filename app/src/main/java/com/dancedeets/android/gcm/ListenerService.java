@@ -168,7 +168,6 @@ public class ListenerService extends GcmListenerService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e(LOG_TAG, "" + bitmap);
             notificationBuilder.setLargeIcon(bitmap);
         }
 
