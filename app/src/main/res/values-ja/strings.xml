@@ -39,4 +39,17 @@
     <string name="action_share_app">DanceDeetsを共有…</string>
     <string name="action_settings">設定</string>
     <string name="open_event">イベントを開く</string>
+    <string name="notifications_title">通知</string>
+    <string name="notifications_vibrate">バイブレーション	</string>
+    <string name="notifications_sound">サウンド</string>
+    <string name="notification_setup">通知設定</string>
+    <string name="notifications_summary_off">非アクティブ</string>
+    <string name="notifications_summary_on">アクティブ</string>
+    <string name="notifications_upcomingEvents">イベント再通知</string>
+    <string name="notifications_eventsAdded">近くのイベントが追加されました</string>
+    <string name="notifications_eventsAdded_summary"></string>
+    <string name="notifications_sound_summary"></string>
+    <string name="notifications_upcomingEvents_summary"></string>
+    <string name="notifications_vibrate_summary"></string>
+    <string name="notification_categories">通知カテゴリ</string>
 </resources>

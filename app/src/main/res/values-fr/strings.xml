@@ -39,6 +39,18 @@
     <string name="action_share_app">Partager DanceDeets…</string>
     <string name="action_settings">Paramètres</string>
     <string name="open_event">Ouvrir l\'événement</string>
+    <string name="notification_setup">Paramètres de notification</string>
+    <string name="notifications_sound">Son</string>
+    <string name="notifications_vibrate">Vibreur</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_summary_off">Inactif</string>
+    <string name="notifications_summary_on">Actif</string>
+    <string name="notifications_upcomingEvents">Rappel de l\'événement	</string>
+    <string name="notifications_upcomingEvents_summary"></string>
+    <string name="notifications_eventsAdded">Evénement à proximité a été ajoutée</string>
+    <string name="notifications_eventsAdded_summary"></string>
+    <string name="notifications_sound_summary"></string>
+    <string name="notification_categories">Catégories de notification</string>
 </resources>
 
 

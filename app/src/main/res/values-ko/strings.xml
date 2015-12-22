@@ -39,4 +39,17 @@
     <string name="action_share_app">공유 DanceDeets</string>
     <string name="action_settings">설정</string>
     <string name="open_event">이벤트 보기</string>
+    <string name="notifications_title">알림</string>
+    <string name="notification_setup">알림 설정</string>
+    <string name="notifications_sound">소리</string>
+    <string name="notifications_vibrate">진동</string>
+    <string name="notifications_summary_off">비활성</string>
+    <string name="notifications_summary_on">활성</string>
+    <string name="notifications_upcomingEvents">이벤트 미리 알림</string>
+    <string name="notifications_eventsAdded">근처 이벤트가 추가되었습니다</string>
+    <string name="notifications_eventsAdded_summary"></string>
+    <string name="notifications_sound_summary"></string>
+    <string name="notifications_upcomingEvents_summary"></string>
+    <string name="notifications_vibrate_summary"></string>
+    <string name="notification_categories">알림 카테고리</string>
 </resources>

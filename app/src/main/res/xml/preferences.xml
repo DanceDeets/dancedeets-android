@@ -2,28 +2,27 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
         android:key="notifications_global"
-        android:title="Notifications"
-        android:summary="Notify"
-        android:summaryOn="Active"
-        android:summaryOff="Inactive"
+        android:title="@string/notifications_title"
+        android:summaryOn="@string/notifications_summary_on"
+        android:summaryOff="@string/notifications_summary_off"
         android:defaultValue="true"
         />
 
     <PreferenceCategory
-        android:title="Notification Setup">
+        android:title="@string/notification_setup">
 
         <CheckBoxPreference
             android:key="notifications_sound"
-            android:title="Sound"
-            android:summary="Play sound on incoming notifications"
+            android:title="@string/notifications_sound"
+            android:summary="@string/notifications_sound_summary"
             android:dependency="notifications_global"
             android:defaultValue="true"
             />
 
         <CheckBoxPreference
             android:key="notifications_vibrate"
-            android:title="Vibrate"
-            android:summary="Vibrate on incoming notifications"
+            android:title="@string/notifications_vibrate"
+            android:summary="@string/notifications_vibrate_summary"
             android:dependency="notifications_global"
             android:defaultValue="true"
             />
@@ -31,20 +30,20 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Categories">
+        android:title="@string/notification_categories">
 
         <CheckBoxPreference
             android:key="notifications_upcomingEvents"
-            android:title="Upcoming Events"
-            android:summary="Send reminders for RSVPed dance events"
+            android:title="@string/notifications_upcomingEvents"
+            android:summary="@string/notifications_upcomingEvents_summary"
             android:dependency="notifications_global"
             android:defaultValue="true"
             />
 
         <CheckBoxPreference
             android:key="notifications_eventsAdded"
-            android:title="Nearby Events Added"
-            android:summary="Notify about new events added nearby"
+            android:title="@string/notifications_eventsAdded"
+            android:summary="@string/notifications_eventsAdded_summary"
             android:dependency="notifications_global"
             android:defaultValue="true"
             />

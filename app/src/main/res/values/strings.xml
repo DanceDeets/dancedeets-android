@@ -44,4 +44,17 @@
     <string name="action_share_app">Share DanceDeets…</string>
     <string name="open_event">Open Event</string>
     <string name="action_settings">Settings</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_summary_on">Active</string>
+    <string name="notifications_summary_off">Inactive</string>
+    <string name="notification_setup">Notification Setup</string>
+    <string name="notifications_sound">Sound</string>
+    <string name="notifications_vibrate">Vibrate</string>
+    <string name="notifications_upcomingEvents">Event Reminders</string>
+    <string name="notifications_eventsAdded">Nearby Events Added</string>
+    <string name="notifications_eventsAdded_summary">Notify about new events added nearby</string>
+    <string name="notifications_upcomingEvents_summary">Send reminders for RSVPed dance events</string>
+    <string name="notifications_vibrate_summary">Vibrate on incoming notifications</string>
+    <string name="notifications_sound_summary">Play sound on incoming notifications</string>
+    <string name="notification_categories">Notification Categories</string>
 </resources>

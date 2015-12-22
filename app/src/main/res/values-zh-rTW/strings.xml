@@ -39,4 +39,15 @@
     <string name="action_share_app">分享DanceDeets</string>
     <string name="action_settings">設定</string>
     <string name="open_event">檢視活動</string>
+    <string name="notification_setup">通知設定</string>
+    <string name="notifications_sound">音效</string>
+    <string name="notifications_vibrate">震動</string>
+    <string name="notifications_title">通知</string>
+    <string name="notifications_summary_off">非使用中</string>
+    <string name="notifications_summary_on">使用中</string>
+    <string name="notifications_upcomingEvents">活動提醒</string>
+    <string name="notifications_eventsAdded">附近的活動已被添加</string>
+    <string name="notifications_eventsAdded_summary"></string>
+    <string name="notifications_sound_summary"></string>
+    <string name="notification_categories">通知類別</string>
 </resources>
