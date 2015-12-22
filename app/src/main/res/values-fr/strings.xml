@@ -51,6 +51,7 @@
     <string name="notifications_eventsAdded_summary"></string>
     <string name="notifications_sound_summary"></string>
     <string name="notification_categories">Catégories de notification</string>
+    <string name="notifications_vibrate_summary"></string>
 </resources>
 
 

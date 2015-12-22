@@ -50,4 +50,6 @@
     <string name="notifications_eventsAdded_summary"></string>
     <string name="notifications_sound_summary"></string>
     <string name="notification_categories">通知類別</string>
+    <string name="notifications_vibrate_summary"></string>
+    <string name="notifications_upcomingEvents_summary"></string>
 </resources>
