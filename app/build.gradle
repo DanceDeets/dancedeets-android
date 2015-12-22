@@ -12,8 +12,8 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
     defaultConfig {
         applicationId "com.dancedeets.android"
         minSdkVersion 15
@@ -52,8 +52,8 @@ repositories {
 
 dependencies {
     // You must install or update the Support Repository through the SDK manager to use this dependency.
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:support-v13:22.2.1'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.android.support:support-v13:23.1.1'
     //compile 'com.google.android.gms:play-services-ads:8.0.+'
     //compile 'com.google.android.gms:play-services-analytics:5.0.+'
     compile 'com.google.android.gms:play-services:8.3.0'
@@ -66,8 +66,9 @@ dependencies {
     //    exclude group: 'org.hamcrest'
     //}
     //androidTestCompile 'org.apache.httpcomponents:httpclient:4.3.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support.test:runner:0.3'
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.+@aar') {
         transitive = true;
     }
