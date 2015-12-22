@@ -4,9 +4,16 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
 /**
- * Created by lambert on 2015/12/22.
+ * A basic SettingsActivity that manages the SettingsFragment.
  */
 public class SettingsActivity extends PreferenceActivity {
+
+    public static class Notifications {
+        public final static String GLOBAL = "notifications_global";
+        public final static String UPCOMING_EVENTS = "notifications_upcomingEvents";
+        public final static String SOUND = "notifications_sound";
+        public final static String VIBRATE = "notifications_vibrate";
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

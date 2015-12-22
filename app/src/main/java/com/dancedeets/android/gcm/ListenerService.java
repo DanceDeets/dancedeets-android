@@ -20,16 +20,19 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
+import com.dancedeets.android.SettingsActivity;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.util.VolleySingleton;
 import com.google.android.gms.gcm.GcmListenerService;
@@ -70,12 +73,18 @@ public class ListenerService extends GcmListenerService {
         } else {
             Log.d(TAG, "From: " + from);
 
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean notificationsEnabled = sharedPref.getBoolean(SettingsActivity.Notifications.GLOBAL, true);
+            boolean notificationsEventsEnabled = sharedPref.getBoolean(SettingsActivity.Notifications.UPCOMING_EVENTS, true);
+
             //if (from.startsWith("/topics/")) {
             //}
 
             switch(NotificationType.valueOf((String) data.get("notification_type"))) {
                 case EVENT_REMINDER:
-                    sendEventReminder(data);
+                    if (notificationsEnabled && notificationsEventsEnabled) {
+                        sendEventReminder(data);
+                    }
                     break;
             }
         }
@@ -101,7 +110,7 @@ public class ListenerService extends GcmListenerService {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        ListenerService.this.onEventReceived(data, event);
+                        ListenerService.this.onEventReceived(event);
                     }
                 }).start();
             }
@@ -114,14 +123,14 @@ public class ListenerService extends GcmListenerService {
     }
 
 
-    public void onEventReceived(Bundle data, FullEvent event) {
+    public void onEventReceived(FullEvent event) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
         PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         String startTime = event.getStartTimeStringTimeOnly();
         String location = event.getVenue().getName();
@@ -130,11 +139,18 @@ public class ListenerService extends GcmListenerService {
                 .setContentText(startTime + ": " + location)
                 .setSubText(ListenerService.this.getString(R.string.open_event))
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri)
                 .setCategory(NotificationCompat.CATEGORY_EVENT)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(event.getDescription()))
                 .setContentIntent(pendingIntent);
+
+        if (sharedPref.getBoolean(SettingsActivity.Notifications.SOUND, true)) {
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            notificationBuilder.setSound(defaultSoundUri);
+        }
+        if (sharedPref.getBoolean(SettingsActivity.Notifications.VIBRATE, true)) {
+            notificationBuilder.setVibrate(new long[]{0, 250, 250, 250});
+        }
 
         // Sadly, most flyers are not amenable to viewing in the 2:1 ratio wide image views
         // used for BigImageStyle notifications.
