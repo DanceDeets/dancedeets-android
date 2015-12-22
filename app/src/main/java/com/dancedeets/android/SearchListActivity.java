@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.geo.FetchAddress;
+import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;

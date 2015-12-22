@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.geo;
 
 import android.content.Context;
 import android.net.Uri;

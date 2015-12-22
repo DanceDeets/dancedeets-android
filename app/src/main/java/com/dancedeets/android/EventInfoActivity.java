@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.ParcelableUtil;
 import com.dancedeets.android.uistate.BundledState;
