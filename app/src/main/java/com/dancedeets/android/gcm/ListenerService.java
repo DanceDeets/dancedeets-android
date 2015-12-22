@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -130,7 +129,7 @@ public class ListenerService extends GcmListenerService {
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
         // Ensure we open this URL using the DanceDeets app
-        intent.setPackage("com.dancedeets.android");
+        intent.setPackage(getPackageName());
 
         PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -148,7 +147,7 @@ public class ListenerService extends GcmListenerService {
                 .setContentIntent(pendingIntent);
 
         if (sharedPref.getBoolean(SettingsActivity.Notifications.SOUND, true)) {
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Uri defaultSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.happening);
             notificationBuilder.setSound(defaultSoundUri);
         }
         if (sharedPref.getBoolean(SettingsActivity.Notifications.VIBRATE, true)) {
