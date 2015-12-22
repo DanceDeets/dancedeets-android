@@ -41,14 +41,24 @@
             android:text="Event Location"
             android:textSize="14sp"
             android:textIsSelectable="true"
+            />
+
+        <TextView
+            android:id="@+id/location_open"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/location"
+            android:text="@string/menu_view_map"
+            android:textSize="14sp"
             android:clickable="true"
+            android:paddingBottom="5dp"
             />
 
         <TextView
             android:id="@+id/date_time"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/location"
+            android:layout_below="@id/location_open"
             android:ellipsize="marquee"
             android:singleLine="false"
             android:text="Event Date/Time"

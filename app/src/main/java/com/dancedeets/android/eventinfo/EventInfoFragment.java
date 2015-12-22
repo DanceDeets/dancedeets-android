@@ -448,7 +448,8 @@ public class EventInfoFragment extends StateFragment<
         TextView title = (TextView) rootView.findViewById(R.id.title);
         title.setText(event.getTitle());
         TextView location = (TextView) rootView.findViewById(R.id.location);
-
+        TextView locationOpen = (TextView) rootView.findViewById(R.id.location_open);
+        locationOpen.setTextColor(locationOpen.getLinkTextColors());
 
         String locationText = "";
         if (event.getVenue().hasName()) {
@@ -456,7 +457,7 @@ public class EventInfoFragment extends StateFragment<
             locationText = event.getVenue().getName() + "\n" + event.getVenue().getAddress("\n");
         }
         location.setText(locationText);
-        location.setOnClickListener(new View.OnClickListener() {
+        locationOpen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openLocationOnMap();
