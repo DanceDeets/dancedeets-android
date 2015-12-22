@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.util;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;

@@ -7,9 +7,9 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.dancedeets.android.PlaceholderNetworkImageView;
+import com.dancedeets.android.util.PlaceholderNetworkImageView;
 import com.dancedeets.android.R;
-import com.dancedeets.android.VolleySingleton;
+import com.dancedeets.android.util.VolleySingleton;
 import com.dancedeets.android.models.CoverData;
 import com.dancedeets.android.models.FullEvent;
 

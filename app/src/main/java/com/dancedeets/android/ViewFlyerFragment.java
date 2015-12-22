@@ -25,6 +25,7 @@ import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
+import com.dancedeets.android.util.VolleySingleton;
 
 import java.io.File;
 import java.io.FileOutputStream;

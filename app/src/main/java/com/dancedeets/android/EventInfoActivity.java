@@ -24,6 +24,7 @@ import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
+import com.dancedeets.android.util.VolleySingleton;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 

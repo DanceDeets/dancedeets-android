@@ -2,6 +2,7 @@ package com.dancedeets.android;
 
 import android.location.Location;
 
+import com.dancedeets.android.util.Hashing;
 import com.facebook.AccessToken;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;

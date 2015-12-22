@@ -30,7 +30,7 @@ import android.util.Log;
 
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
-import com.dancedeets.android.VolleySingleton;
+import com.dancedeets.android.util.VolleySingleton;
 import com.dancedeets.android.models.FullEvent;
 import com.google.android.gms.gcm.GcmListenerService;
 

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.ShareActionProvider;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.util.Hashing;
 import com.facebook.AccessToken;
 
 import java.util.Locale;

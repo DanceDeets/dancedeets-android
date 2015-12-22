@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.util;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;

@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

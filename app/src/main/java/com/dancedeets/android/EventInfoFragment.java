@@ -31,6 +31,8 @@ import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
+import com.dancedeets.android.util.JsonArrayRequest;
+import com.dancedeets.android.util.VolleySingleton;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;

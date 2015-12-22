@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.gcm.RegistrationIntentService;
+import com.dancedeets.android.util.VolleySingleton;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;

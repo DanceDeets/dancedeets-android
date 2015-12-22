@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
+import com.dancedeets.android.util.VolleySingleton;
 import com.facebook.AccessToken;
 
 import org.json.JSONArray;

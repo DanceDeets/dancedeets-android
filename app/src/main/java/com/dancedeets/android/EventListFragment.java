@@ -25,6 +25,7 @@ import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateFragment;
+import com.dancedeets.android.util.VolleySingleton;
 
 import java.util.ArrayList;
 import java.util.List;

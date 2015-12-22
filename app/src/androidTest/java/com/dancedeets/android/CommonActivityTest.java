@@ -15,6 +15,7 @@ import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
+import com.dancedeets.android.util.VolleySingleton;
 
 import org.hamcrest.Matcher;
 

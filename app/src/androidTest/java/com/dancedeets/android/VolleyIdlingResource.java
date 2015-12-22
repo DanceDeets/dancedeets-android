@@ -9,6 +9,7 @@ import android.util.Log;
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.dancedeets.android.util.VolleySingleton;
 
 import java.lang.reflect.Field;
 import java.util.Set;

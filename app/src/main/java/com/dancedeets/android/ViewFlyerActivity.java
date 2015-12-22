@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.util.VolleySingleton;
 
 /**
  * Shows zoomable/pannable event flyers, when clicked on from the event info page.
