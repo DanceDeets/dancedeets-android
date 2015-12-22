@@ -30,6 +30,7 @@ import android.util.Log;
 
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
+import com.dancedeets.android.VolleySingleton;
 import com.dancedeets.android.models.FullEvent;
 import com.google.android.gms.gcm.GcmListenerService;
 
@@ -65,7 +66,6 @@ public class ListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         Log.i(TAG, "onMessageReceived");
         if (data.containsKey("mp_message")) {
-            String mp_message = data.getString("mp_message");
             MixPanelReceiver receiver = new MixPanelReceiver();
             receiver.handleNotificationIntent(this, data);
         } else {
@@ -111,6 +111,7 @@ public class ListenerService extends GcmListenerService {
             return;
         }
         // Grab all the relevant Event information in a way that lets us use our OOP FullEvent accessors.
+        VolleySingleton.createInstance(this);
         DanceDeetsApi.getEvent(eventId, new DanceDeetsApi.OnEventReceivedListener() {
 
             @Override
@@ -120,7 +121,7 @@ public class ListenerService extends GcmListenerService {
                     public void run() {
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
 
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
                         PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
                                 PendingIntent.FLAG_ONE_SHOT);
 
