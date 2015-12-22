@@ -129,6 +129,9 @@ public class ListenerService extends GcmListenerService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
+        // Ensure we open this URL using the DanceDeets app
+        intent.setPackage("com.dancedeets.android");
+
         PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
