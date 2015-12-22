@@ -24,6 +24,7 @@ import com.dancedeets.android.FacebookActivity;
 import com.dancedeets.android.HelpSystem;
 import com.dancedeets.android.R;
 import com.dancedeets.android.SendFeedback;
+import com.dancedeets.android.SettingsActivity;
 import com.dancedeets.android.eventinfo.EventInfoActivity;
 import com.dancedeets.android.eventinfo.EventInfoFragment;
 import com.dancedeets.android.geo.FetchAddress;
@@ -277,6 +278,9 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
             case R.id.action_logout:
                 LoginManager.getInstance().logOut();
                 return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

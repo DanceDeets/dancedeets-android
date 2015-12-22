@@ -103,11 +103,13 @@
         <activity android:name="com.dancedeets.android.WebViewActivity">
         </activity>
 
+        <activity android:name="com.dancedeets.android.SettingsActivity"
+            />
+
         <activity android:name="com.facebook.FacebookActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-
 
         <activity
             android:name="com.dancedeets.android.MessageActivity">

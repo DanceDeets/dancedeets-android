@@ -24,6 +24,7 @@ import com.dancedeets.android.FacebookActivity;
 import com.dancedeets.android.HelpSystem;
 import com.dancedeets.android.R;
 import com.dancedeets.android.SendFeedback;
+import com.dancedeets.android.SettingsActivity;
 import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.ParcelableUtil;
@@ -336,6 +337,9 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
             case R.id.action_logout:
                 LoginManager.getInstance().logOut();
                 return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 // Basic intent for Parent Activity
