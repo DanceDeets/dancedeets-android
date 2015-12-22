@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventlist;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.dancedeets.android.eventlist.EventListItem;
-import com.dancedeets.android.eventlist.HeaderListItem;
-import com.dancedeets.android.eventlist.ListItem;
-import com.dancedeets.android.eventlist.OneboxListItem;
+import com.dancedeets.android.eventlist.adapter.EventListItem;
+import com.dancedeets.android.eventlist.adapter.HeaderListItem;
+import com.dancedeets.android.eventlist.adapter.ListItem;
+import com.dancedeets.android.eventlist.adapter.OneboxListItem;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
 

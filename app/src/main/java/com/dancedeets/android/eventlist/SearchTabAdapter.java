@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventlist;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -11,6 +11,8 @@ import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.dancedeets.android.R;
 
 /**
  * A PagerAdapter for tracking the various search tabs we support.

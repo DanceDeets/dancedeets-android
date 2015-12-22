@@ -4,6 +4,8 @@ package com.dancedeets.android;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 
+import com.dancedeets.android.eventlist.SearchListActivity;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;

@@ -25,7 +25,7 @@
         android:text="@string/search_location"
         />
 
-    <com.dancedeets.android.DelayAutoCompleteTextView
+    <com.dancedeets.android.util.DelayAutoCompleteTextView
         android:id="@+id/search_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

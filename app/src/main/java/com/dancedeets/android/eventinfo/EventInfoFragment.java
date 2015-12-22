@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventinfo;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +26,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.AnalyticsUtil;
+import com.dancedeets.android.R;
+import com.dancedeets.android.ViewFlyerActivity;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.NamedPerson;
 import com.dancedeets.android.uistate.BundledState;

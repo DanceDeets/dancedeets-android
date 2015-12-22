@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventinfo;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

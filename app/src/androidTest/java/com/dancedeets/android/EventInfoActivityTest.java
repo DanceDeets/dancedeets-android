@@ -8,6 +8,7 @@ import android.support.test.espresso.core.deps.guava.io.Resources;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.util.Log;
 
+import com.dancedeets.android.eventinfo.EventInfoActivity;
 import com.dancedeets.android.models.FullEvent;
 
 import org.json.JSONArray;

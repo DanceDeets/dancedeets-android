@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.eventlist.SearchListActivity;
 import com.dancedeets.android.gcm.RegistrationIntentService;
 import com.dancedeets.android.geo.FetchAddress;
 import com.dancedeets.android.util.VolleySingleton;

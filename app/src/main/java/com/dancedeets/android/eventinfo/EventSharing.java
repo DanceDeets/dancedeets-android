@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventinfo;
 
 import com.dancedeets.android.models.FullEvent;
 

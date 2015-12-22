@@ -1,4 +1,4 @@
-package com.dancedeets.android.eventlist;
+package com.dancedeets.android.eventlist.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

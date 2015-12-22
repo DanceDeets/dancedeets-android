@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventlist;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,9 +17,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.dancedeets.android.eventlist.EventListItem;
-import com.dancedeets.android.eventlist.ListItem;
-import com.dancedeets.android.eventlist.OneboxListItem;
+import com.dancedeets.android.AnalyticsUtil;
+import com.dancedeets.android.DanceDeetsApi;
+import com.dancedeets.android.R;
+import com.dancedeets.android.WebViewActivity;
+import com.dancedeets.android.eventlist.adapter.EventListItem;
+import com.dancedeets.android.eventlist.adapter.ListItem;
+import com.dancedeets.android.eventlist.adapter.OneboxListItem;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.OneboxLink;
 import com.dancedeets.android.uistate.BundledState;
@@ -150,7 +154,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
                 "Tab", mBundled.mSearchOptions.timePeriod.toString(),
                 "Result Count", Integer.toString(mBundled.mEventList.size()),
                 "Onebox Count", Integer.toString(mBundled.mOneboxList.size())
-                );
+        );
 
         onEventListFilled(false);
     }
@@ -306,7 +310,7 @@ public class EventListFragment extends StateFragment<EventListFragment.MyBundled
         }
     }
 
-    protected void startSearch() {
+    public void startSearch() {
         if (getActivity() == null) {
             Log("startSearch called too early, setting mPendingSearch");
             mPendingSearch = true;

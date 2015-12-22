@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventlist;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +11,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.dancedeets.android.R;
 import com.dancedeets.android.geo.PlacesAdapter;
 import com.dancedeets.android.uistate.BundledState;
 import com.dancedeets.android.uistate.RetainedState;

@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventinfo;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,6 +18,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.AdManager;
+import com.dancedeets.android.DanceDeetsApi;
+import com.dancedeets.android.FacebookActivity;
+import com.dancedeets.android.HelpSystem;
+import com.dancedeets.android.R;
+import com.dancedeets.android.SendFeedback;
 import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.ParcelableUtil;

@@ -1,4 +1,4 @@
-package com.dancedeets.android;
+package com.dancedeets.android.eventlist;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -18,6 +18,14 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.dancedeets.android.AdManager;
+import com.dancedeets.android.AnalyticsUtil;
+import com.dancedeets.android.FacebookActivity;
+import com.dancedeets.android.HelpSystem;
+import com.dancedeets.android.R;
+import com.dancedeets.android.SendFeedback;
+import com.dancedeets.android.eventinfo.EventInfoActivity;
+import com.dancedeets.android.eventinfo.EventInfoFragment;
 import com.dancedeets.android.geo.FetchAddress;
 import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
