@@ -30,8 +30,8 @@ import android.util.Log;
 
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.R;
-import com.dancedeets.android.util.VolleySingleton;
 import com.dancedeets.android.models.FullEvent;
+import com.dancedeets.android.util.VolleySingleton;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import java.io.InputStream;
@@ -50,7 +50,7 @@ public class ListenerService extends GcmListenerService {
         String getValue() {
             return value;
         }
-    };
+    }
 
     private static final String TAG = "ListenerService";
 
@@ -61,7 +61,6 @@ public class ListenerService extends GcmListenerService {
      * @param data Data bundle containing message data as key/value pairs.
      *             For Set of keys use data.keySet().
      */
-    // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
         Log.i(TAG, "onMessageReceived");
@@ -71,40 +70,23 @@ public class ListenerService extends GcmListenerService {
         } else {
             Log.d(TAG, "From: " + from);
 
-            if (from.startsWith("/topics/")) {
-                // message received from some topic.
-            } else {
-                // normal downstream message.
-            }
+            //if (from.startsWith("/topics/")) {
+            //}
 
-            // [START_EXCLUDE]
-            /**
-             * Production applications would usually process the message here.
-             * Eg: - Syncing with server.
-             *     - Store message in local database.
-             *     - Update UI.
-             */
-
-            /**
-             * In some cases it may be useful to show a notification indicating to the user
-             * that a message was received.
-             */
             switch(NotificationType.valueOf((String) data.get("notification_type"))) {
                 case EVENT_REMINDER:
-                    sendNotification(data);
+                    sendEventReminder(data);
                     break;
             }
-            // [END_EXCLUDE]
         }
     }
-    // [END receive_message]
 
     /**
      * Create and show a simple notification containing the received GCM message.
      *
      * @param data GCM data received.
      */
-    private void sendNotification(final Bundle data) {
+    private void sendEventReminder(final Bundle data) {
         final String eventId = data.getString("event_id");
         if (eventId == null) {
             Log.e(LOG_TAG, "Got empty event_id from server.");
@@ -119,58 +101,7 @@ public class ListenerService extends GcmListenerService {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
-
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
-                        PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
-                                PendingIntent.FLAG_ONE_SHOT);
-
-                        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                        String startTime = event.getStartTimeStringTimeOnly();
-                        String location = event.getVenue().getName();
-                        notificationBuilder.setSmallIcon(R.drawable.ic_penguin_head_outline)
-                                .setContentTitle(event.getTitle())
-                                .setContentText(startTime + ": " + location)
-                                .setSubText(ListenerService.this.getString(R.string.open_event))
-                                .setAutoCancel(true)
-                                .setSound(defaultSoundUri)
-                                .setCategory(NotificationCompat.CATEGORY_EVENT)
-                                .setStyle(new NotificationCompat.BigTextStyle()
-                                        .bigText(event.getDescription()))
-                                .setContentIntent(pendingIntent);
-
-                        // Sadly, most flyers are not amenable to viewing in the 2:1 ratio wide image views
-                        // used for BigImageStyle notifications.
-                        // So instead, we load a small cover image for use for notification thumbnails.
-                        String imageUrl = event.getThumbnailUrl();
-                        if (imageUrl != null) {
-                            Bitmap bitmap = null;
-                            try {
-                                // Download Image from URL
-                                InputStream input = new java.net.URL(imageUrl).openStream();
-                                // Decode Bitmap
-                                bitmap = BitmapFactory.decodeStream(input);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            Log.e(LOG_TAG, "" + bitmap);
-                            notificationBuilder.setLargeIcon(bitmap);
-                        }
-
-
-                        NotificationManager notificationManager =
-                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                        Uri mapUrl = event.getOpenMapUrl();
-                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUrl);
-                        PendingIntent mapPendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, mapIntent,
-                                PendingIntent.FLAG_ONE_SHOT);
-                        notificationBuilder.addAction(R.drawable.ic_menu_map, "Get Directions", mapPendingIntent);
-                        // The notificationId is used for overwriting existing notifications,
-                        // or ensuring separate notifications for separate events.
-                        int notificationId = eventId.hashCode();
-                        notificationManager.notify(notificationId, notificationBuilder.build());
+                        ListenerService.this.onEventReceived(data, event);
                     }
                 }).start();
             }
@@ -181,4 +112,61 @@ public class ListenerService extends GcmListenerService {
             }
         });
     }
+
+
+    public void onEventReceived(Bundle data, FullEvent event) {
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
+        PendingIntent pendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        String startTime = event.getStartTimeStringTimeOnly();
+        String location = event.getVenue().getName();
+        notificationBuilder.setSmallIcon(R.drawable.ic_penguin_head_outline)
+                .setContentTitle(event.getTitle())
+                .setContentText(startTime + ": " + location)
+                .setSubText(ListenerService.this.getString(R.string.open_event))
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setCategory(NotificationCompat.CATEGORY_EVENT)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(event.getDescription()))
+                .setContentIntent(pendingIntent);
+
+        // Sadly, most flyers are not amenable to viewing in the 2:1 ratio wide image views
+        // used for BigImageStyle notifications.
+        // So instead, we load a small cover image for use for notification thumbnails.
+        String imageUrl = event.getThumbnailUrl();
+        if (imageUrl != null) {
+            Bitmap bitmap = null;
+            try {
+                // Download Image from URL
+                InputStream input = new java.net.URL(imageUrl).openStream();
+                // Decode Bitmap
+                bitmap = BitmapFactory.decodeStream(input);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.e(LOG_TAG, "" + bitmap);
+            notificationBuilder.setLargeIcon(bitmap);
+        }
+
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Uri mapUrl = event.getOpenMapUrl();
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUrl);
+        PendingIntent mapPendingIntent = PendingIntent.getActivity(ListenerService.this, 0 /* Request code */, mapIntent,
+                PendingIntent.FLAG_ONE_SHOT);
+        notificationBuilder.addAction(R.drawable.ic_menu_map, "Get Directions", mapPendingIntent);
+        // The notificationId is used for overwriting existing notifications,
+        // or ensuring separate notifications for separate events.
+        int notificationId = event.getId().hashCode();
+        notificationManager.notify(notificationId, notificationBuilder.build());
+    }
+
 }
