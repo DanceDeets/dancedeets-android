@@ -37,6 +37,8 @@
     <string name="tab_ongoing_events">Evénements en cours</string>
     <string name="tab_past_events">Evénements passés</string>
     <string name="action_share_app">Partager DanceDeets…</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="open_event">Ouvrir l\'événement</string>
 </resources>
 
 

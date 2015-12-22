@@ -37,4 +37,6 @@
     <string name="tab_ongoing_events">진행중인 이벤트</string>
     <string name="tab_past_events">지난 이벤트</string>
     <string name="action_share_app">공유 DanceDeets</string>
+    <string name="action_settings">설정</string>
+    <string name="open_event">이벤트 보기</string>
 </resources>
