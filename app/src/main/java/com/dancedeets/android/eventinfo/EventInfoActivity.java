@@ -25,6 +25,7 @@ import com.dancedeets.android.HelpSystem;
 import com.dancedeets.android.R;
 import com.dancedeets.android.SendFeedback;
 import com.dancedeets.android.SettingsActivity;
+import com.dancedeets.android.gcm.ListenerService;
 import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
 import com.dancedeets.android.models.ParcelableUtil;
@@ -260,6 +261,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
     }
 
     public boolean handleIntent(Intent intent) {
+        ListenerService.clearAddedEventTitles();
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             Uri url = AppLinks.getTargetUrlFromInboundIntent(this, getIntent());
             if (url == null) {

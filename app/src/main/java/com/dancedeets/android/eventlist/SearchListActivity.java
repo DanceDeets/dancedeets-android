@@ -27,6 +27,7 @@ import com.dancedeets.android.SendFeedback;
 import com.dancedeets.android.SettingsActivity;
 import com.dancedeets.android.eventinfo.EventInfoActivity;
 import com.dancedeets.android.eventinfo.EventInfoFragment;
+import com.dancedeets.android.gcm.ListenerService;
 import com.dancedeets.android.geo.FetchAddress;
 import com.dancedeets.android.geo.FetchLocation;
 import com.dancedeets.android.models.FullEvent;
@@ -297,6 +298,7 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     }
 
     private void handleIntent(Intent intent) {
+        ListenerService.clearAddedEventTitles();
         Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Bundle b = intent.getExtras();
