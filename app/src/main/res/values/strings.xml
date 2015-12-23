@@ -57,4 +57,7 @@
     <string name="notifications_vibrate_summary">Vibrate on incoming notifications</string>
     <string name="notifications_sound_summary">Play sound on incoming notifications</string>
     <string name="notification_categories">Notification Categories</string>
+    <string name="event_added">New Dance Event</string>
+    <string name="see_all_events">See All Events</string>
+    <string name="n_events">%1$d events</string>
 </resources>

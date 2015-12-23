@@ -41,7 +41,7 @@
             />
 
         <CheckBoxPreference
-            android:key="notifications_eventsAdded"
+            android:key="notifications_addedEvents"
             android:title="@string/notifications_eventsAdded"
             android:summary="@string/notifications_eventsAdded_summary"
             android:dependency="notifications_global"
