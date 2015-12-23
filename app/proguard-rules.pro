@@ -32,7 +32,7 @@
 -dontwarn com.mixpanel.** 
 
 
-# For Google Play Services
+# BEGIN For Google Play Services
 -keep class * extends java.util.ListResourceBundle {
     protected java.lang.Object[][] getContents();
 }
@@ -49,4 +49,5 @@
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
+# END For Google Play Services
 
