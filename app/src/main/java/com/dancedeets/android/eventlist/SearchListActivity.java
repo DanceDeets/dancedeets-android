@@ -162,10 +162,8 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
 
     public void onStart() {
         super.onStart();
-        if (mBundled.mSearchOptions.isEmpty()) {
-            mFetchAddress = new FetchAddress();
-            mFetchAddress.onStart(this, this);
-        }
+        mFetchAddress = new FetchAddress();
+        mFetchAddress.onStart(this, this);
         mFetchLocation = new FetchLocation();
         mFetchLocation.onStart(this, this);
     }
@@ -205,6 +203,10 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
 
     @Override
     public void onAddressFound(Location location, Address address) {
+        // If we've already got search results, then don't bother with what the geocode returns.
+        if (!mBundled.mSearchOptions.isEmpty()) {
+            return;
+        }
         String optionalSubLocality = (address != null) ? " (with SubLocality " + address.getSubLocality() + ")" : "";
         Crashlytics.log(Log.INFO, LOG_TAG, "Address found: " + address + optionalSubLocality);
         if (address != null) {
@@ -298,11 +300,13 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
         Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Bundle b = intent.getExtras();
-            String query = "";
+            // If they gave us a search query, search that...
             if (b != null) {
-                query = b.getString(SearchManager.QUERY, "");
+                String query = b.getString(SearchManager.QUERY, "");
+                if (!query.equals("")) {
+                    startSearchFor(new SearchOptions("", query));
+                }
             }
-            startSearchFor(new SearchOptions("", query));
         }
     }
 

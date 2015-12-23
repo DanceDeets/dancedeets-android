@@ -232,8 +232,9 @@ public class ListenerService extends GcmListenerService {
 
         Intent intent;
         if (addedEventTitles.size() > 1) {
-            // We have multiple events added, so just drop them on the search page
-            intent = new Intent(Intent.ACTION_SEARCH);
+            // We have multiple events added, so just drop them on the main search page
+            // But we don't use ACTION_SEARCH since we have nothing to specifically search for.
+            intent = new Intent(Intent.ACTION_MAIN);
             intent.setPackage(getPackageName());
         } else {
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
