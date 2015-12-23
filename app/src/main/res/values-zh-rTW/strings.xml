@@ -52,4 +52,9 @@
     <string name="notification_categories">通知類別</string>
     <string name="notifications_vibrate_summary"></string>
     <string name="notifications_upcomingEvents_summary"></string>
+    <string name="event_added">新的舞蹈活動</string>
+    <string name="see_all_events">查看所有活動</string>
+    <plurals name="n_events">
+        <item quantity="other">%1$d次活動</item>
+    </plurals>
 </resources>

@@ -261,7 +261,7 @@ public class ListenerService extends GcmListenerService {
             }
             notificationBuilder
                     .setSubText(getString(R.string.see_all_events))
-                    .setContentText(String.format(getString(R.string.n_events), addedEventTitles.size()))
+                    .setContentText(String.format(getResources().getQuantityString(R.plurals.n_events, addedEventTitles.size(), addedEventTitles.size())))
                     .setStyle(inboxStyle);
         } else {
             notificationBuilder

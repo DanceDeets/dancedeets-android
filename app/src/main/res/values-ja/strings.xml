@@ -52,4 +52,9 @@
     <string name="notifications_upcomingEvents_summary"></string>
     <string name="notifications_vibrate_summary"></string>
     <string name="notification_categories">通知カテゴリ</string>
+    <string name="event_added">新しいダンスのイベント</string>
+    <string name="see_all_events">すべてのイベントを見ます</string>
+    <plurals name="n_events">
+        <item quantity="other">%1$dイベント</item>
+    </plurals>
 </resources>

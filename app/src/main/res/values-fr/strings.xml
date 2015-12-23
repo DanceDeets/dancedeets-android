@@ -14,7 +14,7 @@
     <string name="hint_enter_keywords">Entrer des mots-clés optionnels</string>
     <string name="cancel">Annuler</string>
     <string name="menu_translate">Traduire</string>
-    <string name="filter_title_viewevent">Evénement DanceDeets</string>
+    <string name="filter_title_viewevent">Événement DanceDeets</string>
     <string name="loading">Chargement…</string>
     <string name="login_bubble">Envie de danser? On a tous les \'deet’ails qu’il vous faut!\n\nCliquez Entrer ci-dessous, et accédez à tous les événements de danse du monde, aussi proches que loins. Votre compte sera uniquement utilisé afin de vous aider à trouver et partager des évenements de danse. (Zéro spam garanti!)</string>
     <string name="login_explain_why_login">Pourquoi s’identifier via Facebook?</string>
@@ -30,9 +30,9 @@
     <string name="enter_feedback_here">Envoyer vos suggestions ici:</string>
     <string name="flyer_title">Flyer pour %1$s</string>
     <string name="couldnt_detect_location">Nous ne pouvons détecter votre emplacement. Entrez votre location ici:</string>
-    <string name="events_near">Evénements à proximité de %1$s</string>
-    <string name="events_near_with_keyword">Evénements à proximité de %1$s contenant les mots-clés "%2$s"</string>
-    <string name="events_with_keyword">Evénements contenant les mots-clés "%1$s"</string>
+    <string name="events_near">Événements à proximité de %1$s</string>
+    <string name="events_near_with_keyword">Événements à proximité de %1$s contenant les mots-clés "%2$s"</string>
+    <string name="events_with_keyword">Événements contenant les mots-clés "%1$s"</string>
     <string name="tab_upcoming_events">Evènements à venir</string>
     <string name="tab_ongoing_events">Evénements en cours</string>
     <string name="tab_past_events">Evénements passés</string>
@@ -52,6 +52,12 @@
     <string name="notifications_sound_summary"></string>
     <string name="notification_categories">Catégories de notification</string>
     <string name="notifications_vibrate_summary"></string>
+    <string name="event_added">Nouvel Événement de Danse</string>
+    <string name="see_all_events">Voir tous les événements</string>
+    <plurals name="n_events">
+        <item quantity="one">%1$d événement</item>
+        <item quantity="other">%1$d événements</item>
+    </plurals>
 </resources>
 
 

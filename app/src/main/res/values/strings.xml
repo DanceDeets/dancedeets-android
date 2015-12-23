@@ -59,5 +59,8 @@
     <string name="notification_categories">Notification Categories</string>
     <string name="event_added">New Dance Event</string>
     <string name="see_all_events">See All Events</string>
-    <string name="n_events">%1$d events</string>
+    <plurals name="n_events">
+        <item quantity="one">%1$d event</item>
+        <item quantity="other">%1$d events</item>
+    </plurals>
 </resources>

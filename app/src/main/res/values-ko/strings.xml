@@ -52,4 +52,9 @@
     <string name="notifications_upcomingEvents_summary"></string>
     <string name="notifications_vibrate_summary"></string>
     <string name="notification_categories">알림 카테고리</string>
+    <string name="event_added">새로운 댄스 이벤트</string>
+    <string name="see_all_events">모든 이벤트보기 </string>
+    <plurals name="n_events">
+        <item quantity="other">%1$d 이벤트</item>
+    </plurals>
 </resources>
