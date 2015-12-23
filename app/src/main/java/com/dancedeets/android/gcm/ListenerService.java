@@ -235,7 +235,6 @@ public class ListenerService extends GcmListenerService {
             // We have multiple events added, so just drop them on the search page
             intent = new Intent(Intent.ACTION_SEARCH);
             intent.setPackage(getPackageName());
-            //TODO(notify): figure out why this intent doesn't work
         } else {
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getUrl()));
             intent.setPackage(getPackageName());
