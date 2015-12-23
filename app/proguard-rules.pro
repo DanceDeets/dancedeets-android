@@ -19,7 +19,7 @@
 # So stack traces are easy... (adds ~100KB)
 -dontobfuscate
 
-# Just of general interst...
+# Just of general interest...
 -printseeds seeds.txt
 -printusage unused.txt
 -printmapping mapping.txt

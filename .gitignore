@@ -1,7 +1,11 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
-/build
-/facebook/build
+.gradle
+.idea/workspace.xml
+.idea/libraries
+app/app-release.apk
+app/manifest-merger-release-report.txt
+app/seeds.txt
+app/unused.txt
+build
+facebook/build
+local.properties
