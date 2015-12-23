@@ -297,7 +297,12 @@ public class SearchListActivity extends FacebookActivity implements StateHolder<
     private void handleIntent(Intent intent) {
         Crashlytics.log(Log.INFO, LOG_TAG, "handleIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            startSearchFor(new SearchOptions("", intent.getStringExtra(SearchManager.QUERY)));
+            Bundle b = intent.getExtras();
+            String query = "";
+            if (b != null) {
+                query = b.getString(SearchManager.QUERY, "");
+            }
+            startSearchFor(new SearchOptions("", query));
         }
     }
 

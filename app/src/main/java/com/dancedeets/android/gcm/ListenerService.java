@@ -216,6 +216,7 @@ public class ListenerService extends GcmListenerService {
         notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
+    // We synchronize access to edit/view the addedEventTitles list.
     public synchronized static void clearAddedEventTitles() {
         //TODO(notify): we need to call this from the proper opened-the-app notifications (view, search, etc?)
         addedEventTitles.clear();
