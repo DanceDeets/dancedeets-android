@@ -17,7 +17,4 @@
     <screenName name="com.dancedeets.android.ViewFlyerActivity">
         Flyer View
     </screenName>
-
-    <!--  The following value should be replaced with correct property id. -->
-    <string name="ga_trackingId">UA-18831479-1</string>
 </resources>
