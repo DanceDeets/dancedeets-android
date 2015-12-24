@@ -175,7 +175,7 @@
         <activity android:name="com.mixpanel.android.surveys.SurveyActivity"
             android:theme="@style/com_mixpanel_android_SurveyActivityTheme"/>
 
-        <provider android:authorities="com.facebook.app.FacebookContentProvider2347064084"
+        <provider android:authorities="com.facebook.app.FacebookContentProvider2347064084${applicationIdSuffix}"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true"/>
 

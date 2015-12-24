@@ -29,6 +29,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            manifestPlaceholders = [ applicationIdSuffix:".debug"]
         }
         release {
             minifyEnabled true
