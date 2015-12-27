@@ -53,18 +53,33 @@ public class RegistrationIntentService extends IntentService {
 
         AccessToken accessToken = intent.getParcelableExtra(FB_ACCESS_TOKEN);
 
-        try {
-            // Initially this call goes out to the network to retrieve the token, subsequent calls
-            // are local. It is blocking, which is why we run this in a separate Service.
-            // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
-            // See https://developers.google.com/cloud-messaging/android/start for details on this file.
-            InstanceID instanceID = InstanceID.getInstance(this);
-            String deviceToken = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
-                    GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+        String deviceToken = null;
+        int numTries = 0;
+        int maxTries = 3;
+        Exception finalException = null;
+
+        // Occasionally we get an IOException(SERVICE_NOT_AVAILABLE),
+        // so let's retry, per the advice on stack overflow:
+        // http://stackoverflow.com/questions/25129611/gcm-register-service-not-available
+        while (deviceToken == null && numTries < maxTries) {
+            numTries++;
+            try {
+                // Initially this call goes out to the network to retrieve the token, subsequent calls
+                // are local. It is blocking, which is why we run this in a separate Service.
+                // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
+                // See https://developers.google.com/cloud-messaging/android/start for details on this file.
+                InstanceID instanceID = InstanceID.getInstance(this);
+                deviceToken = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
+                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            } catch (Exception e) {
+                Crashlytics.log(Log.ERROR, TAG, "Failed to complete token refresh");
+                finalException = e;
+            }
+        }
+        if (deviceToken != null) {
             sendRegistrationToServer(accessToken, deviceToken);
-        } catch (Exception e) {
-            Crashlytics.log(Log.ERROR, TAG, "Failed to complete token refresh");
-            Crashlytics.logException(e);
+        } else if (finalException != null) {
+            Crashlytics.logException(finalException);
         }
     }
 
