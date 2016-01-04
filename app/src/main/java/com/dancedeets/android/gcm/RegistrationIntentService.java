@@ -32,13 +32,13 @@ import com.google.android.gms.iid.InstanceID;
 
 public class RegistrationIntentService extends IntentService {
 
-    private static final String TAG = "RegIntentService";
+    private static final String LOG_TAG = "RegIntentService";
     private static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
 
     public static final String FB_ACCESS_TOKEN = "fbAccessToken";
 
     public RegistrationIntentService() {
-        super(TAG);
+        super(LOG_TAG);
     }
 
     @Override
@@ -52,6 +52,10 @@ public class RegistrationIntentService extends IntentService {
         }
 
         AccessToken accessToken = intent.getParcelableExtra(FB_ACCESS_TOKEN);
+        if (accessToken == null) {
+            Crashlytics.log(Log.ERROR, LOG_TAG, "Received an empty accessToken in our intent parcel.");
+            return;
+        }
 
         String deviceToken = null;
         int numTries = 0;
@@ -72,7 +76,7 @@ public class RegistrationIntentService extends IntentService {
                 deviceToken = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             } catch (Exception e) {
-                Crashlytics.log(Log.ERROR, TAG, "Failed to complete token refresh");
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Failed to complete token refresh");
                 finalException = e;
             }
         }
