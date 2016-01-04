@@ -96,27 +96,31 @@ public class ListenerService extends GcmListenerService {
             //if (from.startsWith("/topics/")) {
             //}
 
-            switch(NotificationType.valueOf((String) data.get("notification_type"))) {
-                case EVENT_REMINDER:
-                    if (notificationsEnabled && notificationsUpcomingEventsEnabled) {
-                        loadEvent(data.getString("event_id"), new OnEventLoadedListener() {
-                            @Override
-                            public void onEventReceived(FullEvent event) {
-                                ListenerService.this.sendUpcomingEventReminder(event);
-                            }
-                        });
-                    }
-                    break;
-                case EVENT_ADDED:
-                    if (notificationsEnabled && notificationsAddedEventsEnabled) {
-                        loadEvent(data.getString("event_id"), new OnEventLoadedListener() {
-                            @Override
-                            public void onEventReceived(FullEvent event) {
-                                ListenerService.this.sendAddedEventReminder(event);
-                            }
-                        });
-                    }
-                    break;
+            try {
+                switch (NotificationType.valueOf((String)data.get("notification_type"))) {
+                    case EVENT_REMINDER:
+                        if (notificationsEnabled && notificationsUpcomingEventsEnabled) {
+                            loadEvent(data.getString("event_id"), new OnEventLoadedListener() {
+                                @Override
+                                public void onEventReceived(FullEvent event) {
+                                    ListenerService.this.sendUpcomingEventReminder(event);
+                                }
+                            });
+                        }
+                        break;
+                    case EVENT_ADDED:
+                        if (notificationsEnabled && notificationsAddedEventsEnabled) {
+                            loadEvent(data.getString("event_id"), new OnEventLoadedListener() {
+                                @Override
+                                public void onEventReceived(FullEvent event) {
+                                    ListenerService.this.sendAddedEventReminder(event);
+                                }
+                            });
+                        }
+                        break;
+                }
+            } catch (Exception e) {
+                Crashlytics.log(Log.ERROR, LOG_TAG, "Unknown notification_type: " + data.get("notification_type"));
             }
         }
     }
