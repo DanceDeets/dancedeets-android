@@ -40,8 +40,12 @@ import com.dancedeets.android.util.VolleySingleton;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 public class ListenerService extends GcmListenerService {
 
@@ -62,8 +66,9 @@ public class ListenerService extends GcmListenerService {
 
     private static int EVENT_ADDED_NOTIFICATION_ID = -1;
 
-    // A list of event titles. Can be updated/read in many places, so need to synchrnoize.
-    private static List<String> addedEventTitles = new ArrayList<>();
+    // A list of event titles. Can be updated/read in many places, so need to synchronize.
+    // We use an ArrayList to make it easier to sort down below.
+    private static ArrayList<FullEvent> addedEventTitles = new ArrayList<>();
 
 
     public abstract class OnEventLoadedListener implements DanceDeetsApi.OnEventReceivedListener {
@@ -224,15 +229,40 @@ public class ListenerService extends GcmListenerService {
     }
 
     // We synchronize access to edit/view the addedEventTitles list.
-    public synchronized static void clearAddedEventTitles() {
-        addedEventTitles.clear();
+    public static void clearAddedEventTitles() {
+        synchronized (addedEventTitles) {
+            addedEventTitles.clear();
+        }
+    }
+
+    //
+    public static DateFormat getMonthDayFormatter() {
+        SimpleDateFormat sdf = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.MEDIUM);
+        sdf.applyPattern(sdf.toPattern().replaceAll("[^\\p{Alpha}'年]*y+[^\\p{Alpha}'年]*", ""));
+        return sdf;
     }
 
     public synchronized void sendAddedEventReminder(FullEvent event) {
+        synchronized (addedEventTitles) {
+            innerSendAddedEventReminder(event);
+        }
+    }
+
+    // Only call this from synchrnoized methods, we separated it out to make the synchronization less indented
+    private void innerSendAddedEventReminder(FullEvent event) {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        addedEventTitles.add(event.getTitle());
+        addedEventTitles.add(event);
+        Collections.sort(addedEventTitles, new Comparator<FullEvent>() {
+            @Override
+            public int compare(FullEvent a, FullEvent b) {
+                // Would Long.compare, but it's not available until API 19, so just inline it here:
+                long lhs = a.getStartTimeLong();
+                long rhs = b.getStartTimeLong();
+                return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
+            }
+        });
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ListenerService.this);
 
@@ -263,8 +293,10 @@ public class ListenerService extends GcmListenerService {
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
                     .setBigContentTitle(getString(R.string.event_added));
             inboxStyle.setSummaryText(getString(R.string.see_all_events));
-            for (String eventTitle: addedEventTitles) {
-                inboxStyle.addLine(eventTitle);
+            for (FullEvent eachEvent: addedEventTitles) {
+                Date eventDate = eachEvent.getStartTime();
+                DateFormat format = getMonthDayFormatter();
+                inboxStyle.addLine(format.format(eventDate) + ": " + eachEvent.getTitle());
             }
             notificationBuilder
                     .setSubText(getString(R.string.see_all_events))
