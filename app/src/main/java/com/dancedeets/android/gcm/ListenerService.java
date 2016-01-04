@@ -235,7 +235,6 @@ public class ListenerService extends GcmListenerService {
         }
     }
 
-    //
     public static DateFormat getMonthDayFormatter() {
         SimpleDateFormat sdf = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.MEDIUM);
         sdf.applyPattern(sdf.toPattern().replaceAll("[^\\p{Alpha}'年]*y+[^\\p{Alpha}'年]*", ""));
