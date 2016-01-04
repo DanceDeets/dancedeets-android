@@ -19,13 +19,13 @@
             android:defaultValue="true"
             />
 
-        <CheckBoxPreference
+        <!--CheckBoxPreference
             android:key="notifications_vibrate"
             android:title="@string/notifications_vibrate"
             android:summary="@string/notifications_vibrate_summary"
             android:dependency="notifications_global"
             android:defaultValue="true"
-            />
+            /-->
 
     </PreferenceCategory>
 

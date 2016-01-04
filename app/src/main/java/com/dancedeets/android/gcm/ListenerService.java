@@ -21,12 +21,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -198,7 +200,8 @@ public class ListenerService extends GcmListenerService {
             Uri defaultSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.happening);
             notificationBuilder.setSound(defaultSoundUri);
         }
-        if (sharedPref.getBoolean(SettingsActivity.Notifications.VIBRATE, true)) {
+        boolean hasVibratePermission = ContextCompat.checkSelfPermission(this, "android.permission.VIBRATE") == PackageManager.PERMISSION_GRANTED;
+        if (hasVibratePermission && sharedPref.getBoolean(SettingsActivity.Notifications.VIBRATE, true)) {
             notificationBuilder.setVibrate(new long[]{0, 250, 250, 250});
         }
 
