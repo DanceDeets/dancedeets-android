@@ -202,6 +202,7 @@ public class DanceDeetsApi {
                         VolleySingleton volley = VolleySingleton.getInstance();
                         volley.prefetchThumbnail(event.getThumbnailUrl());
                     }
+                    eventList.add(event);
                 } catch (JSONException e) {
                     String eventId = "";
                     try {
@@ -211,7 +212,6 @@ public class DanceDeetsApi {
                     Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException on event" + eventId + ": " + e);
                     Crashlytics.logException(e);
                 }
-                eventList.add(event);
             }
 
             //TODO: Return a full Results object containing events and oneboxes
@@ -230,6 +230,7 @@ public class DanceDeetsApi {
                 try {
                     JSONObject jsonObject = jsonOneboxList.getJSONObject(i);
                     link = OneboxLink.parse(jsonObject);
+                    oneboxList.add(link);
                 } catch (JSONException e) {
                     String data = "";
                     try {
@@ -239,7 +240,6 @@ public class DanceDeetsApi {
                     Crashlytics.log(Log.ERROR, LOG_TAG, "JSONException on object " + data + ": " + e);
                     Crashlytics.logException(e);
                 }
-                oneboxList.add(link);
             }
 
             if (mOnResultsReceivedListener != null) {
