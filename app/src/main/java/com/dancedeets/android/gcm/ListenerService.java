@@ -68,7 +68,7 @@ public class ListenerService extends GcmListenerService {
 
     // A list of event titles. Can be updated/read in many places, so need to synchronize.
     // We use an ArrayList to make it easier to sort down below.
-    private static ArrayList<FullEvent> addedEventTitles = new ArrayList<>();
+    private final static ArrayList<FullEvent> addedEventTitles = new ArrayList<>();
 
 
     public abstract class OnEventLoadedListener implements DanceDeetsApi.OnEventReceivedListener {
