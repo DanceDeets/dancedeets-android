@@ -24,6 +24,7 @@ import com.dancedeets.android.util.VolleySingleton;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -291,5 +292,10 @@ public class LoginActivity extends FacebookActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void logout() {
+        AnalyticsUtil.track("Logout");
+        LoginManager.getInstance().logOut();
     }
 }

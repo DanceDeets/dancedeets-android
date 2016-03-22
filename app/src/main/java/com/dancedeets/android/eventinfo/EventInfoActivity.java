@@ -22,6 +22,7 @@ import com.dancedeets.android.AdManager;
 import com.dancedeets.android.DanceDeetsApi;
 import com.dancedeets.android.FacebookActivity;
 import com.dancedeets.android.HelpSystem;
+import com.dancedeets.android.LoginActivity;
 import com.dancedeets.android.R;
 import com.dancedeets.android.SendFeedback;
 import com.dancedeets.android.SettingsActivity;
@@ -34,7 +35,6 @@ import com.dancedeets.android.uistate.RetainedState;
 import com.dancedeets.android.uistate.StateHolder;
 import com.dancedeets.android.uistate.StateUtil;
 import com.dancedeets.android.util.VolleySingleton;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 
 import org.json.JSONException;
@@ -339,7 +339,7 @@ public class EventInfoActivity extends FacebookActivity implements StateHolder<B
                 HelpSystem.openHelp(this);
                 return true;
             case R.id.action_logout:
-                LoginManager.getInstance().logOut();
+                LoginActivity.logout();
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
