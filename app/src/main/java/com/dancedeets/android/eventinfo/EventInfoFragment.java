@@ -292,7 +292,7 @@ public class EventInfoFragment extends StateFragment<
                 openLocationOnMap();
                 return true;
             case R.id.action_view_facebook:
-                AnalyticsUtil.trackEvent("Open in Facebook", mBundled.mEvent);
+                AnalyticsUtil.trackEvent("Open Source", mBundled.mEvent);
                 Uri facebookUrl = Uri.parse(getEvent().getFacebookUrl());
                 intent = new Intent(Intent.ACTION_VIEW, facebookUrl);
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
