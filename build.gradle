@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.0.0'
         // Causes MissingTranslation problems strings in auto-generated xml files:
         // https://code.google.com/p/analytics-issues/issues/detail?id=733
         // Also causes problems with xml/global_tracker.xml only being generated for some builds.
